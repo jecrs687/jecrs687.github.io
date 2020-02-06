@@ -1,2 +1,2 @@
 # jecrs687.github.io
-my site: <a href='https://jecrs.github.io'>jecrs687</a>
+my site: <a href='https://jecrs687.github.io'>jecrs687</a>
