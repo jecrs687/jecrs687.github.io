@@ -83,7 +83,7 @@ function App() {
           <Tab>
             {data.skills[`${value}`].map((value, index,array)=> 
           <div className='skill' key={index}>
-          <h5>{value.name}</h5> 
+          <h6>{value.name}</h6> 
           <div className='box-percent'>
           <h4>{value.percent}%</h4>
           <Circle percent={`${value.percent}`} 

@@ -274,13 +274,15 @@ color: #f1f1f1;
 .App-data{
   margin: 10px;
   lighting-color:white;
-  border: #111111;
+  border: #999999;
   shape-outside: margin-box;
-  background: linear-gradient(146deg,#ff328411,#010101,#010101, #ff328411);    
-  border-width: 2px;
+  border-width: 0.1px;
   border-style: solid;
-  box-shadow: #444 0px 0px 10px;
-  padding: 10px;
+  background:  #ff9ec5;
+  height: max-content;
+  box-shadow: #bbb 1vmin 1vmin 2px;
+  padding: 5vmin;
+  border-radius: 4vmin;
   flex: 1;
   color: #f1f1f1;
 }
@@ -318,6 +320,9 @@ color: #f1f1f1;
   align-items: center;
   justify-content: center;
 }
+.skill h6{
+  flex:1;
+}
 .skill .box-percent{
   display: flex;
   flex:1;
@@ -326,6 +331,7 @@ color: #f1f1f1;
 }
 .skill h4{
   position: absolute;
+  flex:1;
   top: 50%;
   align-self: center;
 }

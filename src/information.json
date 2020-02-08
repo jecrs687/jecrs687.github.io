@@ -14,7 +14,11 @@
 "city":"teresina",
 "address":"2960, Av.Duque de Caxias",
 "skills":{
-"languages":[{"name":"Português", "percent":100}, {"name":"italiano", "percent":95},{"name":"English", "percent":70}],
+"languages":[
+    {"name":"Português", "percent":100},
+    {"name":"italiano", "percent":95},
+    {"name":"English", "percent":70}
+],
 "tecnologias":[
     {"name":"Reactjs", "percent":80},
     {"name":"React-native", "percent":90},
@@ -26,7 +30,9 @@
     {"name":"C", "percent":95},
     {"name":"AWS", "percent":60},
     {"name":"Google Cloud", "percent":60}
-
+],
+"Others":[
+    {"name": "Photoshop","percent": 80 }
 ]
 
 }}
