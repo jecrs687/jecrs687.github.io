@@ -4,8 +4,24 @@ import './App.css';
 import { TiSocialFacebookCircular,TiSocialInstagramCircular,TiSocialGithubCircular,TiSocialLinkedinCircular } from "react-icons/ti";
 import {  Circle } from 'rc-progress';
 const data = require('./information.json')
+function Skill({value}){
+return(  
+<li>
+          <div className='skill'>
+          <h6>{value.name}</h6> 
+          <div className='box-percent'>
+          <Circle percent={`${value.percent}`} 
+          strokeWidth='10'
+          strokeColor='#ffcce0' 
+          className='circle'
+          />
+         <h4>{value.percent}%</h4>
+          </div>
+          </div>   
+          </li> 
+          )
+}
 function App() {
-
   return (
     <div className="App">
       <header className="App-header">
@@ -57,45 +73,35 @@ function App() {
         </div>
       <div style={{paddingRight:'75px', paddingLeft:'75px'}} className='App-data'>
       <h4>Bio</h4>
-      <i><p>
+      <div>
+      <p>
   "{data.bio}"
-         </p>"</i>
-
+         </p>
+         </div>
       </div>
       </div>
       <div className='App-data2'>
         <h1>Skills</h1>
-        {        
+        <ul className='grip1'>{        
+          
           Object.keys(data.skills).map(
             (value,index)=>
-          <div key={index}>
+          <li key={index}>
             
             <h3>{value}</h3>
         <div style={{flexDirection:'column',display:'flex'}}>          
         <ul>
 
             {data.skills[`${value}`].map((value, index,array)=> 
-          <li>
-          <div className='skill' key={index}>
-          <h6>{value.name}</h6> 
-          <div className='box-percent'>
-          <h4>{value.percent}%</h4>
-          <Circle percent={`${value.percent}`} 
-          strokeWidth='10'
-          strokeColor='#ffcce0' 
-          className='circle'
-          />
-          </div>
-          </div>   
-          </li> 
+          <Skill value={value} key={index}/>
           )}
         </ul>
           
           
         </div>
-            </div>
+            </li>
           )
-        }
+        }</ul>
       </div>
       </body> 
       <p>Powered by <a href='/#'>me</a></p>
