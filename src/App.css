@@ -140,6 +140,9 @@ color: #f1f1f1;
   .App-body{
     flex-direction: column;
   }
+  .body-box{
+    flex-direction: column;
+  }
   .box-icon{
     flex-direction: column;
     top:10px;
@@ -149,35 +152,7 @@ color: #f1f1f1;
     color: #f1f1f1;
   }
 }
-@media screen and (min-width: 1000px)   {
-  .box{
-    height: 70%;
-  }
 
-}
-@media screen and (max-width: 600px) {
-  .box{
-    flex-direction: column;
-    width: 70%;
-  }
-  .icon{
-    height: 5vmax;
-    width: 5vmax;
-  }
-  .box-icon{
-    flex-direction: column;
-    top:10px;
-    border-radius: 10px;
-    right:10px;
-    background-color: #ff80b2;
-  }
-  .bio{
-    font-size: 2.5vmax;
-  }
-  .App-body{
-    flex-direction: column;
-  }
-}
 @keyframes App-logo-down {
   0% {
     opacity: 0;
@@ -269,22 +244,36 @@ color: #f1f1f1;
 
 .App-body{
   display: flex;
+  flex-direction: column;
   flex:1;
   }
+.body-box{
+  display:flex;
+  flex:1
+}
 .App-data{
-  margin: 10px;
+  margin: 4vmin;
   lighting-color:white;
-  border: #999999;
+  border: #ddd;
   shape-outside: margin-box;
-  border-width: 0.1px;
+  border-width: 1px;
   border-style: solid;
+  align-items: center;
+  justify-content: center;
   background:  #ff9ec5;
-  height: max-content;
-  box-shadow: #bbb 1vmin 1vmin 2px;
+  height: min-content;
+  box-shadow: #ddd 1.5vmin 1.5vmin 0px;
   padding: 5vmin;
-  border-radius: 4vmin;
+  padding-top: 7vmin;
+  padding-bottom: 7vmin;
+  border-radius: 10vmax;
+  font-weight: bold;
+  font-family:'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
   flex: 1;
   color: #f1f1f1;
+}
+.App-data p{
+    flex:1
 }
 .App-data2{
   margin: 10px;
@@ -298,6 +287,11 @@ color: #f1f1f1;
   align-items: center;
   justify-content: center;
   box-shadow: #444 0px 0px 10px;
+}
+.App-data2 ul{
+list-style: none;
+display: grid;
+grid-template-columns: repeat(2,1fr);
 }
 .rows{
   display: flex;
@@ -340,4 +334,42 @@ color: #f1f1f1;
   height: 20vmin;
   width: 20vmin;
   flex:1;
+}
+@media screen and (min-width: 1000px)   {
+  .box{
+    height: 70%;
+  }
+
+}
+@media screen and (max-width: 600px) {
+  .box{
+    flex-direction: column;
+    width: 70%;
+  }
+  .icon{
+    height: 5vmax;
+    width: 5vmax;
+  }
+  .box-icon{
+    flex-direction: column;
+    top:10px;
+    border-radius: 10px;
+    right:10px;
+    background-color: #ff80b2;
+  }
+  .bio{
+    font-size: 2.5vmax;
+  }
+  .App-body{
+    flex-direction: column;
+  }
+  .body-box{
+    flex-direction: column;
+  }
+}
+
+@media screen and (max-width: 400px) {
+  .App-data2 ul{
+    grid-template-columns: repeat(1,1fr);
+    }
 }

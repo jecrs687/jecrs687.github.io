@@ -4,22 +4,6 @@ import './App.css';
 import { TiSocialFacebookCircular,TiSocialInstagramCircular,TiSocialGithubCircular,TiSocialLinkedinCircular } from "react-icons/ti";
 import {  Circle } from 'rc-progress';
 const data = require('./information.json')
-function Row({children}){
-  console.log(children)
-  return (<div className="rows">
-    {children[1]!=undefined?children: <Row>{children[0]}<div className='skill' style={{border:'none'}}></div></Row>}
-  </div>)
-}
-function Tab({children}){
-  return(
-    children.map(
-      (value, index, array)=>
-  index%2===0?
-  <Row key={index}>{value}{array[index+1]}</Row>
-  :null
-  )
-  )
-}
 function App() {
 
   return (
@@ -38,7 +22,7 @@ function App() {
           </div>
           <div className='bio'>
             <h1>{data.nick}</h1>
-            <h5 style={{fontWeight:300}}>{data.work}</h5>
+            <h5 style={{fontWeight:300}}>{data.name}, <br/>{data.work}</h5>
                 I LOVE:
                 <ul>
                 {data.loves.map((value,index)=><li key={index} style={{fontFamily:'sans-serif', fontWeight:100}}>{value}</li>)}
@@ -57,6 +41,7 @@ function App() {
       </header>
 
        <body className='App-body'>
+         <div className='body-box'>
       <div className='App-data'>
           <h1>Basic Information</h1>
           <ul style={{textAlign:'justify'}}>
@@ -70,18 +55,27 @@ function App() {
           <p>
           </p>
         </div>
+      <div style={{paddingRight:'75px', paddingLeft:'75px'}} className='App-data'>
+      <h4>Bio</h4>
+      <i><p>
+  "{data.bio}"
+         </p>"</i>
+
+      </div>
+      </div>
       <div className='App-data2'>
         <h1>Skills</h1>
-        
-        {
+        {        
           Object.keys(data.skills).map(
             (value,index)=>
           <div key={index}>
             
             <h3>{value}</h3>
         <div style={{flexDirection:'column',display:'flex'}}>          
-          <Tab>
+        <ul>
+
             {data.skills[`${value}`].map((value, index,array)=> 
+          <li>
           <div className='skill' key={index}>
           <h6>{value.name}</h6> 
           <div className='box-percent'>
@@ -92,11 +86,13 @@ function App() {
           className='circle'
           />
           </div>
-          </div>
+          </div>   
+          </li> 
           )}
-          </Tab>
+        </ul>
+          
+          
         </div>
-
             </div>
           )
         }
