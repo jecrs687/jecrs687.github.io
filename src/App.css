@@ -246,10 +246,14 @@ color: #f1f1f1;
   display: flex;
   flex-direction: column;
   flex:1;
+  background: linear-gradient(#000,#555);
+
+
   }
 .body-box{
   display:flex;
-  flex:1
+  flex:1;
+
 }
 .App-data{
   display:flex;
@@ -287,7 +291,7 @@ color: #f1f1f1;
   display: flex;
   flex-direction: column;
   border: #111111;
-  background: linear-gradient(146deg,#ff328411,#010101,#010101, #ff328411);    
+  background-color: rgba(0,0,0, 0.4); 
   border-width: 2px;
   border-style: solid;
   align-items: center;
@@ -299,22 +303,29 @@ list-style: none;
 display: grid;
 grid-template-columns: repeat(2,1fr);
 }
-.rows{
-  display: flex;
-  flex: 1;
-  position: relative;
-}
+.App-data2 .grid2{
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(2,1fr);
+  align-items: center;
+  flex:1;
+  justify-content: center;
+  align-content: center;
+  }
 .skill{
   border: azure;
+  overflow: hidden;
+  justify-self: center;
+  align-self: center;
   font-size: 4vmin;
-  flex:1;
   display: flex;
   height:35vmin;
   width: 35vmin;
-  padding: 0vmin;
   margin:2vmin;
   border-width: 1px;
   border-style: dashed double;
+  box-shadow: #000 1vmin 1vmin 2vmin;
+  border-radius: 20vmin;
 
 }
 .skill h6{
@@ -337,7 +348,7 @@ grid-template-columns: repeat(2,1fr);
   align-self: center;
 }
 .skill .circle{
-  flex:1
+  flex:1;
 }
 @media screen and (min-width: 1000px)   {
   .box{
@@ -372,13 +383,16 @@ grid-template-columns: repeat(2,1fr);
   }
 }
 
-@media screen and (max-width: 400px) {
-  .App-data2 ul{
+@media screen and (max-width: 500px) {
+  .App-data2 .grid2{
     grid-template-columns: repeat(1,1fr);
     }
 }
 @media screen and (max-width: 1050px) {
-  .App-data2 .grip1{
+  .App-data2 .grid1{
     grid-template-columns: repeat(1,1fr);
+    align-items: center;
+    justify-content: center;
     }
+    
 }

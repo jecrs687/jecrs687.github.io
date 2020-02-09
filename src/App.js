@@ -6,8 +6,7 @@ import {  Circle } from 'rc-progress';
 const data = require('./information.json')
 function Skill({value}){
 return(  
-<li>
-          <div className='skill'>
+<li className='skill'>
           <h6>{value.name}</h6> 
           <div className='box-percent'>
           <Circle percent={`${value.percent}`} 
@@ -17,8 +16,7 @@ return(
           />
          <h4>{value.percent}%</h4>
           </div>
-          </div>   
-          </li> 
+</li> 
           )
 }
 function App() {
@@ -82,15 +80,14 @@ function App() {
       </div>
       <div className='App-data2'>
         <h1>Skills</h1>
-        <ul className='grip1'>{        
+        <ul className='grid1'>{        
           
           Object.keys(data.skills).map(
             (value,index)=>
           <li key={index}>
             
-            <h3>{value}</h3>
-        <div style={{flexDirection:'column',display:'flex'}}>          
-        <ul>
+            <h3>{value}</h3>          
+        <ul className='grid2'>
 
             {data.skills[`${value}`].map((value, index,array)=> 
           <Skill value={value} key={index}/>
@@ -98,7 +95,6 @@ function App() {
         </ul>
           
           
-        </div>
             </li>
           )
         }</ul>
