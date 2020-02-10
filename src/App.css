@@ -246,13 +246,15 @@ color: #f1f1f1;
   display: flex;
   flex-direction: column;
   flex:1;
-  background: linear-gradient(#000,#555);
+  background: linear-gradient(#ff9ec5,70%,#ffcce0);
 
 
   }
 .body-box{
   display:flex;
   flex:1;
+  padding-top: 30px;
+  background: linear-gradient(#000,#f1f1f1,#f1f1f1,#f1f1f1,#f1f1f1,#f1f1f1,#f1f1f1,#f1f1f1,#f1f1f1,#f1f1f1,#f1f1f1,#f1f1f1,#f1f1f1,#f1f1f1, #f1f1f1)
 
 }
 .App-data{
@@ -290,19 +292,32 @@ color: #f1f1f1;
   flex:1;
   display: flex;
   flex-direction: column;
-  border: #111111;
-  background-color: rgba(0,0,0, 0.4); 
-  border-width: 2px;
-  border-style: solid;
   align-items: center;
   justify-content: center;
-  box-shadow: #444 0px 0px 10px;
 }
-.App-data2 ul{
-list-style: none;
+.App-data2 .skills{
+  border-radius: 20px;
+  background-color: #ffcce033;
+  box-shadow: #f1f1f1 1vmin 1vmin 0px;
+  border-width: 2px;
+  border-style: solid;
+  border: #111111;
+  margin: 10px;
+  }
+.App-data2 .grid1{
+border-radius: 20px;
+border-width: 2px;
+border-style: solid;
+border: #111111;
+margin: 4vmin;
+border: #111111;
 display: grid;
 grid-template-columns: repeat(2,1fr);
 }
+.App-data2 .grid2{
+  display: grid;
+  grid-template-columns: repeat(2,1fr);
+  }
 .App-data2 .grid2{
   list-style: none;
   display: grid;
@@ -313,7 +328,6 @@ grid-template-columns: repeat(2,1fr);
   align-content: center;
   }
 .skill{
-  border: azure;
   overflow: hidden;
   justify-self: center;
   align-self: center;
@@ -322,9 +336,6 @@ grid-template-columns: repeat(2,1fr);
   height:35vmin;
   width: 35vmin;
   margin:2vmin;
-  border-width: 1px;
-  border-style: dashed double;
-  box-shadow: #000 1vmin 1vmin 2vmin;
   border-radius: 20vmin;
 
 }
@@ -332,7 +343,7 @@ grid-template-columns: repeat(2,1fr);
   flex:1;
 }
 .skill .box-percent{
-  background: linear-gradient(#ddd,#999,#ddd);
+  background: linear-gradient(#ffcce0,#ffcce0);
   flex: 1;
   position: relative;
   padding: 2vmin;
@@ -384,9 +395,8 @@ grid-template-columns: repeat(2,1fr);
 }
 
 @media screen and (max-width: 500px) {
-  .App-data2 .grid2{
-    grid-template-columns: repeat(1,1fr);
-    }
+
+
 }
 @media screen and (max-width: 1050px) {
   .App-data2 .grid1{

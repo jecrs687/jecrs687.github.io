@@ -4,19 +4,35 @@ import './App.css';
 import { TiSocialFacebookCircular,TiSocialInstagramCircular,TiSocialGithubCircular,TiSocialLinkedinCircular } from "react-icons/ti";
 import {  Circle } from 'rc-progress';
 const data = require('./information.json')
+
+function Skills({value}){
+  return( 
+<div className='skills'>    
+    <h3>{value}</h3>          
+<div className='grid2'>
+
+    {data.skills[`${value}`].map((value, index,array)=> 
+  <Skill value={value} key={index}/>
+  )}
+</div>
+  
+  
+    </div>)
+}
+
 function Skill({value}){
 return(  
-<li className='skill'>
+<div className='skill'>
           <h6>{value.name}</h6> 
           <div className='box-percent'>
           <Circle percent={`${value.percent}`} 
           strokeWidth='10'
-          strokeColor='#ffcce0' 
+          strokeColor='#ffafcf' 
           className='circle'
           />
          <h4>{value.percent}%</h4>
           </div>
-</li> 
+</div> 
           )
 }
 function App() {
@@ -80,24 +96,13 @@ function App() {
       </div>
       <div className='App-data2'>
         <h1>Skills</h1>
-        <ul className='grid1'>{        
+        <div className='grid1'>{        
           
           Object.keys(data.skills).map(
             (value,index)=>
-          <li key={index}>
-            
-            <h3>{value}</h3>          
-        <ul className='grid2'>
-
-            {data.skills[`${value}`].map((value, index,array)=> 
-          <Skill value={value} key={index}/>
-          )}
-        </ul>
-          
-          
-            </li>
+         <Skills value={value} key={index}/>
           )
-        }</ul>
+        }</div>
       </div>
       </body> 
       <p>Powered by <a href='/#'>me</a></p>
