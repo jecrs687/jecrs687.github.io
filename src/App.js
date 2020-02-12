@@ -3,8 +3,8 @@ import logo from './assets/jecrs687.jpg';
 import './App.css';
 import { TiSocialFacebookCircular,TiSocialInstagramCircular,TiSocialGithubCircular,TiSocialLinkedinCircular } from "react-icons/ti";
 import {  Circle } from 'rc-progress';
-const data = require('./information.json')
 
+const data = require('./information.json')
 function Skills({value}){
   return( 
 <div className='skills'>    
@@ -12,12 +12,14 @@ function Skills({value}){
 <div className='grid2'>
 
     {data.skills[`${value}`].map((value, index,array)=> 
+
   <Skill value={value} key={index}/>
   )}
 </div>
   
   
-    </div>)
+    </div>
+    )
 }
 
 function Skill({value}){
@@ -96,8 +98,9 @@ function App() {
       </div>
       <div className='App-data2'>
         <h1>Skills</h1>
-        <div className='grid1'>{        
-          
+        <div className='grid1'>
+
+          {        
           Object.keys(data.skills).map(
             (value,index)=>
          <Skills value={value} key={index}/>
@@ -105,7 +108,8 @@ function App() {
         }</div>
       </div>
       </body> 
-      <p>Powered by <a href='/#'>me</a></p>
+      <div className='App-footer'><p>Powered by <a href='/#'>@jecr687</a>   2020</p>
+      </div>
 
     </div>
   );

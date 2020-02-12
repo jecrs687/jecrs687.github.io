@@ -3,7 +3,7 @@
   display: flex;
   flex-direction: column;
   flex: 1;
-  background-color:#010101;
+  background-color:white;
   overflow: visible;
   color:white
 }
@@ -123,7 +123,9 @@ color: #f1f1f1;
   animation: App-icons-right 3s  linear;
 
 }
-
+.App-footer{
+  color:black;
+}
 
 
 
@@ -246,15 +248,15 @@ color: #f1f1f1;
   display: flex;
   flex-direction: column;
   flex:1;
-  background: linear-gradient(#ff9ec5,70%,#ffcce0);
+  background: linear-gradient(#ff9ec5,90%,#ffcce0);
 
 
   }
 .body-box{
   display:flex;
   flex:1;
-  padding-top: 30px;
-  background: linear-gradient(#000,#f1f1f1,#f1f1f1,#f1f1f1,#f1f1f1,#f1f1f1,#f1f1f1,#f1f1f1,#f1f1f1,#f1f1f1,#f1f1f1,#f1f1f1,#f1f1f1,#f1f1f1, #f1f1f1)
+  padding-top: 1vmax;
+  background: linear-gradient(#f1f1f1,#f1f1f1,#f1f1f1,#f1f1f1,#f1f1f1,#f1f1f1,#f1f1f1,#f1f1f1,#f1f1f1,#f1f1f1,#f1f1f1,#f1f1f1,#f1f1f1, #f1f1f1)
 
 }
 .App-data{
@@ -287,6 +289,13 @@ color: #f1f1f1;
     justify-content: center;
     font-style: italic;
 }
+.App-data ul{
+  list-style: none;
+}
+.App-data ul li{
+  list-style: none;
+  margin-top: 10px;
+}
 .App-data2{
   margin: 10px;
   flex:1;
@@ -297,11 +306,8 @@ color: #f1f1f1;
 }
 .App-data2 .skills{
   border-radius: 20px;
-  background-color: #ffcce033;
-  box-shadow: #f1f1f1 1vmin 1vmin 0px;
-  border-width: 2px;
-  border-style: solid;
-  border: #111111;
+  background: linear-gradient(#ffcce055,70%,#ff9ec5 );
+  box-shadow: #f1f1f1 2vmin 2vmin 0px;
   margin: 10px;
   }
 .App-data2 .grid1{
@@ -332,6 +338,7 @@ grid-template-columns: repeat(2,1fr);
   justify-self: center;
   align-self: center;
   font-size: 4vmin;
+  box-shadow: #f1f1f1 1vmin 1vmin 0px;
   display: flex;
   height:35vmin;
   width: 35vmin;

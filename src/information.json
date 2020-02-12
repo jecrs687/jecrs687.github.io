@@ -23,6 +23,7 @@
 "tecnologias":[
     {"name":"Reactjs", "percent":80},
     {"name":"React-native", "percent":90},
+    {"name":"flutter", "percent":54},
     {"name":"Java", "percent":75},
     {"name":"Python", "percent":85},
     {"name":"Javascript", "percent":85},
@@ -34,6 +35,7 @@
 ],
 "Others":[
     {"name": "Photoshop","percent": 80 }
+
 ]
 
 }}
