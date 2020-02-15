@@ -72,7 +72,7 @@ function App() {
 
       </header>
 
-       <body className='App-body'>
+       {/* <body className='App-body'>
          <div className='body-box'>
       <div className='App-data'>
           <h1>Basic Information</h1>
@@ -107,7 +107,7 @@ function App() {
           )
         }</div>
       </div>
-      </body> 
+      </body> */} 
       <div className='App-footer'><p>Powered by <a href='/#'>@jecr687</a>   2020</p>
       </div>
 
