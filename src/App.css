@@ -245,6 +245,7 @@ color: #f1f1f1;
 }
 
 .App-body{
+  position: relative;
   display: flex;
   flex-direction: column;
   flex:1;
@@ -368,9 +369,17 @@ grid-template-columns: repeat(2,1fr);
 .skill .circle{
   flex:1;
 }
-@media screen and (min-width: 1000px)   {
+.repos{
+  display: flex;
+  flex-direction: column;
+}
+@media screen and (min-width: 800px)   {
   .box{
     height: 70%;
+  }
+  .repos{
+    display: grid;
+    grid-template-columns: repeat(3,1fr);
   }
 
 }

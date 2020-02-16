@@ -1,12 +1,14 @@
 {
 "name":"José Emanuel",
 "nick":"@jecrs687",
+"githubLogin":"jecrs687",
 "work":"futuro cientista da computação",
 "loves":["Computer Science", "New Technologies", "Create"],
 "facebook":"https://www.facebook.com/emanuel687",
 "linkerdin":"https://www.linkedin.com/in/jecrs687/",
 "github":"https://github.com/jecrs687",
 "instagram":"https://instagram.com/jecrs687",
+"avatar_url":"",
 "country":"Brazil",
 "bio":"I thought a lot about the purpose of my life and now I think I know. My goal in this life is to create solutions for use by millions of people around the world",
 "age":19,
@@ -37,5 +39,7 @@
     {"name": "Photoshop","percent": 80 }
 
 ]
+},
+"repos":[]
 
-}}
+}

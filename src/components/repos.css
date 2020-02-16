@@ -1,0 +1,142 @@
+.box-repo{
+    display:flex;
+    flex-direction: column;
+    background-color: rgb(0,0,0); /* Fallback color */
+    background-color: rgba(0,0,0, 0.4); /* Black w/opacity/see-through */
+    color: white;
+    font-weight: bold;
+    border: 3px solid #f1f1f1;
+    border-radius: 0px;
+    width: 80%;
+    height: 80%;
+    margin: 5px;
+    padding: 20px;
+    align-self: center;
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+}
+.box-repo:hover{
+    background-color: rgb(0,0,0); /* Fallback color */
+    background-color: rgba(0,0,0, 0.2); /* Black w/opacity/see-through */
+
+}
+.box-repo .path{
+    font-size: 4vmin;
+    text-align: justify;
+    align-self: flex-start;
+}
+
+.box-repo a{
+    font-size: 5vmin;
+    text-align: justify;
+    align-self: center;
+    color: white;
+    text-decoration-line: none;
+}
+.box-repo a:hover{
+    font-size: 6vmin;
+    color: blue;
+}
+.box-repo .desc{
+
+    font-size: 4vmin;
+    text-align: justify;
+    align-self: center;
+    color: white;
+    text-decoration-line: none;
+}
+.box-repo .created_at{
+    font-size: 4vmin;
+    text-align: justify;
+    align-self: center;
+    color: white;
+    text-decoration-line: none;
+}
+.box-repo .updated_at{
+    font-size: 4vmin;
+    text-align: justify;
+    align-self: center;
+    color: white;
+    text-decoration-line: none;
+}
+.box-repo .fork{
+    font-size: 4vmin;
+    text-align: justify;
+    align-self: flex-end;
+    color: white;
+    text-decoration-line: none;
+}
+
+@media screen and (min-width: 500px)   {
+    .box-repo{
+        display:flex;
+        flex-direction: column;
+        background-color: rgb(0,0,0); /* Fallback color */
+        background-color: rgba(0,0,0, 0.4); /* Black w/opacity/see-through */
+        color: white;
+        font-weight: bold;
+        border: 3px solid #f1f1f1;
+        border-radius: 0px;
+        width: 80%;
+        margin: 5px;
+        padding: 20px;
+        align-self: center;
+        text-align: center;
+        align-items: center;
+        justify-content: center;
+    }
+    .box-repo:hover{
+        background-color: rgb(0,0,0); /* Fallback color */
+        background-color: rgba(0,0,0, 0.2); /* Black w/opacity/see-through */
+    
+    }
+    .box-repo .path{
+        font-size: 2vmin;
+        text-align: justify;
+        align-self: flex-start;
+    }
+    
+    .box-repo a{
+        font-size: 3vmin;
+        text-align: justify;
+        align-self: center;
+        color: white;
+        text-decoration-line: none;
+    }
+    .box-repo a:hover{
+        font-size: 3vmin;
+        color: blue;
+    }
+    .box-repo .desc{
+        font-size: 2vmin;
+        text-align: justify;
+        align-self: center;
+        color: white;
+        text-decoration-line: none;
+    }
+    .box-repo .created_at{
+        font-size: 2vmin;
+        text-align: justify;
+        align-self: center;
+        color: white;
+        text-decoration-line: none;
+    }
+    .box-repo .updated_at{
+        font-size: 2vmin;
+        text-align: justify;
+        align-self: center;
+        color: white;
+        text-decoration-line: none;
+    }
+    .box-repo .fork{
+        flex:1;
+        font-size: 2vmin;
+        text-align: justify;
+        align-self: flex-end;
+        color: white;
+        text-decoration-line: none;
+    }
+    
+  
+  }
