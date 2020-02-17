@@ -2,40 +2,13 @@ import React,{useEffect,useState} from 'react';
 import logo from './assets/jecrs687.jpg';
 import './App.css';
 import { TiSocialFacebookCircular,TiSocialInstagramCircular,TiSocialGithubCircular,TiSocialLinkedinCircular } from "react-icons/ti";
-import {getGithub,getMedium} from './services/api'
-import Repos from './components/repos'
+import {getGithub,getDevTo} from './services/api'
+import {Repos} from './components/repos'
+import {ListSkills}from './components/skills';
+import {ListArticles}from './components/articles';
+
 const data = require('./information.json')
-// import {  Circle } from 'rc-progress';
-// function Skills({value}){
-//   return(     
-//     <div className='skills'>    
-//       <h3>{value}</h3>            
-//       <div className='grid2'>
 
-//         {data.skills[`${value}`].map((value, index,array)=> 
-
-//           <Skill value={value} key={index}/>
-//         )}
-//       </div>
-//     </div>
-//     )
-// }
-
-// function Skill({value}){
-// return(  
-// <div className='skill'>
-//           <h6>{value.name}</h6> 
-//           <div className='box-percent'>
-//           <Circle percent={`${value.percent}`} 
-//           strokeWidth='10'
-//           strokeColor='#ffafcf' 
-//           className='circle'
-//           />
-//          <h4>{value.percent}%</h4>
-//           </div>
-// </div> 
-//           )
-// }
 
 
 
@@ -43,7 +16,8 @@ const data = require('./information.json')
 
 function App() {
   const [info,setInfo]=useState(data)
-  const [,setReload] = useState(false)
+  const [guia,setGuia]=useState('')
+  // const [,setReload] = useState(false)
   useEffect(
     ()=>{
     function insert(github){
@@ -53,13 +27,12 @@ function App() {
       temp.avatar_url = github.avatar_url
       temp.repos = github.repos
       setInfo(temp)
-      setReload(r=>!r)
     }
     async function load(){  
     const github =  await getGithub();
     await insert(github)
-    const medium =  await getMedium();
-    console.log(medium)
+    const devTo =  await getDevTo();
+    setInfo(value=>({...value, ...devTo}))
     }
     if(data.githubLogin!==''){
     load();
@@ -102,45 +75,17 @@ function App() {
       </header>
 
        <div className='App-body'>
-       {/*   <div className='body-box'>
-      <div className='App-data'>
-          <h1>Basic Information</h1>
-          <ul style={{textAlign:'justify'}}>
-            <li>Country: {data.country}</li>
-            <li>Age:{data.age}</li>
-            <li>Email: {data.email}</li>
-            <li>Phone:{data.phone}</li>
-            <li>City: {data.city}</li>
-            <li>Address: {data.address}</li>
-            </ul>
-          <p>
-          </p>
-        </div>
-      <div style={{paddingRight:'75px', paddingLeft:'75px'}} className='App-data'>
-      <h4>Bio</h4>
-      <div>
-      <p>
-  "{data.bio}"
-         </p>
-         </div>
-      </div>
-      </div>
-      <div className='App-data2'>
-        <h1>Skills</h1>
-        <div className='grid1'>
+       <div className='navBar'>
+         <button onClick={()=>{setGuia('repos')}}>Repos</button>
+         <button onClick={()=>{setGuia('skills')}}>Skills</button>
+         <button onClick={()=>{setGuia('articles')}}>articles</button>
 
-          {        
-          Object.keys(data.skills).map(
-            (value,index)=>
-         <Skills value={value} key={index}/>
-          )
-        }</div>
-      </div> */}
-      <div className='repos'>
-        {info.repos.map((value,index)=>(
-        <Repos repo={value} key={index}/>
-      ))}      </div>
-
+       </div>
+      
+      { guia==='repos'?
+        <Repos info={info}/>:
+        guia==='skills'?<ListSkills data={info}/>:
+        guia==='articles'?<ListArticles data={info}/>:null}
       </div>
       <div className='App-footer'><p>Powered by <a href='/#'>@jecr687</a>   2020</p>
       </div>

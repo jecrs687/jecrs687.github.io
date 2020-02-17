@@ -1,7 +1,7 @@
 import React from 'react';
 import './repos.css';
 
-export default function repos({repo}){
+export function Repo({repo}){
     const cores={
         "c":"brown",
         "java":"red",
@@ -17,8 +17,6 @@ export default function repos({repo}){
         var repoDate = new Date(date).getTime()
         var diference = now - repoDate;
         diference = diference/(1000*60*60);
-        console.log(diference)
-        console.log(date)
         if(diference<1){
             return "few minutes"
         }else if(diference<24){
@@ -47,7 +45,6 @@ export default function repos({repo}){
             </div>:                
             <div  className='fork-subbox'/>
         }
-
         {repo.fork?<p className='fork'>fork</p>:<div className='fork'/>}
         </div>
         <div className='time'>
@@ -58,4 +55,11 @@ export default function repos({repo}){
         
         
         )
+}
+export function Repos({info}){
+    return(      
+    <div className='repos'>
+    {info.repos.map((value,index)=>(
+    <Repo repo={value} key={index}/>
+  ))}      </div>)
 }

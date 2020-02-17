@@ -250,9 +250,25 @@ color: #f1f1f1;
   flex-direction: column;
   flex:1;
   background: linear-gradient(#ffcce011,#ffcce044);
-
-
   }
+.App-body .navBar{
+  background-color: #f6f6f6;
+  align-self: stretch;
+  height:50px;
+}
+.App-body .navBar button{
+  background-color: #ffcce0;
+  border:none;
+  font-weight: bolder;
+  font-size: small;
+  width: 20vw;
+  margin-left: 10px;
+  height:100%;
+}
+.App-body .navBar button:hover{
+  background-color: #ffccfa;
+  cursor: pointer;
+}
 .body-box{
   display:flex;
   flex:1;
@@ -260,6 +276,8 @@ color: #f1f1f1;
   background: linear-gradient(#f1f1f1,#f1f1f1,#f1f1f1,#f1f1f1,#f1f1f1,#f1f1f1,#f1f1f1,#f1f1f1,#f1f1f1,#f1f1f1,#f1f1f1,#f1f1f1,#f1f1f1, #f1f1f1)
 
 }
+
+
 .App-data{
   display:flex;
   margin: 4vmin;
@@ -297,83 +315,12 @@ color: #f1f1f1;
   list-style: none;
   margin-top: 10px;
 }
-.App-data2{
-  margin: 10px;
-  flex:1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
-.App-data2 .skills{
-  border-radius: 20px;
-  background: linear-gradient(#ffcce055,70%,#ff9ec5 );
-  box-shadow: #f1f1f1 2vmin 2vmin 0px;
-  margin: 10px;
-  }
-.App-data2 .grid1{
-border-radius: 20px;
-border-width: 2px;
-border-style: solid;
-border: #111111;
-margin: 4vmin;
-border: #111111;
-display: grid;
-grid-template-columns: repeat(2,1fr);
-}
-.App-data2 .grid2{
-  display: grid;
-  grid-template-columns: repeat(2,1fr);
-  }
-.App-data2 .grid2{
-  list-style: none;
-  display: grid;
-  grid-template-columns: repeat(2,1fr);
-  align-items: center;
-  flex:1;
-  justify-content: center;
-  align-content: center;
-  }
-.skill{
-  overflow: hidden;
-  justify-self: center;
-  align-self: center;
-  font-size: 4vmin;
-  box-shadow: #f1f1f1 1vmin 1vmin 0px;
-  display: flex;
-  height:35vmin;
-  width: 35vmin;
-  margin:2vmin;
-  border-radius: 20vmin;
 
-}
-.skill h6{
-  flex:1;
-}
-.skill .box-percent{
-  background: linear-gradient(#ffcce0,#ffcce0);
-  flex: 1;
-  position: relative;
-  padding: 2vmin;
-  display:flex;
-}
-.skill h4{
-  position: absolute;
-  top:27%;
-  left: 27%;
-}
-.skill h6{
-  flex:1;
-  align-self: center;
-}
-.skill .circle{
-  flex:1;
-}
 .repos{
   display: flex;
   flex-direction: column;
 }
-@media screen and (min-width: 600px)   {
+@media screen and (min-width: 650px)   {
 
   .repos{
     display: grid;
@@ -421,12 +368,4 @@ grid-template-columns: repeat(2,1fr);
 @media screen and (max-width: 500px) {
 
 
-}
-@media screen and (max-width: 1050px) {
-  .App-data2 .grid1{
-    grid-template-columns: repeat(1,1fr);
-    align-items: center;
-    justify-content: center;
-    }
-    
 }
