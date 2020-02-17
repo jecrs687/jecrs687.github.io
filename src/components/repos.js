@@ -12,7 +12,23 @@ export default function repos({repo}){
         "html":"red"
 
     }
-    
+    function lastUpdate(date){
+        var now = new Date().getTime()
+        var repoDate = new Date(date).getTime()
+        var diference = now - repoDate;
+        diference = diference/(1000*60*60);
+        console.log(diference)
+        console.log(date)
+        if(diference<1){
+            return "few minutes"
+        }else if(diference<24){
+            return `${diference}`
+        }
+        else{
+            return `${date.slice(0,10)}`
+        }
+        
+    }
     return (
     <div className='box-repo'>
         <p className='path'>/{repo.full_name}</p>
@@ -36,7 +52,7 @@ export default function repos({repo}){
         </div>
         <div className='time'>
         <p className='created_at'>{repo.created_at.slice(0,10)} {Date(repo.created_at).slice(16,24)} </p>
-        <p className='updated_at'>{repo.updated_at.slice(0,10)} {Date(repo.updated_at).slice(16,24)} </p>
+        <p className='updated_at'>{lastUpdate(repo.updated_at)} </p>
         </div>
     </div>
         
