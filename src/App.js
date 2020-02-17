@@ -2,7 +2,7 @@ import React,{useEffect,useState} from 'react';
 import logo from './assets/jecrs687.jpg';
 import './App.css';
 import { TiSocialFacebookCircular,TiSocialInstagramCircular,TiSocialGithubCircular,TiSocialLinkedinCircular } from "react-icons/ti";
-import all from './services/api'
+import {getGithub,getMedium} from './services/api'
 import Repos from './components/repos'
 const data = require('./information.json')
 // import {  Circle } from 'rc-progress';
@@ -49,14 +49,17 @@ function App() {
     function insert(github){
       var temp = data
       temp.nick = github.login
+      temp.name = github.name
       temp.avatar_url = github.avatar_url
       temp.repos = github.repos
       setInfo(temp)
       setReload(r=>!r)
     }
     async function load(){  
-    const github =  await all();
-    insert(github)
+    const github =  await getGithub();
+    await insert(github)
+    const medium =  await getMedium();
+    console.log(medium)
     }
     if(data.githubLogin!==''){
     load();
@@ -72,7 +75,6 @@ function App() {
           <div className='box-info'>
             <div className='box-img'>
               <div>
-              {console.log(info)}
               </div>
               <div>
               </div>

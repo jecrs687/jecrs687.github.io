@@ -1,20 +1,17 @@
 .box-repo{
     display:flex;
     flex-direction: column;
-    background-color: rgb(0,0,0); /* Fallback color */
-    background-color: rgba(0,0,0, 0.4); /* Black w/opacity/see-through */
-    color: white;
+    color: black;
     font-weight: bold;
-    border: 3px solid #f1f1f1;
-    border-radius: 0px;
-    width: 80%;
+    border: 1px solid #dbdbdb;
+    border-radius: 3px;
+    width: 90%;
     height: 80%;
-    margin: 5px;
     padding: 20px;
+    margin: 5px;
     align-self: center;
-    text-align: center;
-    align-items: center;
-    justify-content: center;
+    align-items: flex-start;
+    justify-content: flex-start;
 }
 .box-repo:hover{
     background-color: rgb(0,0,0); /* Fallback color */
@@ -22,7 +19,9 @@
 
 }
 .box-repo .path{
-    font-size: 4vmin;
+    color: #353535;
+    font-weight: 400;
+    font-size: 0vmin;
     text-align: justify;
     align-self: flex-start;
 }
@@ -30,8 +29,6 @@
 .box-repo a{
     font-size: 5vmin;
     text-align: justify;
-    align-self: center;
-    color: white;
     text-decoration-line: none;
 }
 .box-repo a:hover{
@@ -39,103 +36,86 @@
     color: blue;
 }
 .box-repo .desc{
-
     font-size: 4vmin;
+    color: #7c7c7c;
+    font-weight: 400;
     text-align: justify;
-    align-self: center;
-    color: white;
     text-decoration-line: none;
 }
+.box-repo .time{
+    display: flex;
+    align-self: stretch;
+    color: #7c7c7c;
+    font-weight: 400;
+    justify-content: space-between;
+}
 .box-repo .created_at{
+    flex:1;
     font-size: 4vmin;
-    text-align: justify;
-    align-self: center;
-    color: white;
     text-decoration-line: none;
 }
 .box-repo .updated_at{
+    flex:1;
     font-size: 4vmin;
-    text-align: justify;
-    align-self: center;
-    color: white;
     text-decoration-line: none;
 }
 .box-repo .fork{
+    display: flex;
+    justify-content: space-around;
+    width: 100%;
     font-size: 4vmin;
     text-align: justify;
     align-self: flex-end;
-    color: white;
     text-decoration-line: none;
+}
+.box-repo .fork-box{
+    display: flex;
+    justify-content: space-around;
+    width: 100%;
+    font-size: 2vmin;
+    text-align: justify;
+    align-self: flex-end;
+    text-decoration-line: none;
+}
+.box-repo .fork-subbox{
+    display: flex;
+    width: 100%;
+    font-size: 2vmin;
+    text-align: justify;
+    align-self: flex-end;
+    text-decoration-line: none;
+}
+.box-repo .ball{
+    height: 10px;
+    width: 10px;
+    margin:4px;
+    align-self: center;
+    border-radius: 5px;
+    background-color: #f1f1f1;
 }
 
 @media screen and (min-width: 500px)   {
-    .box-repo{
-        display:flex;
-        flex-direction: column;
-        background-color: rgb(0,0,0); /* Fallback color */
-        background-color: rgba(0,0,0, 0.4); /* Black w/opacity/see-through */
-        color: white;
-        font-weight: bold;
-        border: 3px solid #f1f1f1;
-        border-radius: 0px;
-        width: 80%;
-        margin: 5px;
-        padding: 20px;
-        align-self: center;
-        text-align: center;
-        align-items: center;
-        justify-content: center;
-    }
-    .box-repo:hover{
-        background-color: rgb(0,0,0); /* Fallback color */
-        background-color: rgba(0,0,0, 0.2); /* Black w/opacity/see-through */
-    
-    }
     .box-repo .path{
-        font-size: 2vmin;
-        text-align: justify;
-        align-self: flex-start;
+        font-size: 1.5vmin;
     }
     
     .box-repo a{
-        font-size: 3vmin;
-        text-align: justify;
-        align-self: center;
-        color: white;
-        text-decoration-line: none;
+        font-size: 2.5vmin;
     }
     .box-repo a:hover{
         font-size: 3vmin;
-        color: blue;
     }
     .box-repo .desc{
         font-size: 2vmin;
-        text-align: justify;
-        align-self: center;
-        color: white;
-        text-decoration-line: none;
     }
     .box-repo .created_at{
-        font-size: 2vmin;
-        text-align: justify;
-        align-self: center;
-        color: white;
-        text-decoration-line: none;
+        font-size: 1.5vmin;
     }
     .box-repo .updated_at{
-        font-size: 2vmin;
-        text-align: justify;
-        align-self: center;
-        color: white;
-        text-decoration-line: none;
+        font-size: 1.5vmin;
     }
     .box-repo .fork{
-        flex:1;
         font-size: 2vmin;
-        text-align: justify;
-        align-self: flex-end;
-        color: white;
-        text-decoration-line: none;
     }
     
   
