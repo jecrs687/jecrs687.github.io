@@ -373,7 +373,15 @@ grid-template-columns: repeat(2,1fr);
   display: flex;
   flex-direction: column;
 }
-@media screen and (min-width: 800px)   {
+@media screen and (min-width: 600px)   {
+
+  .repos{
+    display: grid;
+    grid-template-columns: repeat(2,1fr);
+    grid-gap: 10px;
+  }
+}
+@media screen and (min-width: 900px)   {
   .box{
     height: 70%;
   }

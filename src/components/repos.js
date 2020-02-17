@@ -22,10 +22,10 @@ export default function repos({repo}){
         if(diference<1){
             return "few minutes"
         }else if(diference<24){
-            return `${diference}`
+            return `Update at ${diference.toFixed(0)} hours ago`
         }
         else{
-            return `${date.slice(0,10)}`
+            return `Update at ${date.slice(0,10)}`
         }
         
     }
@@ -51,7 +51,7 @@ export default function repos({repo}){
         {repo.fork?<p className='fork'>fork</p>:<div className='fork'/>}
         </div>
         <div className='time'>
-        <p className='created_at'>{repo.created_at.slice(0,10)} {Date(repo.created_at).slice(16,24)} </p>
+        <p className='created_at'>{repo.created_at.slice(0,10)} </p>
         <p className='updated_at'>{lastUpdate(repo.updated_at)} </p>
         </div>
     </div>

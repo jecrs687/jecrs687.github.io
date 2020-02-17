@@ -38,6 +38,7 @@
 .box-repo .desc{
     font-size: 4vmin;
     color: #7c7c7c;
+    flex:1;
     font-weight: 400;
     text-align: justify;
     text-decoration-line: none;
