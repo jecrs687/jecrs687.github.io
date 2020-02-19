@@ -16,7 +16,7 @@ const data = require('./information.json')
 
 function App() {
   const [info,setInfo]=useState(data)
-  const [guia,setGuia]=useState('skills')
+  const [guia,setGuia]=useState('')
   // const [,setReload] = useState(false)
   useEffect(
     ()=>{
