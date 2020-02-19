@@ -23,7 +23,7 @@ export function ListArticles({data}){
                             (value,index)=>(
                             <p key={index} className='hashtag'>#{value}</p>
                             ))
-                        :<h1>Without articles</h1>    }
+                        :null   }
                         </div>
                         <p className='published'>
                         {value.published_at.slice(0,10)}

@@ -9,6 +9,7 @@ export async function getGithub(){
     }
 export async function getDevTo(){
    var devToArtics = (await devTo.get('')).data
+   // var devToArtics={};
    console.log(devToArtics)
    return {devToArticles:devToArtics}
    }

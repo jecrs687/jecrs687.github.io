@@ -6,7 +6,7 @@ function Skills({value,data}){
   return(     
     <div className='skills'>    
       <h3>{value}</h3>            
-      <div className='grid2'>
+      <div className='sub-skills'>
 
         {data.skills[`${value}`].map((value, index,array)=> 
 
@@ -35,10 +35,9 @@ return(
 
 export function ListSkills({data}){
     return(
-    <div className='body-box'>
-    <div className='App-data2'>
+    <div className='box-container'>
       <h1>Skills</h1>
-      <div className='grid1'>
+      <div className='skills-container'>
         {        
         Object.keys(data.skills).map(
           (value,index)=>
@@ -46,8 +45,6 @@ export function ListSkills({data}){
         )
       }
       </div>
-      </div>
-      </div>
-      
+      </div>      
     )
 }
