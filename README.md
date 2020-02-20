@@ -1,3 +1,5 @@
+you need alter the informations on index, manifest.json and in information.json
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
