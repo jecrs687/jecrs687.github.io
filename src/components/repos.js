@@ -23,14 +23,14 @@ export function Repo({repo}){
             return `Update at ${diference.toFixed(0)} hours ago`
         }
         else{
-            return `Update at ${date.slice(0,10)}`
+            return `Update at ${date.slice(8,10)}-${date.slice(5,7)}-${date.slice(0,4)}`
         }
         
     }
     return (
     <div className='box-repo'>
         <p className='path'>/{repo.full_name}</p>
-        <a href={repo.html_url}>
+        <a href={repo.html_url} className="name">
             <h3>{repo.name}</h3>
         </a>
         <p className='desc'>{repo.description}</p>
@@ -48,9 +48,14 @@ export function Repo({repo}){
         {repo.fork?<p className='fork'>fork</p>:<div className='fork'/>}
         </div>
         <div className='time'>
-        <p className='created_at'>{repo.created_at.slice(0,10)} </p>
+        <p className='created_at'>{repo.created_at.slice(8,10)}-{repo.created_at.slice(5,7)}-{repo.created_at.slice(0,4)} </p>
         <p className='updated_at'>{lastUpdate(repo.updated_at)} </p>
         </div>
+        {repo.homepage !== '' && repo.homepage !== null?
+        <a 
+        href={repo.homepage} 
+        className='homepage'
+        >official Page</a>:null}
     </div>
         
         

@@ -22,13 +22,13 @@
     align-self: flex-start;
 }
 
-.box-repo a{
-    font-size: 5vmin;
+.box-repo .name{
+    font-size: 3vmin;
     text-align: justify;
     text-decoration-line: none;
 }
-.box-repo a:hover{
-    font-size: 6vmin;
+.box-repo .name:hover{
+    font-size: 4vmin;
     color: blue;
 }
 .box-repo .desc{
@@ -90,16 +90,20 @@
     border-radius: 5px;
     background-color: #f1f1f1;
 }
-
+.box-repo .homepage{
+    font-size: small;
+    text-decoration: none;
+    color: #003cff;
+}
 @media screen and (min-width: 500px)   {
     .box-repo .path{
         font-size: 1.5vmin;
     }
     
-    .box-repo a{
+    .box-repo .name{
         font-size: 2.5vmin;
     }
-    .box-repo a:hover{
+    .box-repo .name:hover{
         font-size: 3vmin;
     }
     .box-repo .desc{
