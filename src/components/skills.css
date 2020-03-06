@@ -1,6 +1,5 @@
 .box-container{
 display:flex;
-background-color: white;
 color: #444;
 flex-direction: column;
 }
@@ -10,7 +9,7 @@ flex-direction: column;
 }
 .skills-container{
   display: grid;
-  grid-template-columns: repeat(3,1fr);
+  grid-template-columns: repeat(2,1fr);
 }
 .skills{
   margin: 10px;

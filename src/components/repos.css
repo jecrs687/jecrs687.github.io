@@ -1,7 +1,7 @@
 .box-repo{
     display:flex;
     flex-direction: column;
-    color: black;
+    color:black;
     font-weight: bold;
     border: 1px solid #dbdbdb;
     border-radius: 3px;
@@ -17,13 +17,13 @@
 .box-repo .path{
     color: #353535;
     font-weight: 400;
-    font-size: 2vmin;
+    font-size: 2.5vmin;
     text-align: justify;
     align-self: flex-start;
 }
 
 .box-repo .name{
-    font-size: 3vmin;
+    font-size: 3.5vmin;
     text-align: justify;
     text-decoration-line: none;
 }
@@ -77,7 +77,7 @@
 .box-repo .fork-subbox{
     display: flex;
     width: 100%;
-    font-size: 2vmin;
+    font-size: 3vmin;
     text-align: justify;
     align-self: flex-end;
     text-decoration-line: none;
@@ -88,7 +88,7 @@
     margin:4px;
     align-self: center;
     border-radius: 5px;
-    background-color: #f1f1f1;
+    background-color: white;
 }
 .box-repo .homepage{
     font-size: small;
@@ -119,6 +119,8 @@
     .box-repo .fork{
         font-size: 2vmin;
     }
-    
+    .box-repo .fork-subbox{
+        font-size: 2vmin;
+    }
   
   }

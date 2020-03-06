@@ -1,7 +1,11 @@
 import React,{useEffect,useState} from 'react';
 import logo from './assets/jecrs687.jpg';
 import './App.css';
-import { TiSocialFacebookCircular,TiSocialInstagramCircular,TiSocialGithubCircular,TiSocialLinkedinCircular } from "react-icons/ti";
+import { TiDocument,TiSocialFacebookCircular,TiSocialInstagramCircular,TiSocialGithubCircular,TiSocialLinkedinCircular } from "react-icons/ti";
+import {GoRepo,GoHome} from "react-icons/go";
+import {FaBrain} from "react-icons/fa";
+import {MdSettings} from "react-icons/md";
+
 import {getGithub,getDevTo} from './services/api'
 import {Repos} from './components/repos'
 import {ListSkills}from './components/skills';
@@ -16,7 +20,8 @@ const data = require('./information.json')
 
 function App() {
   const [info,setInfo]=useState(data)
-  const [guia,setGuia]=useState('')
+  const [guia,setGuia]=useState('home')
+  const [dark,setDark]=useState(true)
   // const [,setReload] = useState(false)
   useEffect(
     ()=>{
@@ -42,6 +47,51 @@ function App() {
   },[])
   return (
     <div className="App">
+      <div className='navBar'>
+        <ul className='navBar-nav'>
+          <li  onClick={()=>{setGuia('home')}} className='navBar-item'>
+            <GoHome className='icon'/>
+            <span className='nav-link'>home</span>
+          </li>
+          <li  onClick={()=>{setGuia('repos')}} className='navBar-item'>
+            <GoRepo className='icon'/>
+            <span className='nav-link'>Repositories</span>
+          </li>
+          <li onClick={()=>{setGuia('skills')}} className='navBar-item'>
+            <TiDocument className='icon'/>
+            <span className='nav-link' >Skills</span>
+          </li>
+          <li onClick={()=>{setGuia('articles')}} className='navBar-item'>
+            <FaBrain className='icon'/>
+            <span className='nav-link' >articles</span>
+          </li>
+          <li className='navBar-item' 
+          
+          onClick={
+          
+            ()=>{
+                dark?
+                document.body.style.setProperty('--theme','#fff')
+                :
+                document.body.style.setProperty('--theme','#111')
+                dark?
+                document.body.style.setProperty('--primary','black')
+                :
+                document.body.style.setProperty('--primary','#fff')
+
+                setDark(!dark)
+
+            }
+            
+          
+            }>
+            <MdSettings className='icon'/>
+            <span className='nav-link' >settings</span>
+          </li>
+        </ul>
+       </div>
+       <div className="body">
+       { guia==='home'?
       <header className="App-header">
       <div className="App-background" src=''></div>        
         <div className='box'>
@@ -72,24 +122,19 @@ function App() {
 
         </div>
 
-      </header>
+      </header>:
 
        <div className='App-body'>
-       <div className='navBar'>
-         <button onClick={()=>{setGuia('repos')}}>Repos</button>
-         <button onClick={()=>{setGuia('skills')}}>Skills</button>
-         <button onClick={()=>{setGuia('articles')}}>articles</button>
-
-       </div>
-      
       { guia==='repos'?
         <Repos info={info}/>:
         guia==='skills'?<ListSkills data={info}/>:
         guia==='articles'?<ListArticles data={info}/>:null}
-      </div>
+      </div>}
+      
       <div className='App-footer'><p>Powered by <a href='/#'>@jecr687</a>   2020</p>
       </div>
 
+    </div>
     </div>
   );
 }
