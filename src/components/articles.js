@@ -17,17 +17,19 @@ export function ListArticles({data}){
                         </p>
                         <div className='footer'>
   
-                        <div className='tags'>
+                        <ul className='tags'>
                         {value.tags?
                         (value.tags.split(', ')).map(
                             (value,index)=>(
-                            <p key={index} className='hashtag'>#{value}</p>
+                            <li key={index} className='hashtag'>#{value}</li>
                             ))
                         :null   }
-                        </div>
-                        <p className='published'>
+                        </ul>
+                        <div className='published'>
+                        <p>
                         {value.published_at.slice(0,10)}
                         </p>
+                        </div>
                         </div>
                         </a>
 

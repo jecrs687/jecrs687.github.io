@@ -1,7 +1,10 @@
 
 :root{
-  --theme:#111;
-  --primary:#fff
+  --navTheme:#111;
+  --navPrimary:#fff;
+  --theme:#fff;
+  --primary:#111;
+  --secundary:#ff80b2
 
 }
 :root::-webkit-scrollbar{
@@ -17,7 +20,7 @@
   text-align: center;
   display: flex;
   flex-direction: row;
-  background-color:#f1f1f1;
+  background-color:var(--theme);
   color:white
 }
 
@@ -148,7 +151,7 @@ color: #f1f1f1;
 
 }
 .App-footer{
-  color:black;
+  color:var(--primary);
 }
 
 
@@ -399,8 +402,8 @@ color: #f1f1f1;
   z-index: 10;
   position: fixed;
   transition:width 1000ms ease;
-  background-color: var(--theme);
-  color:var(--primary)
+  background-color: var(--navTheme);
+  color:var(--navPrimary)
   
   }
   .App .navBar-nav{

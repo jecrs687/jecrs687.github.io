@@ -3,9 +3,7 @@ import logo from './assets/jecrs687.jpg';
 import './App.css';
 import { TiDocument,TiSocialFacebookCircular,TiSocialInstagramCircular,TiSocialGithubCircular,TiSocialLinkedinCircular } from "react-icons/ti";
 import {GoRepo,GoHome} from "react-icons/go";
-import {FaBrain} from "react-icons/fa";
-import {MdSettings} from "react-icons/md";
-
+import {FaSun,FaMoon,FaBrain} from "react-icons/fa";
 import {getGithub,getDevTo} from './services/api'
 import {Repos} from './components/repos'
 import {ListSkills}from './components/skills';
@@ -65,29 +63,34 @@ function App() {
             <FaBrain className='icon'/>
             <span className='nav-link' >articles</span>
           </li>
-          <li className='navBar-item' 
-          
-          onClick={
-          
-            ()=>{
-                dark?
-                document.body.style.setProperty('--theme','#fff')
-                :
-                document.body.style.setProperty('--theme','#111')
-                dark?
-                document.body.style.setProperty('--primary','black')
-                :
-                document.body.style.setProperty('--primary','#fff')
-
+          {dark?          
+          <li className='navBar-item'  onClick={
+            ()=>{    
+                
+              document.body.style.setProperty('--theme','#000')
+              document.body.style.setProperty('--primary','#fff')
+                document.body.style.setProperty('--navTheme','#fff')
+                document.body.style.setProperty('--navPrimary','#111')
                 setDark(!dark)
+            }}>
+              <FaMoon className='icon'/>
+              <span className='nav-link' >Dark</span>
+          </li>:          
+          <li className='navBar-item' 
+            onClick={
+              ()=>{
+                document.body.style.setProperty('--theme','#fff')
+                document.body.style.setProperty('--primary','#000')
+                  document.body.style.setProperty('--navTheme','#111')
+                  document.body.style.setProperty('--navPrimary','#fff')
+                  setDark(!dark)
+              }
+              }>
+              <FaSun className='icon'/>
+              <span className='nav-link' >light</span>
+            </li>
+        }
 
-            }
-            
-          
-            }>
-            <MdSettings className='icon'/>
-            <span className='nav-link' >settings</span>
-          </li>
         </ul>
        </div>
        <div className="body">

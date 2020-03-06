@@ -1,7 +1,7 @@
 .box-repo{
     display:flex;
     flex-direction: column;
-    color:black;
+    color:var(--primary);
     font-weight: bold;
     border: 1px solid #dbdbdb;
     border-radius: 3px;
@@ -15,7 +15,7 @@
 
 }
 .box-repo .path{
-    color: #353535;
+    color: var(--primary);
     font-weight: 400;
     font-size: 2.5vmin;
     text-align: justify;
@@ -23,13 +23,22 @@
 }
 
 .box-repo .name{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
     font-size: 3.5vmin;
     text-align: justify;
-    text-decoration-line: none;
+    color:var(--primary);
+    text-decoration: none;
+}
+.box-repo .name .icon{
+    min-width: 4vmin;
+    width: 4vmin;
+    margin-right: 1rem;
+    color: var(--primary);
 }
 .box-repo .name:hover{
     font-size: 4vmin;
-    color: blue;
 }
 .box-repo .desc{
     font-size: 4vmin;
@@ -96,6 +105,12 @@
     color: #003cff;
 }
 @media screen and (min-width: 500px)   {
+    .box-repo .name .icon{
+        min-width: 2.5vmin;
+        width: 2.5vmin;
+        margin-right: 1rem;
+        color: var(--primary);
+    }
     .box-repo .path{
         font-size: 1.5vmin;
     }

@@ -1,5 +1,6 @@
 import React from 'react';
 import './repos.css';
+import {GoRepo} from "react-icons/go";
 
 export function Repo({repo}){
     const cores={
@@ -30,7 +31,9 @@ export function Repo({repo}){
     return (
     <div className='box-repo'>
         <p className='path'>/{repo.full_name}</p>
+        
         <a href={repo.html_url} className="name">
+            <GoRepo className="icon"/>
             <h3>{repo.name}</h3>
         </a>
         <p className='desc'>{repo.description}</p>

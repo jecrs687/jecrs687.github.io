@@ -1,8 +1,9 @@
 .articles{
     color:black;
+    list-style: none;
     display:grid;
     padding: 20px;
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: repeat(3, 1fr);
 }
 
 .articles a{
@@ -32,7 +33,7 @@ width: 100%;
     font-weight: bold;
 }
 .article-box .description{
-    flex:1;
+    flex:1;   
     font-size: small;
     font-weight: 300;
     color:#525252;
@@ -40,22 +41,23 @@ width: 100%;
 }
 .article-box .footer {
     display: flex;
-    justify-content: space-around;
-
 }
 .article-box .tags {
-    display: flex;
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(3,1fr);
+    flex:1;   
     justify-content: space-around;
 
 }
 .article-box .tags .hashtag {
-    flex:1;   
-    font-size: small;
+    font-size: xx-small;
     font-weight: 300;
-    color:#ccffeb;
-    transform: rotate(-20deg);
+    color:var(--secundary);
+    transform: rotate(-40deg);
 }
 .article-box .footer .published {
+    flex:1;   
     font-size: small;
     font-weight: 300;
     color:#525252;

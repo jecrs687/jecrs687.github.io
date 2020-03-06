@@ -1,6 +1,6 @@
 .box-container{
 display:flex;
-color: #444;
+color: var(--primary);
 flex-direction: column;
 }
 .box-container h1{
@@ -25,7 +25,6 @@ flex-direction: column;
 }
 .skill{
   display:flex;
-  color: black;
   font-weight: bold;
   border: 1px solid #dbdbdb;
   border-radius: 3px;
