@@ -401,21 +401,26 @@ color: #f1f1f1;
 .App .navBar{
   z-index: 10;
   position: fixed;
+  display: flex;
+  flex-direction: column;
   transition:width 1000ms ease;
   background-color: var(--navTheme);
   color:var(--navPrimary)
   
   }
+  .box-logo .logo{
+    display: none;
+    font-weight: 700;
+    }
   .App .navBar-nav{
     list-style: none;
     padding: 0;
+    flex:1;
     margin: 0;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    height: 100%;
-  
+    justify-content: center;  
   }
   .App .navBar-item{
     width: 100%;
@@ -435,7 +440,10 @@ color: #f1f1f1;
     color: #ffcce0;  
     filter: opacity(0.7) grayscale(0%);
     transition:filter 1000ms ease;
-    
+  }
+  
+  .App .box-logo .icon{
+    display: none;
   }
   .App .navBar-item:hover .icon{
     cursor: pointer;
@@ -454,7 +462,33 @@ color: #f1f1f1;
       height: 100vh;
       width: 4rem;
     }
-
+    .box-logo{
+      margin-top:1.5rem ;
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+    }
+    .App .navBar:hover .logo{
+      display: block;
+      }
+    .App .box-logo .icon{
+      display:block;
+      width: 1.5rem;      
+      color: #ffcce0;  
+      transform: rotate(180deg);
+      transition:transform 2000ms ease;
+    }
+    .App .box-logo:hover{
+      color:white;
+      background-color: #ffcce0; 
+      cursor: pointer; 
+    }
+    .App .box-logo:hover  .icon{
+      color:white;
+    }
+    .App .navBar:hover .box-logo .icon{
+      transform: rotate(0deg);
+      }
     .App .navBar:hover .nav-link{
       display: block;
       }
@@ -465,6 +499,8 @@ color: #f1f1f1;
 
     .navBar-item:last-child{
       margin-top: auto;
+      margin-bottom: 1rem;
+
     }
     .navBar-item:first-child{
       margin-top: 20px;

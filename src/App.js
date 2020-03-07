@@ -3,7 +3,7 @@ import logo from './assets/jecrs687.jpg';
 import './App.css';
 import { TiDocument,TiSocialFacebookCircular,TiSocialInstagramCircular,TiSocialGithubCircular,TiSocialLinkedinCircular } from "react-icons/ti";
 import {GoRepo,GoHome} from "react-icons/go";
-import {FaSun,FaMoon,FaBrain} from "react-icons/fa";
+import {FaAngleDoubleLeft,FaSun,FaMoon,FaBrain} from "react-icons/fa";
 import {getGithub,getDevTo} from './services/api'
 import {Repos} from './components/repos'
 import {ListSkills}from './components/skills';
@@ -46,11 +46,16 @@ function App() {
   return (
     <div className="App">
       <div className='navBar'>
+        <div onClick={()=>{setGuia('home')}} className='box-logo'>
+        <span className='logo'>Jecrs687</span>
+        <FaAngleDoubleLeft className="icon"/>
+
+        </div>
         <ul className='navBar-nav'>
-          <li  onClick={()=>{setGuia('home')}} className='navBar-item'>
+          {/* <li  onClick={()=>{setGuia('home')}} className='navBar-item'>
             <GoHome className='icon'/>
             <span className='nav-link'>home</span>
-          </li>
+          </li> */}
           <li  onClick={()=>{setGuia('repos')}} className='navBar-item'>
             <GoRepo className='icon'/>
             <span className='nav-link'>Repositories</span>
