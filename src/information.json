@@ -35,12 +35,13 @@
     {"name":"SQL", "percent":85},
     {"name":"C", "percent":95},
     {"name":"AWS", "percent":60},
+    {"name":"Assembly", "percent":80},
     {"name":"VHDL", "percent":80},
     {"name":"Google Cloud", "percent":60}
 ],
 "Others":[
-    {"name": "Photoshop","percent": 80 }
-
+    {"name": "Photoshop","percent": 80 },
+    {"name": "GIMP2","percent": 60 }
 ]
 },
 "repos":[]
