@@ -411,6 +411,8 @@ color: #f1f1f1;
   .box-logo .logo{
     display: none;
     font-weight: 700;
+    padding-top: 1.5rem;
+    padding-bottom: 1.5rem;
     }
   .App .navBar-nav{
     list-style: none;
@@ -442,6 +444,9 @@ color: #f1f1f1;
     transition:filter 1000ms ease;
   }
   
+  .App .navBar-item:first-child {
+    display: none;
+  }
   .App .box-logo .icon{
     display: none;
   }
@@ -513,6 +518,9 @@ color: #f1f1f1;
       width: 100vw;
       height: 4rem;
   
+    }
+    .App .navBar-item:first-child {
+      display: flex;
     }
     .navBar .navBar-nav{
       flex-direction: row;

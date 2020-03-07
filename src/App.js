@@ -52,10 +52,10 @@ function App() {
 
         </div>
         <ul className='navBar-nav'>
-          {/* <li  onClick={()=>{setGuia('home')}} className='navBar-item'>
+         <li  onClick={()=>{setGuia('home')}} className='navBar-item'>
             <GoHome className='icon'/>
             <span className='nav-link'>home</span>
-          </li> */}
+          </li>
           <li  onClick={()=>{setGuia('repos')}} className='navBar-item'>
             <GoRepo className='icon'/>
             <span className='nav-link'>Repositories</span>
