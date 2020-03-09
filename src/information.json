@@ -11,6 +11,72 @@
 "github":"https://github.com/jecrs687",
 "instagram":"https://instagram.com/jecrs687",
 "avatar_url":"",
+"projects":{
+    "smallProjects":
+    [{
+        "name":"Border Creator",
+        "link":"/miniProjects/border-creator/"
+    },
+    {
+        "name":"box shadow generator",
+        "link":"/miniProjects/box-shadow-generator/"
+    },
+    {
+        "name":"bin2dec",
+        "link":"/miniProjects/bin2dec/"
+    },{
+        "name":"calculator",
+        "link":"/miniProjects/calculator/"
+    }],
+    "algorithms":
+    [{
+        "name":"Border Creator",
+        "link":"/miniProjects/border-creator/"
+    },
+    {
+        "name":"box shadow generator",
+        "link":"/miniProjects/box-shadow-generator/"
+    },
+    {
+        "name":"bin2dec",
+        "link":"/miniProjects/bin2dec/"
+    },{
+        "name":"calculator",
+        "link":"/miniProjects/calculator/"
+    }],
+    "bigProjects":
+    [{
+        "name":"Border Creator",
+        "link":"/miniProjects/border-creator/"
+    },
+    {
+        "name":"box shadow generator",
+        "link":"/miniProjects/box-shadow-generator/"
+    },
+    {
+        "name":"bin2dec",
+        "link":"/miniProjects/bin2dec/"
+    },{
+        "name":"calculator",
+        "link":"/miniProjects/calculator/"
+    }],
+    "applications":
+    [{
+        "name":"Border Creator",
+        "link":"/miniProjects/border-creator/"
+    },
+    {
+        "name":"box shadow generator",
+        "link":"/miniProjects/box-shadow-generator/"
+    },
+    {
+        "name":"bin2dec",
+        "link":"/miniProjects/bin2dec/"
+    },{
+        "name":"calculator",
+        "link":"/miniProjects/calculator/"
+    }]
+},
 "country":"Brazil",
 "bio":"I thought a lot about the purpose of my life and now I think I know. My goal in this life is to create solutions for use by millions of people around the world",
 "age":19,
@@ -44,6 +110,38 @@
     {"name": "GIMP2","percent": 60 }
 ]
 },
-"repos":[]
+"repos":[],
+"paletter":[{
+    "primary":"#fc85ae",
+    "secundary":"#9e579d",
+    "third":"#574b90",
+    "fourth":"#303a52"
+},{
+    "primary":"#a7ff83",
+    "secundary":"#17b978",
+    "third":"#086972",
+    "fourth":"#071a52"
+},{
+    "primary":"#f4fa9c",
+    "secundary":"#f469a9",
+    "third":"#ba53de",
+    "fourth":"#88bef5"
+},{
+    "third":"#fc5185",
+    "secundary":"#364f6b",
+    "primary":"#43dde6",
+    "fourth":"#f0f0f0"
+},{
+    "primary":"#e2f3f5",
+    "secundary":"#22d1ee",
+    "third":"#3d5af1",
+    "fourth":"#0e153a"
+},{
+    "primary":"#581b98",
+    "secundary":"#9c1de7",
+    "third":"#f3558e",
+    "fourth":"#faee1c"
+}
 
+]
 }

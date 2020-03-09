@@ -2,10 +2,11 @@ import React,{useEffect,useState} from 'react';
 import logo from './assets/jecrs687.jpg';
 import './App.css';
 import { TiDocument,TiSocialFacebookCircular,TiSocialInstagramCircular,TiSocialGithubCircular,TiSocialLinkedinCircular } from "react-icons/ti";
-import {GoRepo,GoHome} from "react-icons/go";
+import {GoRepo,GoHome,GoProject} from "react-icons/go";
 import {FaAngleDoubleLeft,FaSun,FaMoon,FaBrain} from "react-icons/fa";
 import {getGithub,getDevTo} from './services/api'
 import {Repos} from './components/repos'
+import {Projects} from './components/Projects'
 import {ListSkills}from './components/skills';
 import {ListArticles}from './components/articles';
 
@@ -18,7 +19,7 @@ const data = require('./information.json')
 
 function App() {
   const [info,setInfo]=useState(data)
-  const [guia,setGuia]=useState('home')
+  const [guia,setGuia]=useState('projects')
   const [dark,setDark]=useState(true)
   // const [,setReload] = useState(false)
   useEffect(
@@ -67,6 +68,10 @@ function App() {
           <li onClick={()=>{setGuia('articles')}} className='navBar-item'>
             <FaBrain className='icon'/>
             <span className='nav-link' >articles</span>
+          </li>
+          <li onClick={()=>{setGuia('projects')}} className='navBar-item'>
+            <GoProject className="icon"/>
+            <span className='nav-link' >Projects</span>
           </li>
           {dark?          
           <li className='navBar-item'  onClick={
@@ -136,7 +141,9 @@ function App() {
       { guia==='repos'?
         <Repos info={info}/>:
         guia==='skills'?<ListSkills data={info}/>:
-        guia==='articles'?<ListArticles data={info}/>:null}
+        guia==='articles'?<ListArticles data={info}/>:
+        guia==='projects'?<Projects data={info}/>:
+        null}
       </div>}
       
       <div className='App-footer'><p>Powered by <a href='/#'>@jecr687</a>   2020</p>
