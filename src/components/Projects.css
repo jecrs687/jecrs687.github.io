@@ -1,6 +1,15 @@
-.projects{
+.box-project{
+    margin-top: 10px;
+}
+.grid-projects{
     display: grid;
     grid-template-columns: repeat(4,1fr);
+}
+.projects .title-project{
+    color:var(--primary);
+    font-size: 2.5rem;
+    font-weight: 700;
+
 }
 .project{
     flex:1;
@@ -29,17 +38,17 @@
     text-shadow: 4px 3px 0px #7A7A7A;
 }
 @media screen and (max-width:1200px){
-    .projects{
+.grid-projects{
         grid-template-columns: repeat(3,1fr);
     }
 }
 @media screen and (max-width:900px){
-    .projects{
+.grid-projects{
         grid-template-columns: repeat(2,1fr);
     }
 }
 @media screen and (max-width:600px){
-    .projects{
+.grid-projects{
         grid-template-columns: repeat(1,1fr);
     }
 }

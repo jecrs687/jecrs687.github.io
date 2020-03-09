@@ -18,64 +18,23 @@
         "link":"/miniProjects/border-creator/"
     },
     {
-        "name":"box shadow generator",
+        "name":"Box shadow generator",
         "link":"/miniProjects/box-shadow-generator/"
     },
     {
-        "name":"bin2dec",
+        "name":"Bin2Dec",
         "link":"/miniProjects/bin2dec/"
     },{
-        "name":"calculator",
+        "name":"Calculator",
         "link":"/miniProjects/calculator/"
     }],
-    "algorithms":
-    [{
-        "name":"Border Creator",
-        "link":"/miniProjects/border-creator/"
-    },
-    {
-        "name":"box shadow generator",
-        "link":"/miniProjects/box-shadow-generator/"
-    },
-    {
-        "name":"bin2dec",
-        "link":"/miniProjects/bin2dec/"
-    },{
-        "name":"calculator",
-        "link":"/miniProjects/calculator/"
-    }],
-    "bigProjects":
-    [{
-        "name":"Border Creator",
-        "link":"/miniProjects/border-creator/"
-    },
-    {
-        "name":"box shadow generator",
-        "link":"/miniProjects/box-shadow-generator/"
-    },
-    {
-        "name":"bin2dec",
-        "link":"/miniProjects/bin2dec/"
-    },{
-        "name":"calculator",
-        "link":"/miniProjects/calculator/"
-    }],
-    "applications":
-    [{
-        "name":"Border Creator",
-        "link":"/miniProjects/border-creator/"
-    },
-    {
-        "name":"box shadow generator",
-        "link":"/miniProjects/box-shadow-generator/"
-    },
-    {
-        "name":"bin2dec",
-        "link":"/miniProjects/bin2dec/"
-    },{
-        "name":"calculator",
-        "link":"/miniProjects/calculator/"
-    }]
+    "bigProjects":[
+        {
+            "name":"rich text editor",
+            "link":"/rich-text-editor/"
+
+        }
+    ]
 },
 "country":"Brazil",
 "bio":"I thought a lot about the purpose of my life and now I think I know. My goal in this life is to create solutions for use by millions of people around the world",
@@ -141,7 +100,54 @@
     "secundary":"#9c1de7",
     "third":"#f3558e",
     "fourth":"#faee1c"
+},{
+    "primary":"#c5e3f6",
+    "secundary":"#fc5c9c",
+    "third":"#fccde2",
+    "fourth":"#fcefee"
 }
+,{
+    "primary":"#482ff7",
+    "secundary":"#2d6cdf",
+    "third":"#46c3db",
+    "fourth":"#f3f169"
+}
+,{
+    "primary":"#fff98c",
+    "secundary":"#e0c45c",
+    "third":"#cb3b3b",
+    "fourth":"#85203b"
+}
+,{
+    "primary":"#28c7fa",
+    "secundary":"#775ada",
+    "third":"#002651",
+    "fourth":"#ff304f"
+}
+,{
+    "primary":"#21e6c1",
+    "secundary":"#278ea5",
+    "third":"#1f4287",
+    "fourth":"#071e3d"
+},{
+    "primary":"#feff89",
+    "secundary":"#ff9f68",
+    "third":"#f85959",
+    "fourth":"#7c203a"
+},{
+    "primary":"#f3cf7a",
+    "secundary":"#be6a15",
+    "third":"#ac3f21",
+    "fourth":"#6e3b3b"
+},
+{
+    "primary":"#cabbe9",
+    "secundary":"#ffcef3",
+    "third":"#fdfdfd",
+    "fourth":"#a1eafb"
+}
+
+
 
 ]
 }

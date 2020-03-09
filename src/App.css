@@ -441,7 +441,7 @@ color: #f1f1f1;
     margin:0 1.5rem;
     color: #ffcce0;  
     filter: opacity(0.7) grayscale(0%);
-    transition:filter 1000ms ease;
+    transition:1000ms ease;
   }
   
   .App .navBar-item:first-child {
@@ -516,8 +516,9 @@ color: #f1f1f1;
       bottom: 0;
       padding: 0;
       width: 100vw;
-      height: 4rem;
-  
+      height: 15vmin;
+      align-items: center;
+      justify-content: center;
     }
     .App .navBar-item:first-child {
       display: flex;
@@ -531,7 +532,7 @@ color: #f1f1f1;
       justify-items: center;
     }
     .navBar .navBar-item .icon{
-      width: 5vw;
+      width: 4vmin;
     }
 
   }  
