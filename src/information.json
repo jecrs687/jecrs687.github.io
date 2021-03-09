@@ -30,9 +30,13 @@
     }],
     "bigProjects":[
         {
-            "name":"rich text editor",
+            "name":"Rich text editor",
             "link":"/rich-text-editor/"
 
+        },
+        {
+            "name":"NovelBr",
+            "link":"/novelbr/"
         }
     ]
 },

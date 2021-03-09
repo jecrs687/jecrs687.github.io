@@ -65,9 +65,12 @@ export function Repo({repo}){
         )
 }
 export function Repos({info}){
+    const repos = info.repos
     return(      
     <div className='repos'>
-    {info.repos.map((value,index)=>(
+    {repos.map((value,index)=>(
     <Repo repo={value} key={index}/>
-  ))}      </div>)
+    ))}      
+    </div>
+    )
 }

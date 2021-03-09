@@ -69,10 +69,10 @@ function App() {
             <FaBrain className='icon'/>
             <span className='nav-link' >articles</span>
           </li>
-          {/* <li onClick={()=>{setGuia('projects')}} className='navBar-item'>
+          <li onClick={()=>{setGuia('projects')}} className='navBar-item'>
             <GoProject className="icon"/>
             <span className='nav-link' >Projects</span>
-          </li> */}
+          </li>
           {dark?          
           <li className='navBar-item'  onClick={
             ()=>{    
@@ -142,7 +142,7 @@ function App() {
         <Repos info={info}/>:
         guia==='skills'?<ListSkills data={info}/>:
         guia==='articles'?<ListArticles data={info}/>:
-        // guia==='projects'?<Projects data={info}/>:
+        guia==='projects'?<Projects data={info}/>:
         null}
       </div>}
       
