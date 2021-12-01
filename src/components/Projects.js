@@ -18,15 +18,13 @@ return(
 export function Projects({data}){
     return(
         <div className='projects'>
+            <div className="box-project">
+        <div className="grid-projects">
               {Object.keys(data.projects).map(
-              value=>(
-                  <div className="box-project">
-                      <span className="title-project">{value}</span>
-                        <div className="grid-projects">
-                          {data.projects[value].map((value)=>(<Project colors={data.paletter} name={value.name} link={value.link} />))}
-                        </div>
+              value=>(data.projects[value].map((value)=>(<Project colors={data.paletter} name={value.name} link={value.link} />))
+              ))}
+               </div>
                     </div>
-              ))}          
         </div>
     )
 }

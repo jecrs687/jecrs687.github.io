@@ -1,7 +1,6 @@
 import React,{useEffect,useState} from 'react';
-import logo from './assets/jecrs687.jpg';
 import './App.css';
-import { TiDocument,TiSocialFacebookCircular,TiSocialInstagramCircular,TiSocialGithubCircular,TiSocialLinkedinCircular } from "react-icons/ti";
+import { TiDocument } from "react-icons/ti";
 import {GoRepo,GoHome,GoProject} from "react-icons/go";
 import {FaAngleDoubleLeft,FaSun,FaMoon,FaBrain} from "react-icons/fa";
 import {getGithub,getDevTo} from './services/api'
@@ -9,7 +8,7 @@ import {Repos} from './components/repos'
 import {Projects} from './components/Projects'
 import {ListSkills}from './components/skills';
 import {ListArticles}from './components/articles';
-
+import {Home} from './components/home'
 const data = require('./information.json')
 
 
@@ -19,7 +18,7 @@ const data = require('./information.json')
 
 function App() {
   const [info,setInfo]=useState(data)
-  const [guia,setGuia]=useState('projects')
+  const [guia,setGuia]=useState('home')
   const [dark,setDark]=useState(true)
   // const [,setReload] = useState(false)
   useEffect(
@@ -105,37 +104,7 @@ function App() {
        </div>
        <div className="body">
        { guia==='home'?
-      <header className="App-header">
-      <div className="App-background" src=''></div>        
-        <div className='box'>
-          <div className='box-info'>
-            <div className='box-img'>
-              <div>
-              </div>
-              <div>
-              </div>
-              <img src={info.avatar_url!==''? info.avatar_url:logo} className="App-logo" alt="logo" />
-          </div>
-          </div>
-          <div className='bio'>
-            <h1>{info.nick}</h1>
-            <h5 style={{fontWeight:300}}>{info.name}, <br/>{info.work}</h5>
-                I LOVE:
-                <ul>
-                {data.loves.map((value,index)=><li key={index} style={{fontFamily:'sans-serif', fontWeight:100}}>{value}</li>)}
-                </ul>
-          </div>
-
-          <div className='box-icon'>
-            <a href={data.facebook}><TiSocialFacebookCircular className='icon'/></a>
-            <a href={data.github}><TiSocialGithubCircular className='icon'/></a>
-            <a href={data.instagram}><TiSocialInstagramCircular className='icon'/></a>
-            <a href={data.linkerdin}><TiSocialLinkedinCircular className='icon'/></a>
-          </div> 
-
-        </div>
-
-      </header>:
+      <Home data={info}/>:
 
        <div className='App-body'>
       { guia==='repos'?

@@ -4,10 +4,10 @@
 }
 .grid-projects{
     display: grid;
-    grid-template-columns: repeat(4,1fr);
+    grid-template-columns: repeat(3,1fr);
 }
 .box-project{
-    margin: 19px;
+    margin: 1px;
 }
 .projects .title-project{
     color:var(--primary);
@@ -16,11 +16,6 @@
 
 }
 .project{
-    margin:5px;
-    border-radius: 100%;
-    border-color: var(--secundary);
-    border-width: 5px;
-    border-style:dotted;
     flex:1;
     display: flex;
     height: 40vh;
@@ -31,7 +26,7 @@
     transition:filter 1000ms ease;
 }
 .project:hover{
-    filter: brightness(110%);
+    filter: brightness(140%);
 }
 
 .project .title{
