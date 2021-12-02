@@ -4,7 +4,9 @@
   --navPrimary:#fff;
   --theme:#fff;
   --primary:#111;
-  --secundary:#ff80b2
+  --secundary:#ff80b2;
+  overflow-x: hidden;
+  
 
 }
 :root::-webkit-scrollbar{

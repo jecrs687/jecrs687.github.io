@@ -1,49 +1,12 @@
 import React from 'react'
 import "./home.css"
-// import { TiDocument,TiSocialFacebookCircular,TiSocialInstagramCircular,TiSocialGithubCircular,TiSocialLinkedinCircular } from "react-icons/ti";
-// import logo from '../assets/jecrs687.jpg';
+ import { TiDocument,TiSocialFacebookCircular,TiSocialInstagramCircular,TiSocialGithubCircular,TiSocialLinkedinCircular } from "react-icons/ti";
+import logo from '../assets/jecrs687.jpg';
 
-export function Home({data}){
+export function Home({info, data}){
     return(
-        <div className="home">
-            <div className="base">
-            <div className="name">Emanuel Cascone</div>
-            <span className="subline">________________________</span>
-            <div className="boxSetas">
-            <div className="setas">👇👇👇👇👇</div>
-            </div>
-            </div>
-            <div className="Parallax">
-            <div className="paralla_item" id="one">
-                <div className="paral first" >
-                    Nice to meet you
-                </div>
-                <div className="paral second">
-                    How you know, I'm Emanuel
-                </div>
-            </div>
-            <div className="paralla_item" id="two">
-                    <div className="paral second">
-                    How you know, I'm Emanuel
-
-                </div>
-                <div className="paral third">
-                    trying do a effect
-                </div>
-            </div>
-            <div className="paralla_item" id="three">
-                    <div className="paral third">
-                    trying do a effect
-
-                </div>
-                </div>
-                <div className="end">
-                    
-                </div>
-            </div>
-            <div className="ParallaxEnd"></div>
-        </div>
-/* <header className="App-header">
+      
+<header className="App-header">
       <div className="App-background" src=''></div>        
         <div className='box'>
           <div className='box-info'>
@@ -73,6 +36,6 @@ export function Home({data}){
 
         </div>
 
-      </header> */
+      </header> 
     )
       }

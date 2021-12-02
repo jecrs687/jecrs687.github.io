@@ -8,7 +8,7 @@ import {Repos} from './components/repos'
 import {Projects} from './components/Projects'
 import {ListSkills}from './components/skills';
 import {ListArticles}from './components/articles';
-import {Home} from './components/home'
+import {Home} from './components/NewHome'
 const data = require('./information.json')
 
 
@@ -104,7 +104,7 @@ function App() {
        </div>
        <div className="body">
        { guia==='home'?
-      <Home data={info}/>:
+      <Home data={data} info={info}/>:
 
        <div className='App-body'>
       { guia==='repos'?

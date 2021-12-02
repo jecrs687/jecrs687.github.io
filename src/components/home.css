@@ -3,10 +3,8 @@
     overflow-x: hidden;
 }
 .home{
-    display:flexbox;
     inset: 0;
     color:whitesmoke;
-    
     top:0;
     background-color: aqua;
     overflow: hidden;
@@ -63,12 +61,12 @@
     }
     85%{
         opacity: 1;
-        transform: scaleX(0.6) scaleY(0.7) translate(-250px,0);
+        transform: scaleX(0.4) scaleY(0.7) translate(-250px,0);
 
     }
     100%{
         opacity: 1;
-        transform: scale(0.7)  translate(0px,0);
+        transform: scale(0.7) scaleX(0.4)  translate(0px,0);
     }
 }
 .base{
@@ -102,55 +100,46 @@ align-items: center;
     animation-delay: 7s;
 }
 .subline{
-    transform: scale(0.7) ;
+    transform: scale(0.7) scaleX(0.4) ;
     font-size:  clamp(6vw, 8vmin, 5vw);
     animation: subline 5s;
-    margin-top: clamp(-5vw, -7vmin, -6vw);
+    margin-top: clamp(-9vw, -7vmin, -6vw);
 }
 
-.Parallax{
-    transform-style: preserve-3d;
+/* implemeting parallax funcionts */
 
-    perspective: 300px;
+.parallax{
+height:100vh;
+font-size:  clamp(6vw, 8vmin, 5vw);
+overflow-x: hidden;
+overflow-y:auto ;
+perspective: 300px;
 
 }
-
-.paralla_item{
+.parallax_group{
     position: relative;
-    transform-style: preserve-3d;
     height: 100vh;
-    width: 100vw;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 500;
-    font-size: 7vmin;
-    color: white;
-    
-
+    transform-style: preserve-3d;
 }
-.paral{
+.parallax_item {
+    position:absolute;
+    inset: 0;
     display: flex;
-    inset:0;
-    justify-content: center;
     align-items: center;
+    justify-content: center;
 }
 .first{
-    position: absolute;
-    transform: translateZ(-200px) scale(3);
+    transform: translateZ(-300px) scale(3);
 }
- 
 .second{
-    position: absolute;
     transform: translateZ(0px);
-
-
 }
 .third{
-    position: absolute;
-    transform: translateZ(100px);
+    transform: translateZ(300px);
 }
-
 #one > .first{
     background-color: tomato;
+}
+#second > .second{
+    background-color: aqua;
 }
