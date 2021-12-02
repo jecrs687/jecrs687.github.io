@@ -7,31 +7,33 @@ export function Home({data}){
     return(
         <div className="home">
             <div className="base">
-            <h1 className="name">Emanuel Cascone</h1>
+            <div className="name">Emanuel Cascone</div>
             <span className="subline">________________________</span>
             <div className="boxSetas">
             <div className="setas">👇👇👇👇👇</div>
             </div>
             </div>
             <div className="Parallax">
-            <div className="ParallaxItem">
-                <div className="first">
+            <div className="paralla_item" id="one">
+                <div className="paral first" >
                     Nice to meet you
                 </div>
-                <div className="second">
+                <div className="paral second">
                     How you know, I'm Emanuel
                 </div>
             </div>
-            <div className="ParallaxItem">
-                    <div className="second">
+            <div className="paralla_item" id="two">
+                    <div className="paral second">
+                    How you know, I'm Emanuel
 
                 </div>
-                <div className="third">
-                    
+                <div className="paral third">
+                    trying do a effect
                 </div>
             </div>
-            <div className="ParallaxItem">
-                    <div className="third">
+            <div className="paralla_item" id="three">
+                    <div className="paral third">
+                    trying do a effect
 
                 </div>
                 </div>

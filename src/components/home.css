@@ -1,11 +1,11 @@
-@import url('https://fonts.googleapis.com/css2?family=Lobster+Two');
+@import url('https://fonts.googleapis.com/css2?family=Crimson+Pro&family=Literata');
 :root{
     overflow-x: hidden;
 }
 .home{
     display:flexbox;
     inset: 0;
-    color: pink;
+    color:whitesmoke;
     
     top:0;
     background-color: aqua;
@@ -50,25 +50,25 @@
     }
     50%{
         opacity: 0;
-        transform: scaleX(2) translate(1000px,0);
+        transform: scale(0.0001)  translate(400vmax,0);
     }
     51%{
         opacity: 1;
-        transform: scaleX(2) translate(1000px,0);
+        transform: scaleX(0.2) scaleY(0.7)  translate(400vmax,0);
     }
     72%{
         opacity: 1;
-        transform: scaleX(3) translate(1000px,0) ;
+        transform: scaleX(0.8) scaleY(0.7) translate(120vw,0) ;
 
     }
     85%{
         opacity: 1;
-        transform: scaleX(2) translate(-100px,0);
+        transform: scaleX(0.6) scaleY(0.7) translate(-250px,0);
 
     }
     100%{
         opacity: 1;
-        transform: scaleX(1) translate(0px,0);
+        transform: scale(0.7)  translate(0px,0);
     }
 }
 .base{
@@ -77,18 +77,19 @@
 background-color: var(--primary) ;
 height: 100vh;
 inset:0;
+
 top:0;
 justify-content: center;
 align-items: center;
 }
 .home .name{
-    font-family: Tangerine;
+    width: 100vw;
     overflow-y: hidden;
-
-    font-size: 15vmin;
+    font-size: clamp(5vw, 7vmin, 13vw);
     animation-delay: 2s;
+    font-weight: 500;
+
     animation: appear 3s alternate;
-    text-shadow: 4px 4px 4px #555;
 
     }
 .home .boxSetas{ 
@@ -101,10 +102,10 @@ align-items: center;
     animation-delay: 7s;
 }
 .subline{
-    transform: scaleX(1);
-    font-size: 5vmin;
+    transform: scale(0.7) ;
+    font-size:  clamp(6vw, 8vmin, 5vw);
     animation: subline 5s;
-    margin-top: -17vmin;
+    margin-top: clamp(-5vw, -7vmin, -6vw);
 }
 
 .Parallax{
@@ -114,10 +115,9 @@ align-items: center;
 
 }
 
-.ParallaxItem{
+.paralla_item{
     position: relative;
     transform-style: preserve-3d;
-
     height: 100vh;
     width: 100vw;
     display: flex;
@@ -129,16 +129,28 @@ align-items: center;
     
 
 }
-
+.paral{
+    display: flex;
+    inset:0;
+    justify-content: center;
+    align-items: center;
+}
 .first{
     position: absolute;
-
+    transform: translateZ(-200px) scale(3);
 }
  
 .second{
     position: absolute;
-    transform: translateZ(-200px) scale(2);
+    transform: translateZ(0px);
+
+
+}
+.third{
+    position: absolute;
+    transform: translateZ(100px);
 }
 
-.first{
+#one > .first{
+    background-color: tomato;
 }
