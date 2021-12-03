@@ -69,16 +69,57 @@
         transform: scale(0.7) scaleX(0.4)  translate(0px,0);
     }
 }
+@keyframes paint{
+    0%{
+        opacity:1;
+        
+    }
+    85%{
+        opacity:1;
+    }
+    100%{
+        opacity: 0;
+    }
+}
+@keyframes change_color {
+0%{
+    background-color:var(--primary);
+    color:white;
+}
+50%{
+    background-color: white;
+    color:black;
+}
+100%{
+    background-color:var(--primary);
+        color:white;
+}
+}
 .base{
+    position: relative;
     display: flex;
     flex-direction: column;
-background-color: var(--primary) ;
-height: 100vh;
-inset:0;
-
-top:0;
-justify-content: center;
-align-items: center;
+    background-color: var(--primary) ;
+    color: white;
+    height: 100vh;
+    inset:0;
+    justify-content: center;
+    align-items: center;
+    animation: change_color 12s;
+    animation-delay: 12s;
+}
+.img{
+    position:absolute;
+        opacity: 0;
+        bottom:15vh;
+        height: 41vh;
+        left: 25vw;
+    animation: paint 8s;
+    animation-delay: 9.5s;
+}
+img{
+    position: absolute;
+    height: 50vh;
 }
 .home .name{
     width: 100vw;
@@ -96,12 +137,14 @@ align-items: center;
 }
 .home .setas{
     opacity: 0;
+    font-size: 1rem;
     animation: upAndDown 0.7s infinite;
-    animation-delay: 7s;
+    animation-delay: 15s;
 }
 .subline{
     transform: scale(0.7) scaleX(0.4) ;
     font-size:  clamp(6vw, 8vmin, 5vw);
+    font-weight: 900;
     animation: subline 5s;
     margin-top: clamp(-9vw, -7vmin, -6vw);
 }
@@ -110,7 +153,7 @@ align-items: center;
 
 .parallax{
 height:100vh;
-font-size:  clamp(6vw, 8vmin, 5vw);
+font-size:   5vw;
 overflow-x: hidden;
 overflow-y:auto ;
 perspective: 300px;
@@ -129,17 +172,26 @@ perspective: 300px;
     justify-content: center;
 }
 .first{
-    transform: translateZ(-300px) scale(3);
+    transform: translateZ(-100px) scale(2) ;
 }
 .second{
-    transform: translateZ(0px);
+    transform: translateZ(0px) scale(1);
 }
 .third{
-    transform: translateZ(300px);
+    transform: translateZ(100px) scale(0.7);
+}
+.end{
+    height: 100vh;
+    display: flex;
+}
+#base{
+    z-index: 2;
 }
 #one > .first{
+    z-index: 1;
     background-color: tomato;
 }
 #second > .second{
-    background-color: aqua;
+    background-color:blueviolet;
+    z-index:0;
 }
