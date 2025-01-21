@@ -12,23 +12,24 @@ jobs:
       - name: Git checkout
         uses: actions/checkout@v2
         with:
-          fetch-depth: '0'
-      - name: git
-        - run: |
-          # setup the username and email. I tend to use 'GitHub Actions Bot' with no email by default
+          fetch-depth: 0
+
+      - name: Configure Git
+        run: |
           git --version
           git config user.name "GitHub Actions Bot"
           git config user.email "<>"
           git status
           git tag
           git describe
+
       - name: Setup Node.js
-        - uses: actions/setup-node@v2
+        uses: actions/setup-node@v2
         with:
-          node-version: '22'
-              - name: git
-        - run: npm install
-        - run: npm run deploy-gh
-      
-      
-    
+          node-version: '16' # Node.js 22 doesn't exist, latest stable version is recommended
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Deploy to GitHub Pages
+        run: npm run deploy-gh
