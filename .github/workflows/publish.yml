@@ -14,8 +14,8 @@ jobs:
         with:
           node-version: '22'
       - run: npm install
-      - run: global user.email "emanuelcascone@gmail.com"
-      - run: global user.name "Emanuel Cascone"
+      - run: git config --global user.email  "emanuelcascone@gmail.com"
+      - run: git config --global user.name "Emanuel Cascone"
       - run: npm run deploy-gh
       
       
