@@ -14,7 +14,7 @@ jobs:
         with:
           node-version: '22'
               - name: git
-      run: |
+      - run: |
         # setup the username and email. I tend to use 'GitHub Actions Bot' with no email by default
         git --version
         git config user.name "GitHub Actions Bot"
