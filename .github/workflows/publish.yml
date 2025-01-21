@@ -13,9 +13,16 @@ jobs:
       - uses: actions/setup-node@v2
         with:
           node-version: '22'
+              - name: git
+      run: |
+        # setup the username and email. I tend to use 'GitHub Actions Bot' with no email by default
+        git --version
+        git config user.name "GitHub Actions Bot"
+        git config user.email "<>"
+        git status
+        git tag
+        git describe
       - run: npm install
-      - run: git config --global user.email  "emanuelcascone@gmail.com"
-      - run: git config --global user.name "jecrs687"
       - run: npm run deploy-gh
       
       
