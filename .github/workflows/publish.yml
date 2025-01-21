@@ -1,5 +1,3 @@
-//using gh-pages to build and publish the site on github, using the workflow
-
 name: Publish site
 permissions:
   contents: read
