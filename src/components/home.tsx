@@ -1,13 +1,28 @@
 import React from 'react'
 import "./home.css"
- import { TiDocument,TiSocialFacebookCircular,TiSocialInstagramCircular,TiSocialGithubCircular,TiSocialLinkedinCircular } from "react-icons/ti";
+ import { TiSocialFacebookCircular,TiSocialInstagramCircular,TiSocialGithubCircular,TiSocialLinkedinCircular } from "react-icons/ti";
 import logo from '../assets/jecrs687.jpg';
 
-export function Home({info, data}){
+interface Info {
+  avatar_url: string;
+  nick: string;
+  name: string;
+  work: string;
+}
+
+interface Data {
+  loves: (string | number | boolean | React.ReactElement | Iterable<React.ReactNode> | React.ReactPortal | null | undefined)[];
+  facebook: string;
+  github: string;
+  instagram: string;
+  linkerdin: string;
+}
+
+export function Home({info, data}: {info: Info, data: Data}){
     return(
       
 <header className="App-header">
-      <div className="App-background" src=''></div>        
+      <div className="App-background" ></div>        
         <div className='box'>
           <div className='box-info'>
             <div className='box-img'>
@@ -23,7 +38,7 @@ export function Home({info, data}){
             <h5 style={{fontWeight:300}}>{info.name}, <br/>{info.work}</h5>
                 I LOVE:
                 <ul>
-                {data.loves.map((value,index)=><li key={index} style={{fontFamily:'sans-serif', fontWeight:100}}>{value}</li>)}
+                {data.loves.map((value: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | null | undefined,index: React.Key | null | undefined)=><li key={index} style={{fontFamily:'sans-serif', fontWeight:100}}>{value}</li>)}
                 </ul>
           </div>
 

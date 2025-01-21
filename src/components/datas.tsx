@@ -1,7 +1,17 @@
 
 
 
-export default function datas(){
+interface DataProps {
+  country: string;
+  age: number;
+  email: string;
+  phone: string;
+  city: string;
+  address: string;
+  bio: string;
+}
+
+export default function datas({data}: {data: DataProps}){
     return (    
     <div>
     <div className='App-data'>

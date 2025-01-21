@@ -1,0 +1,22 @@
+//using gh-pages to build and publish the site on github, using the workflow
+
+name: Publish site
+permissions:
+  contents: read
+on:
+  push:
+    branches:
+      - main
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '22'
+      - run: npm install
+      - run: npm run deploy-gh
+      
+      
+    

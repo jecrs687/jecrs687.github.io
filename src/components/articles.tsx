@@ -1,7 +1,19 @@
 
-import React from 'react'
 import './articles.css'
-export function ListArticles({data}){
+interface Article {
+    url: string;
+    social_image: string;
+    title: string;
+    description: string;
+    tags: string;
+    published_at: string;
+}
+
+export interface ArticlesData {
+    devToArticles?: Article[];
+}
+
+export function ListArticles({data}: {data: ArticlesData}){
     return(
         <div className='articles'>
             {

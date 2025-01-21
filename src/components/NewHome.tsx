@@ -1,9 +1,8 @@
-import React from 'react'
 import "./home.css"
 import logo from '../assets/022Fl.gif'
 import {Cube} from './subComponents/cube'
 
-export function Home({ info, data }) {
+export function Home() {
   return (
     <div className="home">
       <div className="parallax">

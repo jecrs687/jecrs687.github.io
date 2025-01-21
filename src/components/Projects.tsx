@@ -1,9 +1,14 @@
-import React from 'react'
 import "./Projects.css"
 
 
 
-function Project({colors,name,link}){
+interface ProjectProps {
+    colors: { primary: string; secundary: string; third: string; }[];
+    name: string;
+    link: string;
+}
+
+function Project({ colors, name, link }: ProjectProps){
     var palette = Math.floor(Math.random() * colors.length);
     var color= colors[palette].primary;
     var color2= colors[palette].secundary;
@@ -15,13 +20,18 @@ return(
 )
 }
 
-export function Projects({data}){
+export interface ProjectsData {
+    projects: { name: string; link: string; }[][];
+    paletter: { primary: string; secundary: string; third: string; }[];
+}
+
+export function Projects({data}: { data: any }){
     return(
         <div className='projects'>
             <div className="box-project">
         <div className="grid-projects">
               {Object.keys(data.projects).map(
-              value=>(data.projects[value].map((value)=>(<Project colors={data.paletter} name={value.name} link={value.link} />))
+              key => (data.projects[+key].map((project: { name: string; link: string; }) => (<Project colors={data.paletter} name={project.name} link={project.link} />))
               ))}
                </div>
                     </div>
