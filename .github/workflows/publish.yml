@@ -26,8 +26,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: '16' # Node.js 22 doesn't exist, latest stable version is recommended
-
+          node-version: '22' 
       - name: Install dependencies
         run: npm install
 
