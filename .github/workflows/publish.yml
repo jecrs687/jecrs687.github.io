@@ -17,9 +17,10 @@ jobs:
       - name: Configure Git
         run: |
           git --version
-          git config user.name "GitHub Actions Bot"
+          git config user.name "${{github.actor}}"
           git config user.email "emanuelcascone@gmail.com"
-          git status
+          git remote set-url origin https://${{secrets.GH_TOKEN}}@github.com/${{github.repository}}.git
+
 
       - name: Setup Node.js
         uses: actions/setup-node@v2
