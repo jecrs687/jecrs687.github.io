@@ -1,4 +1,4 @@
-import{r as Ke,l as hx,n as fx,j as xi}from"./index-DvuUjOVi.js";/**
+import{r as Ke,w as hx,x as fx,j as xi}from"./index-Y8m3Dsjf.js";/**
  * @license
  * Copyright 2010-2023 Three.js Authors
  * SPDX-License-Identifier: MIT
