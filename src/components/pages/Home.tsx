@@ -5,7 +5,6 @@ import { Link } from 'react-router-dom';
 import { FaGithub, FaLinkedin, FaInstagram, FaArrowDown, FaMusic, FaGuitar, FaBookOpen, FaCode, FaHeart, FaLanguage } from 'react-icons/fa';
 import { SiMalt } from 'react-icons/si';
 import { useTheme } from '../../contexts/ThemeContext';
-import totoro from '../../assets/totoro-transparent.gif';
 import backgroundJapan from '../../assets/background.jpg';
 import info from '../../information.json';
 
@@ -393,7 +392,7 @@ const Home = () => {
         {/* Floating Totoro */}
         <div className="absolute right-8 sm:right-20 bottom-44 sm:bottom-24 h-24 md:h-40 z-10 opacity-80 hover:opacity-100 transition-opacity duration-300">
           <animated.div style={{ transform: y.to(value => `translateY(${value}px)`) }}>
-            <img src={totoro} alt="Totoro" className="h-full object-contain" />
+            <img src={"/pikachu.gif"} alt="Totoro" className="h-full object-contain w-[350px] sm:w-[350px] md:w-[475px]" />
           </animated.div>
         </div>
 
@@ -697,7 +696,7 @@ const Home = () => {
         <div className="container mx-auto px-4 text-center relative z-10">
           <div className="mb-6 flex justify-center">
             <animated.div style={{ transform: y.to(value => `translateY(${value / 2}px)`) }}>
-              <img src={totoro} alt="Totoro" className="h-16 object-contain" />
+              <img src={"/pikachu.gif"} alt="Totoro" className="h-16 object-contain" />
             </animated.div>
           </div>
 
