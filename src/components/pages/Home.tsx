@@ -79,7 +79,16 @@ const SakuraDecoration = ({ className = "", size = "small" }) => {
 };
 
 // Featured interest card component
-const InterestCard = ({ icon: Icon, title, description, color }) => {
+import { ElementType } from 'react';
+
+interface InterestCardProps {
+  icon: ElementType;
+  title: string;
+  description: string;
+  color: string;
+}
+
+const InterestCard = ({ icon: Icon, title, description, color }: InterestCardProps) => {
   return (
     <motion.div
       className={`bg-white dark:bg-gray-800/90 rounded-xl p-4 border border-gray-100 dark:border-gray-700 shadow hover:shadow-lg transition-all h-full`}
