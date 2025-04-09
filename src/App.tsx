@@ -1,5 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState, Suspense, lazy } from 'react';
-import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { getGithub, getDevTo } from './services/api';
 import Navbar from './components/layout/Navbar';
@@ -18,31 +19,61 @@ const ArticlesPage = lazy(() => import('./components/pages/ArticlesPage'));
 const ProjectsPage = lazy(() => import('./components/pages/ProjectsPage'));
 const InstagramLinkPage = lazy(() => import('./components/pages/InstagramLinkPage'));
 
-// Page transitions
+// Page transitions - enhanced with smoother animations
 const pageVariants = {
   initial: {
     opacity: 0,
-    x: -20,
+    y: -10,
+    x: -10,
+    scale: 0.98,
   },
   in: {
     opacity: 1,
+    y: 0,
     x: 0,
+    scale: 1,
   },
   exit: {
     opacity: 0,
-    x: 20,
+    y: 10,
+    x: 10,
+    scale: 0.98,
   }
 };
 
 const pageTransition = {
-  type: "tween",
-  ease: "anticipate",
-  duration: 0.5
+  type: "spring",
+  stiffness: 200,
+  damping: 25,
+  duration: 0.4
+};
+
+// Detect if device is mobile
+const isMobileDevice = () => {
+  return (
+    typeof window !== 'undefined' &&
+    (window.matchMedia('(max-width: 768px)').matches ||
+      /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent))
+  );
 };
 
 const AnimatedRoutes = () => {
   const location = useLocation();
   const [info, setInfo] = useState(data);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    // Check if device is mobile on mount
+    setIsMobile(isMobileDevice());
+
+    // Add resize listener to update mobile state
+    const handleResize = () => {
+      setIsMobile(isMobileDevice());
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   useEffect(() => {
     async function loadData() {
@@ -70,6 +101,11 @@ const AnimatedRoutes = () => {
       loadData();
     }
   }, []);
+
+  // If mobile and on homepage, redirect to Instagram
+  if (isMobile && location.pathname === '/') {
+    return <Navigate to="/instagram" replace />;
+  }
 
   return (
     <AnimatePresence mode="wait">
@@ -151,7 +187,7 @@ function App() {
   return (
     <ThemeProvider>
       <SceneProvider>
-        <div className="flex flex-col min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 transition-colors duration-500">
+        <div className="flex flex-col min-h-screen bg-gradient-to-br from-gray-50 via-pink-50/10 to-gray-100 dark:from-gray-900 dark:via-indigo-900/5 dark:to-gray-800 transition-colors duration-500">
           {!isInstagramPage && (
             <div className="fixed top-0 left-0 right-0 z-50">
               <Navbar />
@@ -166,7 +202,8 @@ function App() {
                 <div className="flex flex-col md:flex-row justify-between items-center gap-4">
                   <div className="text-center md:text-left">
                     <p className="text-sm text-gray-600 dark:text-gray-400">
-                      Designed with <span className="text-sakura-500">♥</span> by <a href="https://github.com/jecrs687" className="font-medium text-sakura-600 hover:text-sakura-700 dark:text-sakura-400 dark:hover:text-sakura-300 transition-colors">@jecrs687</a> © {new Date().getFullYear()}
+                      <span className="font-jp mr-1">作成者</span>
+                      Designed with <span className="text-sakura-500">♥</span> by <a href="https://github.com/jecrs687" className="font-medium text-sakura-600 hover:text-sakura-700 dark:text-sakura-400 dark:hover:text-sakura-300 transition-colors">Emma (Leli)</a> © {new Date().getFullYear()}
                     </p>
                   </div>
                   <div className="flex space-x-4">
@@ -186,6 +223,12 @@ function App() {
                       <span className="sr-only">Instagram</span>
                       <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                         <path fillRule="evenodd" d="M12.315 2c2.43 0 2.784.013 3.808.06 1.064.049 1.791.218 2.427.465a4.902 4.902 0 011.772 1.153 4.902 4.902 0 011.153 1.772c.247.636.416 1.363.465 2.427.048 1.067.06 1.407.06 4.123v.08c0 2.643-.012 2.987-.06 4.043-.049 1.064-.218 1.791-.465 2.427a4.902 4.902 0 01-1.153 1.772 4.902 4.902 0 01-1.772 1.153c-.636.247-1.363.416-2.427.465-1.067.048-1.407.06-4.123.06h-.08c-2.643 0-2.987-.012-4.043-.06-1.064-.049-1.791-.218-2.427-.465a4.902 4.902 0 01-1.772-1.153 4.902 4.902 0 01-1.153-1.772c-.247-.636-.416-1.363-.465-2.427-.047-1.024-.06-1.379-.06-3.808v-.63c0-2.43.013-2.784.06-3.808.049-1.064.218-1.791.465-2.427a4.902 4.902 0 011.153-1.772A4.902 4.902 0 015.45 2.525c.636-.247 1.363-.416 2.427-.465C8.901 2.013 9.256 2 11.685 2h.63zm-.081 1.802h-.468c-2.456 0-2.784.011-3.807.058-.975.045-1.504.207-1.857.344-.467.182-.8.398-1.15.748-.35.35-.566.683-.748 1.15-.137.353-.3.882-.344 1.857-.047 1.023-.058 1.351-.058 3.807v.468c0 2.456.011 2.784.058 3.807.045.975.207 1.504.344 1.857.182.466.399.8.748 1.15.35.35.683.566 1.15.748.353.137.882.3 1.857.344 1.054.048 1.37.058 4.041.058h.08c2.597 0 2.917-.01 3.96-.058.976-.045 1.505-.207 1.858-.344.466-.182.8-.398 1.15-.748.35-.35.566-.683.748-1.15.137-.353.3-.882.344-1.857.048-1.055.058-1.37.058-4.041v-.08c0-2.597-.01-2.917-.058-3.96-.045-.976-.207-1.505-.344-1.858a3.097 3.097 0 00-.748-1.15 3.098 3.098 0 00-1.15-.748c-.353-.137-.882-.3-1.857-.344-1.023-.047-1.351-.058-3.807-.058zM12 6.865a5.135 5.135 0 110 10.27 5.135 5.135 0 010-10.27zm0 1.802a3.333 3.333 0 100 6.666 3.333 3.333 0 000-6.666zm5.338-3.205a1.2 1.2 0 110 2.4 1.2 1.2 0 010-2.4z" clipRule="evenodd"></path>
+                      </svg>
+                    </a>
+                    <a href="mailto:emanuelcascone@gmail.com" className="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-colors">
+                      <span className="sr-only">Email</span>
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
                       </svg>
                     </a>
                   </div>

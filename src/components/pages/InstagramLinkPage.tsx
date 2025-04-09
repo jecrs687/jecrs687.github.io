@@ -1,15 +1,16 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaGithub, FaLinkedin, FaInstagram, FaGlobe, FaMedium, FaCode, FaLanguage, FaMusic, FaHeart, FaPlane, FaCoffee, FaBookOpen, FaUtensils, FaGuitar } from 'react-icons/fa';
+import { FaGithub, FaLinkedin, FaInstagram, FaGlobe, FaMedium, FaCode, FaMusic, FaHeart, FaBookmark, FaMicrophone, FaBookOpen, FaGuitar, FaUserFriends, FaStar, FaJsSquare } from 'react-icons/fa';
+import { SiMalt } from 'react-icons/si';
 import { Link } from 'react-router-dom';
 import info from '../../information.json';
 import { useSpring, animated } from 'react-spring';
 
 // Custom animated button component
-const AnimatedLink = ({ 
-  href, 
-  icon: Icon, 
-  text, 
+const AnimatedLink = ({
+  href,
+  icon: Icon,
+  text,
   gradient = "from-sakura-500 to-cyber-500",
   iconClass = ""
 }: {
@@ -27,8 +28,8 @@ const AnimatedLink = ({
       className={`w-full sm:w-64 flex items-center p-4 mb-4 rounded-xl bg-white dark:bg-gray-800/90 border border-gray-200 dark:border-gray-700 backdrop-blur-sm shadow-lg hover:shadow-xl transition-all duration-300`}
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
-      whileHover={{ 
-        scale: 1.03, 
+      whileHover={{
+        scale: 1.03,
         boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)'
       }}
       whileTap={{ scale: 0.97 }}
@@ -52,16 +53,16 @@ const AsianDecoration = ({ type }: { type: 'sakura' | 'wave' | 'lantern' | 'tori
   const decorations = {
     sakura: (
       <div className="relative">
-        <motion.div 
+        <motion.div
           className="w-6 h-6 bg-sakura-200 dark:bg-sakura-900/40 rounded-full relative"
-          animate={{ 
+          animate={{
             rotate: [0, 45, 0],
             scale: [1, 1.1, 1]
           }}
-          transition={{ 
-            duration: 4, 
+          transition={{
+            duration: 4,
             repeat: Infinity,
-            ease: "easeInOut" 
+            ease: "easeInOut"
           }}
         >
           <div className="absolute w-6 h-6 rotate-[22.5deg] bg-sakura-200 dark:bg-sakura-900/40 rounded-full"></div>
@@ -72,38 +73,38 @@ const AsianDecoration = ({ type }: { type: 'sakura' | 'wave' | 'lantern' | 'tori
       </div>
     ),
     wave: (
-      <motion.svg 
-        width="40" 
-        height="20" 
-        viewBox="0 0 40 20" 
+      <motion.svg
+        width="40"
+        height="20"
+        viewBox="0 0 40 20"
         className="text-cyber-400 dark:text-cyber-600"
         initial={{ pathLength: 0 }}
         animate={{ pathLength: 1 }}
-        transition={{ 
+        transition={{
           duration: 2,
           repeat: Infinity,
           repeatType: "loop",
           repeatDelay: 0.5
         }}
       >
-        <motion.path 
-          d="M0 10 Q5 0, 10 10 Q15 20, 20 10 Q25 0, 30 10 Q35 20, 40 10" 
-          fill="none" 
-          stroke="currentColor" 
+        <motion.path
+          d="M0 10 Q5 0, 10 10 Q15 20, 20 10 Q25 0, 30 10 Q35 20, 40 10"
+          fill="none"
+          stroke="currentColor"
           strokeWidth="2"
         />
       </motion.svg>
     ),
     lantern: (
       <div className="relative">
-        <motion.div 
+        <motion.div
           className="w-3 h-1 bg-amber-500 rounded-full mb-0.5 mx-auto"
           animate={{ y: [-1, 0, -1] }}
           transition={{ duration: 1.5, repeat: Infinity }}
         />
-        <motion.div 
+        <motion.div
           className="w-6 h-8 bg-gradient-to-b from-red-500 to-red-700 rounded-lg relative overflow-hidden"
-          animate={{ 
+          animate={{
             boxShadow: ['0 0 8px rgba(239, 68, 68, 0.3)', '0 0 16px rgba(239, 68, 68, 0.6)', '0 0 8px rgba(239, 68, 68, 0.3)']
           }}
           transition={{ duration: 2, repeat: Infinity }}
@@ -116,7 +117,7 @@ const AsianDecoration = ({ type }: { type: 'sakura' | 'wave' | 'lantern' | 'tori
     ),
     torii: (
       <div className="relative my-1">
-        <motion.div 
+        <motion.div
           className="w-8 h-6"
           animate={{ scale: [1, 1.03, 1] }}
           transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
@@ -137,12 +138,12 @@ const ProjectCard = ({ project, index }: { project: Project; index: number }) =>
   const gradients = [
     "from-sakura-400 to-sakura-600",
     "from-cyber-400 to-cyber-600",
-    "from-matcha-400 to-matcha-600", 
+    "from-matcha-400 to-matcha-600",
     "from-fuji-400 to-fuji-600"
   ];
-  
+
   const gradient = gradients[index % gradients.length];
-  
+
   return (
     <motion.a
       href={project.link}
@@ -153,7 +154,7 @@ const ProjectCard = ({ project, index }: { project: Project; index: number }) =>
       whileInView={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.1 }}
       viewport={{ once: true }}
-      whileHover={{ 
+      whileHover={{
         y: -5,
         boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)',
         transition: { duration: 0.2 }
@@ -182,17 +183,19 @@ const InstagramLinkPage = () => {
   const [currentMood, setCurrentMood] = useState(0);
 
   // Animated Japanese characters
-  const japaneseChars = "私の人生を楽しむ"; // "Enjoying my life" in Japanese
-  const koreanChars = "인생을 즐기자"; // "Let's enjoy life" in Korean
+  const japaneseChars = "人生を楽しむ"; // "Enjoy life" in Japanese
+  const koreanChars = "함께하자"; // "Let's do it together" in Korean
 
-  // Current mood options
+  // Current mood options - updated to match Emma's interests
   const moods = [
     "Coding mode 💻",
-    "Traveling mode ✈️",
-    "Coffee time ☕",
+    "Learning Japanese 🇯🇵",
+    "Learning Korean 🇰🇷",
     "Music lover 🎵",
-    "Language learning 🗣️",
-    "Pasta mood 🍝",
+    "Reading books 📚",
+    "Missing Malta 🇲🇹",
+    "Karaoke time 🎤",
+    "Anime fan 🌸",
   ];
 
   // Spring animation for the floating elements
@@ -206,7 +209,7 @@ const InstagramLinkPage = () => {
   useEffect(() => {
     // Auto-scroll to the top when the component mounts
     window.scrollTo(0, 0);
-    
+
     // Show quote after a delay
     const timer = setTimeout(() => {
       setShowQuote(true);
@@ -216,7 +219,7 @@ const InstagramLinkPage = () => {
     const moodInterval = setInterval(() => {
       setCurrentMood((prev) => (prev + 1) % moods.length);
     }, 3000);
-    
+
     return () => {
       clearTimeout(timer);
       clearInterval(moodInterval);
@@ -226,7 +229,6 @@ const InstagramLinkPage = () => {
   const projects = [
     ...(info.projects.bigProjects || []).slice(0, 3)
   ];
-
 
   // Animation variants
   const containerVariants = {
@@ -255,7 +257,7 @@ const InstagramLinkPage = () => {
   // Generate animated background elements (sakura petals or particles)
   const generateBackgroundElements = () => {
     const elements = [];
-    
+
     // Sakura petals
     for (let i = 0; i < 15; i++) {
       elements.push(
@@ -292,7 +294,7 @@ const InstagramLinkPage = () => {
         </motion.div>
       );
     }
-    
+
     // Lanterns
     for (let i = 0; i < 5; i++) {
       elements.push(
@@ -321,33 +323,36 @@ const InstagramLinkPage = () => {
         </motion.div>
       );
     }
-    
+
     return elements;
   };
 
-  // Personal interests to display
+  // Personal interests to display - updated to match Emma's preferences
   const interests = [
-    { name: "Italy 🇮🇹", icon: FaUtensils, color: "from-green-500 to-red-500" },
-    { name: "Brazil 🇧🇷", icon: FaGuitar, color: "from-green-500 to-yellow-500" },
-    { name: "Travel ✈️", icon: FaPlane, color: "from-blue-500 to-purple-500" },
-    { name: "Coffee ☕", icon: FaCoffee, color: "from-amber-700 to-amber-900" },
-    { name: "Books 📚", icon: FaBookOpen, color: "from-amber-500 to-red-700" },
     { name: "Music 🎵", icon: FaMusic, color: "from-indigo-500 to-purple-500" },
-    { name: "Languages 🗣️", icon: FaLanguage, color: "from-teal-500 to-blue-500" },
+    { name: "Anime 🌸", icon: FaStar, color: "from-pink-500 to-red-500" },
+    { name: "JPop 🎧", icon: FaMusic, color: "from-blue-500 to-pink-500" },
+    { name: "KDramas 📺", icon: FaBookmark, color: "from-red-500 to-amber-500" },
+    { name: "Guitar 🎸", icon: FaGuitar, color: "from-amber-700 to-amber-900" },
+    { name: "Books 📚", icon: FaBookOpen, color: "from-emerald-500 to-teal-700" },
+    { name: "Karaoke 🎤", icon: FaMicrophone, color: "from-cyan-500 to-blue-500" },
+    { name: "Coding 💻", icon: FaJsSquare, color: "from-yellow-500 to-amber-700" },
+    { name: "Friends 👯", icon: FaUserFriends, color: "from-violet-500 to-purple-700" },
+    { name: "Malta 🇲🇹", icon: SiMalt, color: "from-red-500 to-white-500" },
   ];
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-gray-50 via-pink-50/10 to-indigo-50/10 dark:from-gray-900 dark:via-indigo-900/5 dark:to-pink-900/5">
       {/* Korean wave pattern overlay */}
-      <div  
-        style={{ 
+      <div
+        style={{
           backgroundImage: `url("data:image/svg+xml,%3Csvg width='40' height='12' viewBox='0 0 40 12' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 6c2 0 3 1 4 2s2 2 4 2 3-1 4-2 2-2 4-2 3 1 4 2 2 2 4 2 3-1 4-2 2-2 4-2 3 1 4 2 2 2 4 2' fill='%23000000' fill-opacity='0.4' fill-rule='evenodd'/%3E%3C/svg%3E")`,
           backgroundSize: '40px 12px'
         }}
         className="absolute inset-0 bg-repeat opacity-5 dark:opacity-10 dark:[background-image:url('data:image/svg+xml,%3Csvg_width=%2740%27_height=%2712%27_viewBox=%270_0_40_12%27_xmlns=%27http://www.w3.org/2000/svg%27%3E%3Cpath_d=%27M0_6c2_0_3_1_4_2s2_2_4_2_3-1_4-2_2-2_4-2_3_1_4_2_2_2_4_2_3-1_4-2_2-2_4-2_3_1_4_2_2_2_4_2%27_fill=%27%23ffffff%27_fill-opacity=%270.4%27_fill-rule=%27evenodd%27/%3E%3C/svg%3E')]"
       >
       </div>
-      
+
       {/* Animated background elements */}
       {generateBackgroundElements()}
 
@@ -368,7 +373,7 @@ const InstagramLinkPage = () => {
             </motion.div>
           ))}
         </div>
-        
+
         <div className="absolute top-10 right-0 w-5 flex flex-col items-center space-y-3">
           {koreanChars.split('').map((char, i) => (
             <motion.div
@@ -383,14 +388,14 @@ const InstagramLinkPage = () => {
             </motion.div>
           ))}
         </div>
-        
+
         {/* Decorative elements */}
         <div className="absolute top-8 left-1/2 transform -translate-x-1/2">
           <AsianDecoration type="torii" />
         </div>
-        
+
         {/* Profile header */}
-        <motion.div 
+        <motion.div
           className="text-center mb-8 relative"
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -400,25 +405,25 @@ const InstagramLinkPage = () => {
             className="w-32 h-32 mx-auto relative mb-5"
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
-            transition={{ 
-              type: "spring", 
-              stiffness: 260, 
-              damping: 20, 
-              delay: 0.2 
+            transition={{
+              type: "spring",
+              stiffness: 260,
+              damping: 20,
+              delay: 0.2
             }}
           >
             {/* Decorative circle behind avatar */}
             <div className="absolute -inset-3 rounded-full bg-gradient-to-br from-sakura-500 to-fuji-400 animate-spin-slow opacity-30 blur-md"></div>
             <div className="absolute inset-0 rounded-full bg-gradient-to-br from-sakura-500 to-fuji-400 animate-pulse-slow"></div>
-            
-            <img 
-              src="/assets/profile.jpg" 
-              alt="Emanuel Cascone" 
+
+            <img
+              src="/assets/profile.jpg"
+              alt="Emanuel Cascone"
               className="w-full h-full object-cover rounded-full p-1 bg-white dark:bg-gray-900 relative z-10"
             />
-            
+
             {/* Status indicator */}
-            <motion.div 
+            <motion.div
               className="absolute -bottom-2 -right-2 bg-white dark:bg-gray-800 rounded-full p-1 shadow-lg z-20"
               animate={{
                 scale: [1, 1.1, 1],
@@ -432,32 +437,32 @@ const InstagramLinkPage = () => {
             >
               <div className="bg-green-500 w-4 h-4 rounded-full"></div>
             </motion.div>
-            
+
             {/* Small sakura decoration */}
             <div className="absolute -top-2 -left-2 z-20">
               <AsianDecoration type="sakura" />
             </div>
           </motion.div>
-          
-          <motion.h1 
+
+          <motion.h1
             className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-sakura-600 to-cyber-500 text-transparent bg-clip-text mb-2 font-jp"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.3 }}
           >
-            エマヌエル・カスコーネ
+            エマ・レリ
           </motion.h1>
-          
+
           <motion.h2
             className="text-xl font-bold text-gray-800 dark:text-gray-200 mb-1 font-heading"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.35 }}
           >
-            Emanuel Cascone
+            Emma (Leli)
           </motion.h2>
-          
-          <motion.p 
+
+          <motion.p
             className="text-gray-600 dark:text-gray-400 mb-3"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -492,7 +497,7 @@ const InstagramLinkPage = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5 }}
           >
-            <motion.a 
+            <motion.a
               href={info.github}
               target="_blank"
               rel="noopener noreferrer"
@@ -502,7 +507,7 @@ const InstagramLinkPage = () => {
             >
               <FaGithub className="text-xl" />
             </motion.a>
-            <motion.a 
+            <motion.a
               href={info.linkedin}
               target="_blank"
               rel="noopener noreferrer"
@@ -512,7 +517,7 @@ const InstagramLinkPage = () => {
             >
               <FaLinkedin className="text-xl" />
             </motion.a>
-            <motion.a 
+            <motion.a
               href={info.instagram}
               target="_blank"
               rel="noopener noreferrer"
@@ -522,7 +527,7 @@ const InstagramLinkPage = () => {
             >
               <FaInstagram className="text-xl" />
             </motion.a>
-            <motion.a 
+            <motion.a
               href={info.facebook}
               target="_blank"
               rel="noopener noreferrer"
@@ -533,7 +538,7 @@ const InstagramLinkPage = () => {
               <FaGlobe className="text-xl" />
             </motion.a>
           </motion.div>
-          
+
           {/* Quote animation */}
           <AnimatePresence>
             {showQuote && (
@@ -550,18 +555,20 @@ const InstagramLinkPage = () => {
                 <div className="absolute -bottom-3 -right-2 text-3xl text-sakura-300 dark:text-sakura-700 font-serif">
                   "
                 </div>
-              
-                <p className="text-gray-700 dark:text-gray-300 text-sm italic font-kr">
-                  <span className="text-sakura-600 dark:text-sakura-400 font-medium">Frui vita</span> {" "}
-                  (🇮🇹🇧🇷)→🇲🇹 <br />
+
+                <p className="text-gray-700 dark:text-gray-300 text-sm italic">
+                  <span className="text-sakura-600 dark:text-sakura-400 font-medium">
+                    <span className="font-kr mr-1">안녕하세요!</span>
+                    <span className="font-jp mr-1">こんにちは!</span>
+                  </span> <br />
                   {info.bio}
                 </p>
               </motion.div>
             )}
           </AnimatePresence>
-          
+
           {/* Japanese/Korean wave decoration */}
-          <motion.div 
+          <motion.div
             className="flex justify-center mb-4"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -569,8 +576,8 @@ const InstagramLinkPage = () => {
           >
             <AsianDecoration type="wave" />
           </motion.div>
-          
-          {/* Interests tags */}
+
+          {/* Interests tags - updated with Emma's interests */}
           <motion.div
             className="flex flex-wrap justify-center gap-2 mb-8"
             initial="hidden"
@@ -585,8 +592,8 @@ const InstagramLinkPage = () => {
                 whileTap={{ scale: 0.95 }}
                 variants={{
                   hidden: { opacity: 0, y: 20, x: index % 2 === 0 ? -20 : 20 },
-                  show: { 
-                    opacity: 1, 
+                  show: {
+                    opacity: 1,
                     y: 0,
                     x: 0,
                     transition: { duration: 0.5, delay: 0.7 + (index * 0.1) }
@@ -611,8 +618,37 @@ const InstagramLinkPage = () => {
           </div>
         </div>
 
+        {/* Story/About Me section with Asian styling */}
+        <motion.div
+          className="mb-12 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm p-5 rounded-xl border border-gray-200 dark:border-gray-700 relative"
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.7 }}
+        >
+          <div className="absolute -top-3 -right-3">
+            <AsianDecoration type="sakura" />
+          </div>
+
+          <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-3 font-kr flex items-center">
+            <span className="font-jp text-sakura-600 dark:text-sakura-400 mr-2">物語</span>
+            <span className="font-heading">My Story</span>
+          </h2>
+
+          <p className="text-gray-700 dark:text-gray-300 mb-3 text-sm">
+            Living in beautiful Malta, where everyone calls me Leli! Brazilian-Italian by birth, global citizen by heart. ✨
+          </p>
+
+          <p className="text-gray-700 dark:text-gray-300 mb-3 text-sm">
+            I'm passionate about <span className="text-sakura-600 dark:text-sakura-400 font-medium">music</span> and play the guitar 🎸. You'll often find me at karaoke singing my favorite JPop songs!
+          </p>
+
+          <p className="text-gray-700 dark:text-gray-300 text-sm">
+            Currently studying <span className="font-jp text-cyber-600 dark:text-cyber-400">日本語</span> and <span className="font-kr text-fuji-600 dark:text-fuji-400">한국어</span> because I love Asian culture, anime, and KDramas. My friends mean the world to me - always loyal! And I adore my sister Aurora. 💫
+          </p>
+        </motion.div>
+
         {/* Links section */}
-        <motion.div 
+        <motion.div
           className="space-y-4 flex flex-col items-center mb-12 relative"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -635,47 +671,47 @@ const InstagramLinkPage = () => {
           >
             <AsianDecoration type="torii" />
           </animated.div>
-          
+
           <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2 font-jp flex items-center">
             <span className="mr-2">つながろう</span>
-            <span className="font-heading">Connect & Follow</span>
+            <span className="font-heading">Connect With Me</span>
           </h2>
-          
+
           <div className="w-full flex flex-col items-center">
-            <AnimatedLink 
+            <AnimatedLink
               href={info.github}
               icon={FaGithub}
-              text="GitHub"
+              text="My Code on GitHub"
               gradient="from-gray-600 to-gray-900"
             />
-            <AnimatedLink 
+            <AnimatedLink
               href={info.linkedin}
               icon={FaLinkedin}
-              text="LinkedIn"
+              text="Professional Profile"
               gradient="from-blue-500 to-blue-700"
             />
-            <AnimatedLink 
+            <AnimatedLink
               href={info.instagram}
               icon={FaInstagram}
-              text="Instagram"
+              text="My Instagram Feed"
               gradient="from-pink-500 via-red-500 to-yellow-500"
             />
-            <AnimatedLink 
+            <AnimatedLink
               href={info.facebook}
               icon={FaGlobe}
               text="Facebook"
               gradient="from-blue-600 to-blue-800"
             />
-            <AnimatedLink 
+            <AnimatedLink
               href={`https://medium.com/@${info.mediumUser}`}
               icon={FaMedium}
-              text="Medium"
+              text="Read My Articles"
               gradient="from-gray-700 to-black"
             />
           </div>
         </motion.div>
 
-        {/* Projects section */}
+        {/* Projects section - with more creative title */}
         <motion.div
           className="mb-12"
           initial={{ opacity: 0 }}
@@ -683,15 +719,15 @@ const InstagramLinkPage = () => {
           transition={{ delay: 0.9 }}
         >
           <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6 text-center font-kr flex justify-center items-center">
-            <span className="inline-block mr-2">프로젝트</span> 
-            <span className="font-heading">Projects</span>
+            <span className="inline-block mr-2">창작물</span>
+            <span className="font-heading">My Digital Creations</span>
           </h2>
-          
+
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {projects.map((project, index) => (
               <ProjectCard key={project.name} project={project} index={index} />
             ))}
-            
+
             <motion.a
               href="https://jecrs687.github.io/projects"
               className="col-span-1 sm:col-span-2 flex items-center justify-center p-4 rounded-xl bg-gradient-to-r from-matcha-500 to-cyber-500 text-white font-medium shadow-lg hover:shadow-xl transition-all"
@@ -705,7 +741,7 @@ const InstagramLinkPage = () => {
             </motion.a>
           </div>
         </motion.div>
-        
+
         {/* About me quick facts with more Japanese/Korean styling */}
         <motion.div
           className="mb-12"
@@ -715,42 +751,61 @@ const InstagramLinkPage = () => {
         >
           <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4 text-center font-jp flex justify-center items-center">
             <span className="mr-2">私について</span>
-            <span className="font-heading">About Me</span>
+            <span className="font-heading">Quick Facts</span>
           </h2>
-          
+
           <div className="grid grid-cols-2 gap-3">
             <motion.div
               className="bg-white dark:bg-gray-800/90 p-4 rounded-xl shadow backdrop-blur-sm border border-gray-200 dark:border-gray-700"
               whileHover={{ y: -5, transition: { duration: 0.2 } }}
             >
               <p className="text-sm text-gray-500 dark:text-gray-400 font-jp">場所 • Location</p>
-              <p className="font-medium text-gray-800 dark:text-white">{info.city}, {info.country}</p>
+              <p className="font-medium text-gray-800 dark:text-white">Malta 🇲🇹</p>
             </motion.div>
-            
+
             <motion.div
               className="bg-white dark:bg-gray-800/90 p-4 rounded-xl shadow backdrop-blur-sm border border-gray-200 dark:border-gray-700"
               whileHover={{ y: -5, transition: { duration: 0.2 } }}
             >
               <p className="text-sm text-gray-500 dark:text-gray-400 font-kr">언어 • Languages</p>
               <p className="font-medium text-gray-800 dark:text-white">
-                {info.skills.languages.slice(0, 3).map(lang => lang.name).join(', ')}
+                Learning Japanese & Korean
               </p>
             </motion.div>
-            
+
+            <motion.div
+              className="bg-white dark:bg-gray-800/90 p-4 rounded-xl shadow backdrop-blur-sm border border-gray-200 dark:border-gray-700"
+              whileHover={{ y: -5, transition: { duration: 0.2 } }}
+            >
+              <p className="text-sm text-gray-500 dark:text-gray-400 font-jp">別名 • Nickname</p>
+              <p className="font-medium text-gray-800 dark:text-white">
+                Emma / Leli ✨
+              </p>
+            </motion.div>
+
+            <motion.div
+              className="bg-white dark:bg-gray-800/90 p-4 rounded-xl shadow backdrop-blur-sm border border-gray-200 dark:border-gray-700"
+              whileHover={{ y: -5, transition: { duration: 0.2 } }}
+            >
+              <p className="text-sm text-gray-500 dark:text-gray-400 font-kr">성격 • Personality</p>
+              <p className="font-medium text-gray-800 dark:text-white">
+                Loyal & Sociable
+              </p>
+            </motion.div>
+
             <motion.div
               className="bg-white dark:bg-gray-800/90 p-4 rounded-xl shadow backdrop-blur-sm border border-gray-200 dark:border-gray-700 col-span-2"
               whileHover={{ y: -5, transition: { duration: 0.2 } }}
             >
-              <p className="text-sm text-gray-500 dark:text-gray-400 font-jp">趣味 • Interests</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400 font-jp">趣味 • Favorites</p>
               <div className="flex flex-wrap gap-2 mt-1">
                 {info.loves.slice(0, 5).map((love, i) => (
-                  <span key={i} className={`px-2 py-1 text-xs rounded-md ${
-                    i % 5 === 0 ? "bg-sakura-100 text-sakura-800 dark:bg-sakura-900/30 dark:text-sakura-300" :
+                  <span key={i} className={`px-2 py-1 text-xs rounded-md ${i % 5 === 0 ? "bg-sakura-100 text-sakura-800 dark:bg-sakura-900/30 dark:text-sakura-300" :
                     i % 5 === 1 ? "bg-cyber-100 text-cyber-800 dark:bg-cyber-900/30 dark:text-cyber-300" :
-                    i % 5 === 2 ? "bg-matcha-100 text-matcha-800 dark:bg-matcha-900/30 dark:text-matcha-300" :
-                    i % 5 === 3 ? "bg-fuji-100 text-fuji-800 dark:bg-fuji-900/30 dark:text-fuji-300" :
-                    "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300"
-                  }`}>
+                      i % 5 === 2 ? "bg-matcha-100 text-matcha-800 dark:bg-matcha-900/30 dark:text-matcha-300" :
+                        i % 5 === 3 ? "bg-fuji-100 text-fuji-800 dark:bg-fuji-900/30 dark:text-fuji-300" :
+                          "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300"
+                    }`}>
                     {love}
                   </span>
                 ))}
@@ -758,7 +813,7 @@ const InstagramLinkPage = () => {
             </motion.div>
           </div>
         </motion.div>
-        
+
         {/* Footer with Japanese/Korean elements */}
         <motion.div
           className="text-center pt-8 border-t border-gray-200 dark:border-gray-800"
@@ -771,20 +826,20 @@ const InstagramLinkPage = () => {
             <AsianDecoration type="wave" />
             <AsianDecoration type="sakura" />
           </div>
-          
-          <Link 
-            to="/" 
+
+          <Link
+            to="/"
             className="text-sm font-jp text-gray-500 dark:text-gray-400 hover:text-sakura-500 dark:hover:text-sakura-400 transition-colors"
           >
             ポートフォリオへ • Visit Full Portfolio
           </Link>
           <p className="text-xs text-gray-400 dark:text-gray-600 mt-2 font-kr">
             <span className="inline-block mr-1">정성껏</span>
-            Created with <FaHeart className="inline text-sakura-500 mx-1" /> by Emanuel Cascone
+            Created with <FaHeart className="inline text-sakura-500 mx-1" /> by Emma
           </p>
         </motion.div>
       </div>
-      
+
       {/* Custom CSS for vertical writing and animations */}
       <style>{`
         .writing-vertical {
