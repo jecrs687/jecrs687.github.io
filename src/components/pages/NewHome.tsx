@@ -1,6 +1,4 @@
-import "./home.css"
-import logo from '../assets/022Fl.gif'
-import {Cube} from './subComponents/cube'
+import logo from '../../assets/022Fl.gif'
 
 export function Home() {
   return (
@@ -36,9 +34,6 @@ export function Home() {
           <div className="parallax_item third">
               And passionate with new technologies
           </div>
-        </div>
-        <div className="end">
-          <Cube/>
         </div>
       </div>
     </div>

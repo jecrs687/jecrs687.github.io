@@ -1,3 +1,5 @@
+/* Remove direct import of tailwindcss - it should be imported through index.css */
+/* @import "tailwindcss"; */
 
 :root{
   --navTheme:#111;
@@ -395,9 +397,6 @@ color: #f1f1f1;
 
 
 
-
-
-
 /* nav bar */
 
 .App .navBar{
@@ -537,4 +536,4 @@ color: #f1f1f1;
       width: 4vmin;
     }
 
-  }  
+  }
