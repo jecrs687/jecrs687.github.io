@@ -189,7 +189,7 @@ function App() {
       <SceneProvider>
         <div className="flex flex-col min-h-screen bg-gradient-to-br from-gray-50 via-pink-50/10 to-gray-100 dark:from-gray-900 dark:via-indigo-900/5 dark:to-gray-800 transition-colors duration-500">
           {!isInstagramPage && (
-            <div className="fixed top-0 left-0 right-0 z-50">
+            <div className="fixed top-0 left-0 right-0 z-50 w-[250px]">
               <Navbar />
             </div>
           )}
