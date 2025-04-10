@@ -104,23 +104,6 @@ const ReposPage = ({ info }: ReposPageProps) => {
     // Add more languages as needed
   };
 
-  // Animation variants
-  const container = {
-    hidden: { opacity: 0 },
-    show: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.05,
-        delayChildren: 0.7, // Add delay to ensure parent is visible first
-        when: "beforeChildren" // Ensure the container animation completes first
-      }
-    }
-  };
-
-  const item = {
-    hidden: { opacity: 0, y: 20 },
-    show: { opacity: 1, y: 0, transition: { duration: 0.5 } }
-  };
 
   // Generate tech pattern symbols for backgrounds
   const techPatternSymbols = ['0', '1', '{', '}', '<', '>', '/', '*', '#', '='];
