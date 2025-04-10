@@ -284,92 +284,81 @@ const ArticlesPage = ({ data }: { data: ArticlesData }) => {
           ) : (
             <motion.div 
               className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
-              initial="hidden"
-              animate="visible"
-              variants={{
-                hidden: { opacity: 0 },
-                visible: {
-                  opacity: 1,
-                  transition: {
-                    staggerChildren: 0.1
-                  }
-                }
-              }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5, delay: 0.3 }}
             >
-              <AnimatePresence>
-                {filteredArticles.map((article, index) => (
-                  <motion.article
-                    key={article.url || index}
-                    className="bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm rounded-lg overflow-hidden shadow-lg hover:shadow-xl border border-gray-200 dark:border-gray-700 transition-all duration-300"
-                    variants={{
-                      hidden: { opacity: 0, y: 20 },
-                      visible: { opacity: 1, y: 0 }
-                    }}
-                    whileHover={{ 
-                      y: -8,
-                      boxShadow: '0 20px 25px -5px rgba(139, 92, 246, 0.1), 0 10px 10px -5px rgba(139, 92, 246, 0.04)'
-                    }}
-                    layout
-                  >
-                    <a href={article.url} target="_blank" rel="noopener noreferrer" className="block h-full">
-                      <div className="relative h-48 overflow-hidden group">
-                        {article.social_image ? (
-                          <>
-                            <img 
-                              src={article.social_image} 
-                              alt={article.title} 
-                              className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500"
-                            />
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-70"></div>
-                          </>
-                        ) : (
-                          <div className="w-full h-full bg-gradient-to-br from-fuji-500 to-fuji-700 flex items-center justify-center p-6">
-                            <h3 className="text-white text-xl font-bold text-center">{article.title}</h3>
-                          </div>
-                        )}
-                        
-                        <div className="absolute bottom-0 left-0 w-full p-4 text-white">
-                          <div className="flex items-center text-sm mb-1 opacity-90">
-                            <FaCalendarAlt className="mr-1" />
-                            <span>{formatDate(article.published_at)}</span>
-                          </div>
+              {filteredArticles.map((article, index) => (
+                <motion.article
+                  key={article.url || index}
+                  className="bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm rounded-lg overflow-hidden shadow-lg hover:shadow-xl border border-gray-200 dark:border-gray-700 transition-all duration-300"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.3 + (index * 0.1) }}
+                  whileHover={{ 
+                    y: -8,
+                    boxShadow: '0 20px 25px -5px rgba(139, 92, 246, 0.1), 0 10px 10px -5px rgba(139, 92, 246, 0.04)'
+                  }}
+                  layout
+                >
+                  <a href={article.url} target="_blank" rel="noopener noreferrer" className="block h-full">
+                    <div className="relative h-48 overflow-hidden group">
+                      {article.social_image ? (
+                        <>
+                          <img 
+                            src={article.social_image} 
+                            alt={article.title} 
+                            className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-70"></div>
+                        </>
+                      ) : (
+                        <div className="w-full h-full bg-gradient-to-br from-fuji-500 to-fuji-700 flex items-center justify-center p-6">
+                          <h3 className="text-white text-xl font-bold text-center">{article.title}</h3>
                         </div>
+                      )}
+                      
+                      <div className="absolute bottom-0 left-0 w-full p-4 text-white">
+                        <div className="flex items-center text-sm mb-1 opacity-90">
+                          <FaCalendarAlt className="mr-1" />
+                          <span>{formatDate(article.published_at)}</span>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="p-6">
+                      <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3 line-clamp-2">
+                        {article.title}
+                      </h3>
+                      
+                      <p className="text-gray-600 dark:text-gray-400 mb-4 line-clamp-3 text-sm">
+                        {article.description}
+                      </p>
+                      
+                      <div className="flex flex-wrap gap-2 mb-4">
+                        {article.tags && article.tags.split(', ').map((tag, idx) => (
+                          <span 
+                            key={idx} 
+                            className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-fuji-100 text-fuji-800 dark:bg-fuji-900/40 dark:text-fuji-200"
+                          >
+                            <FaTag className="mr-1 h-2 w-2" />
+                            {tag}
+                          </span>
+                        ))}
                       </div>
                       
-                      <div className="p-6">
-                        <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3 line-clamp-2">
-                          {article.title}
-                        </h3>
-                        
-                        <p className="text-gray-600 dark:text-gray-400 mb-4 line-clamp-3 text-sm">
-                          {article.description}
-                        </p>
-                        
-                        <div className="flex flex-wrap gap-2 mb-4">
-                          {article.tags && article.tags.split(', ').map((tag, idx) => (
-                            <span 
-                              key={idx} 
-                              className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-fuji-100 text-fuji-800 dark:bg-fuji-900/40 dark:text-fuji-200"
-                            >
-                              <FaTag className="mr-1 h-2 w-2" />
-                              {tag}
-                            </span>
-                          ))}
-                        </div>
-                        
-                        <div className="flex justify-end">
-                          <span className="text-fuji-600 dark:text-fuji-400 text-sm font-medium inline-flex items-center">
-                            Read more
-                            <svg className="ml-1 w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                            </svg>
-                          </span>
-                        </div>
+                      <div className="flex justify-end">
+                        <span className="text-fuji-600 dark:text-fuji-400 text-sm font-medium inline-flex items-center">
+                          Read more
+                          <svg className="ml-1 w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                          </svg>
+                        </span>
                       </div>
-                    </a>
-                  </motion.article>
-                ))}
-              </AnimatePresence>
+                    </div>
+                  </a>
+                </motion.article>
+              ))}
             </motion.div>
           )}
           
