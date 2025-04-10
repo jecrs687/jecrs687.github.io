@@ -110,14 +110,16 @@ const ReposPage = ({ info }: ReposPageProps) => {
     show: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.05
+        staggerChildren: 0.05,
+        delayChildren: 0.7, // Add delay to ensure parent is visible first
+        when: "beforeChildren" // Ensure the container animation completes first
       }
     }
   };
 
   const item = {
     hidden: { opacity: 0, y: 20 },
-    show: { opacity: 1, y: 0 }
+    show: { opacity: 1, y: 0, transition: { duration: 0.5 } }
   };
 
   // Generate tech pattern symbols for backgrounds
@@ -343,16 +345,13 @@ const ReposPage = ({ info }: ReposPageProps) => {
             </motion.p>
           </motion.div>
         ) : (
-          <motion.div 
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
-            variants={container}
-            initial="hidden"
-            animate="show"
-          >
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredRepos.map((repo, index) => (
               <motion.div
                 key={repo.id || index}
-                variants={item}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.7 + (index * 0.1) }}
                 onHoverStart={() => setHoverIndex(index)}
                 onHoverEnd={() => setHoverIndex(null)}
                 className={`relative bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700 group transition-all duration-300 shadow-md hover:shadow-xl ${hoverIndex === index ? 'ring-2 ring-offset-2 ring-cyber-500 dark:ring-offset-gray-900' : ''}`}
@@ -477,7 +476,7 @@ const ReposPage = ({ info }: ReposPageProps) => {
                 </div>
               </motion.div>
             ))}
-          </motion.div>
+          </div>
         )}
       </div>
     </div>
