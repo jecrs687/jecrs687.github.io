@@ -1,11 +1,13 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState, Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { getGithub, getDevTo } from './services/api';
 import Navbar from './components/layout/Navbar';
 import LoadingScreen from './components/common/LoadingScreen';
+import ErrorBoundary from './components/common/ErrorBoundary';
 import data from './information.json';
+import { useIsMobile } from './hooks';
+import type { UserInfo } from './types';
 
 // Theme provider context
 import { ThemeProvider } from './contexts/ThemeContext';
@@ -48,39 +50,22 @@ const pageTransition = {
   duration: 0.4
 };
 
-// Detect if device is mobile
-const isMobileDevice = () => {
-  return (
-    typeof window !== 'undefined' &&
-    (window.matchMedia('(max-width: 768px)').matches ||
-      /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent))
-  );
-};
-
 const AnimatedRoutes = () => {
   const location = useLocation();
-  const [info, setInfo] = useState(data);
-  const [isMobile, setIsMobile] = useState(false);
-
-  useEffect(() => {
-    // Check if device is mobile on mount
-    setIsMobile(isMobileDevice());
-
-    // Add resize listener to update mobile state
-    const handleResize = () => {
-      setIsMobile(isMobileDevice());
-    };
-
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
+  const [info, setInfo] = useState<UserInfo>(data as UserInfo);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     async function loadData() {
       try {
-        const github = await getGithub() as any;
+        setIsLoading(true);
+        setError(null);
 
-        const updatedInfo = {
+        const github = await getGithub();
+
+        const updatedInfo: UserInfo = {
           ...info,
           nick: github.login,
           name: github.name,
@@ -91,14 +76,19 @@ const AnimatedRoutes = () => {
         setInfo(updatedInfo);
 
         const devTo = await getDevTo();
-        setInfo(prevInfo => ({ ...prevInfo, ...devTo }));
-      } catch (error) {
-        console.error('Error loading data:', error);
+        setInfo((prevInfo: UserInfo) => ({ ...prevInfo, ...devTo }));
+      } catch (err) {
+        console.error('Error loading data:', err);
+        setError(err as Error);
+      } finally {
+        setIsLoading(false);
       }
     }
 
     if (data.githubUser !== '') {
       loadData();
+    } else {
+      setIsLoading(false);
     }
   }, []);
 
@@ -244,9 +234,11 @@ function App() {
 
 const AppWrapper = () => {
   return (
-    <Router>
-      <App />
-    </Router>
+    <ErrorBoundary>
+      <Router>
+        <App />
+      </Router>
+    </ErrorBoundary>
   );
 };
 
