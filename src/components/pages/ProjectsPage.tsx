@@ -18,7 +18,7 @@ interface ProjectsData {
     smallProjects: Project[];
     bigProjects?: Project[];
   };
-  palette: { primary: string; secundary: string; third: string; }[];
+  palette?: { primary: string; secundary: string; third: string; }[];
 }
 
 const ProjectsPage = ({ data }: { data: ProjectsData }) => {
@@ -27,7 +27,7 @@ const ProjectsPage = ({ data }: { data: ProjectsData }) => {
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [categories, setCategories] = useState<string[]>([]);
   const [filteredProjects, setFilteredProjects] = useState<Project[]>([]);
-  
+
   // Get all projects from both small and big projects
   const allProjects = [...(data.projects.smallProjects || [])];
   const bigProjects = data.projects.bigProjects || [];
@@ -63,9 +63,9 @@ const ProjectsPage = ({ data }: { data: ProjectsData }) => {
       {/* Background elements */}
       <div className="absolute inset-0 overflow-hidden z-0">
         <div className="absolute inset-0 opacity-5 dark:opacity-10 bg-project-grid bg-repeat"></div>
-        <motion.div 
+        <motion.div
           className="absolute top-0 -left-32 w-64 h-64 bg-gradient-to-br from-primary-500/20 to-cyber-500/20 rounded-full blur-3xl"
-          animate={{ 
+          animate={{
             scale: [1, 1.2, 1],
             x: [0, 20, 0],
             y: [0, 20, 0],
@@ -76,9 +76,9 @@ const ProjectsPage = ({ data }: { data: ProjectsData }) => {
             repeatType: "reverse"
           }}
         ></motion.div>
-        <motion.div 
+        <motion.div
           className="absolute bottom-20 right-0 w-80 h-80 bg-gradient-to-br from-sakura-500/20 to-primary-500/20 rounded-full blur-3xl"
-          animate={{ 
+          animate={{
             scale: [1, 1.3, 1],
             x: [0, -30, 0],
             y: [0, -20, 0],
@@ -98,13 +98,13 @@ const ProjectsPage = ({ data }: { data: ProjectsData }) => {
         className="relative z-10 py-16 px-4 sm:px-6 lg:px-8"
       >
         <div className="max-w-7xl mx-auto">
-          <motion.div 
+          <motion.div
             className="text-center mb-16"
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <motion.div 
+            <motion.div
               className="mb-6 inline-block"
               initial={{ scale: 0, rotate: 180 }}
               animate={{ scale: 1, rotate: 0 }}
@@ -114,12 +114,12 @@ const ProjectsPage = ({ data }: { data: ProjectsData }) => {
                 <FaPalette className="text-3xl" />
               </div>
             </motion.div>
-            
+
             <h1 className="text-4xl sm:text-5xl font-bold mb-6 bg-gradient-to-r from-primary-600 to-sakura-400 bg-clip-text text-transparent font-heading">
               Creative Studio
             </h1>
-            
-            <motion.div 
+
+            <motion.div
               className="flex items-center justify-center mb-4"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -129,14 +129,14 @@ const ProjectsPage = ({ data }: { data: ProjectsData }) => {
               <div className="mx-4 text-primary-500">✦</div>
               <div className="h-px bg-gradient-to-r from-transparent via-primary-500/50 to-transparent w-24 sm:w-48"></div>
             </motion.div>
-            
+
             <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
               A showcase of my creative work and technical projects
             </p>
           </motion.div>
 
           {/* Category filters */}
-          <motion.div 
+          <motion.div
             className="mb-12 flex flex-wrap justify-center gap-3"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -147,11 +147,10 @@ const ProjectsPage = ({ data }: { data: ProjectsData }) => {
                 <button
                   key={category}
                   onClick={() => setSelectedCategory(category)}
-                  className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
-                    selectedCategory === category
+                  className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${selectedCategory === category
                       ? 'bg-primary-500 text-white shadow-neon-sakura'
                       : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
-                  }`}
+                    }`}
                 >
                   {category.charAt(0).toUpperCase() + category.slice(1)}
                 </button>
@@ -160,7 +159,7 @@ const ProjectsPage = ({ data }: { data: ProjectsData }) => {
           </motion.div>
 
           {/* Projects grid */}
-          <motion.div 
+          <motion.div
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
             layout
             initial="hidden"
@@ -177,7 +176,7 @@ const ProjectsPage = ({ data }: { data: ProjectsData }) => {
           >
             <AnimatePresence>
               {filteredProjects.map((project, index) => (
-                <ProjectCard 
+                <ProjectCard
                   key={project.name}
                   project={project}
                   index={index}
@@ -198,7 +197,7 @@ const ProjectsPage = ({ data }: { data: ProjectsData }) => {
               transition={{ delay: 0.3, duration: 0.5 }}
               className="mt-24"
             >
-              <motion.div 
+              <motion.div
                 className="text-center mb-12"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -209,7 +208,7 @@ const ProjectsPage = ({ data }: { data: ProjectsData }) => {
                 </h2>
                 <div className="w-24 h-1 bg-gradient-to-r from-sakura-400 to-primary-400 mx-auto rounded-full"></div>
               </motion.div>
-              
+
               <div className="space-y-16">
                 {bigProjects.map((project, index) => (
                   <FeaturedProjectCard
@@ -228,16 +227,16 @@ const ProjectsPage = ({ data }: { data: ProjectsData }) => {
   );
 };
 
-const ProjectCard = ({ 
-  project, 
-  index, 
+const ProjectCard = ({
+  project,
+  index,
   palette,
   isHovered,
   onHover,
   onLeave
-}: { 
-  project: Project; 
-  index: number; 
+}: {
+  project: Project;
+  index: number;
   palette: { primary: string; secundary: string; third: string; }[];
   isHovered: boolean;
   onHover: () => void;
@@ -246,7 +245,7 @@ const ProjectCard = ({
   // Get a color from the palette based on the index
   const paletteIndex = index % palette.length;
   const colorScheme = palette[paletteIndex];
-  
+
   const tilt = useSpring({
     transform: isHovered ? 'scale(1.03) translateY(-10px)' : 'scale(1) translateY(0px)',
     boxShadow: isHovered ? '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)' : '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
@@ -270,37 +269,37 @@ const ProjectCard = ({
         onClick={() => window.open(`https://jecrs687.github.io${project.link}`, '_blank')}
       >
         {/* Background gradient */}
-        <div 
-          className="absolute inset-0 w-full h-2/3" 
+        <div
+          className="absolute inset-0 w-full h-2/3"
           style={{
-            background: project.image 
-              ? `url(${project.image}) center/cover no-repeat` 
+            background: project.image
+              ? `url(${project.image}) center/cover no-repeat`
               : `linear-gradient(135deg, ${colorScheme.primary}, ${colorScheme.secundary}, ${colorScheme.third})`,
           }}
         />
-        
+
         {/* Category tag */}
         {project.category && (
           <div className="absolute top-4 right-4 px-3 py-1 rounded-full text-xs font-medium bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm text-primary-600 dark:text-primary-400 border border-primary-200 dark:border-primary-800 shadow-sm">
             {project.category}
           </div>
         )}
-        
+
         {/* Content */}
         <div className="absolute bottom-0 left-0 right-0 p-6 bg-white/95 dark:bg-gray-800/95 backdrop-blur-md border-t border-gray-200 dark:border-gray-700">
           <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">{project.name}</h3>
-          
+
           <p className="text-gray-600 dark:text-gray-400 text-sm line-clamp-2 mb-3">
             {project.description || `A creative project showcasing my work in ${project.category || 'development'}.`}
           </p>
-          
+
           <div className="flex justify-between items-center">
             {/* Tech stack pills */}
             {project.technologies && project.technologies.length > 0 && (
               <div className="flex flex-wrap gap-1">
                 {project.technologies.slice(0, 2).map((tech, i) => (
-                  <span 
-                    key={i} 
+                  <span
+                    key={i}
                     className="px-2 py-0.5 text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300 rounded"
                   >
                     {tech}
@@ -313,8 +312,8 @@ const ProjectCard = ({
                 )}
               </div>
             )}
-            
-            <motion.div 
+
+            <motion.div
               className="text-primary-600 dark:text-primary-400 flex items-center text-sm font-medium"
               animate={{ x: isHovered ? 5 : 0 }}
               transition={{ type: 'spring', stiffness: 300, damping: 20 }}
@@ -329,13 +328,13 @@ const ProjectCard = ({
   );
 };
 
-const FeaturedProjectCard = ({ 
-  project, 
-  index, 
-  palette 
-}: { 
-  project: Project; 
-  index: number; 
+const FeaturedProjectCard = ({
+  project,
+  index,
+  palette
+}: {
+  project: Project;
+  index: number;
   palette: { primary: string; secundary: string; third: string; }[];
 }) => {
   const isEven = index % 2 === 0;
@@ -343,7 +342,7 @@ const FeaturedProjectCard = ({
   const colorScheme = palette[paletteIndex];
 
   const [hovered, setHovered] = useState(false);
-  
+
   const spring = useSpring({
     transform: hovered ? 'translateY(-10px)' : 'translateY(0px)',
     boxShadow: hovered ? '0 25px 50px -12px rgba(0, 0, 0, 0.25)' : '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
@@ -360,22 +359,22 @@ const FeaturedProjectCard = ({
       onMouseLeave={() => setHovered(false)}
     >
       <div className={`flex flex-col ${isEven ? 'lg:flex-row' : 'lg:flex-row-reverse'}`}>
-        <animated.div 
-          style={spring} 
+        <animated.div
+          style={spring}
           className="lg:w-1/2 h-64 lg:h-auto relative overflow-hidden"
         >
-          <div 
-            className="absolute inset-0 transform hover:scale-105 transition-transform duration-700 ease-in-out" 
+          <div
+            className="absolute inset-0 transform hover:scale-105 transition-transform duration-700 ease-in-out"
             style={{
-              background: project.image 
-                ? `url(${project.image}) center/cover no-repeat` 
+              background: project.image
+                ? `url(${project.image}) center/cover no-repeat`
                 : `linear-gradient(135deg, ${colorScheme.primary}, ${colorScheme.secundary})`,
             }}
           />
-          
+
           {!project.image && (
             <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
-              <motion.div 
+              <motion.div
                 initial={{ scale: 0.8, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ delay: 0.3 }}
@@ -389,7 +388,7 @@ const FeaturedProjectCard = ({
             </div>
           )}
         </animated.div>
-        
+
         <div className="lg:w-1/2 p-8 flex flex-col justify-between">
           {project.category && (
             <div className="mb-2">
@@ -398,20 +397,20 @@ const FeaturedProjectCard = ({
               </span>
             </div>
           )}
-          
+
           <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{project.name}</h3>
-          
+
           <p className="text-gray-600 dark:text-gray-400 mb-6">
             {project.description || `An impressive featured project that showcases my skills in ${project.category || 'development'}. This work represents some of my best efforts and technical capabilities.`}
           </p>
-        
+
           {project.technologies && project.technologies.length > 0 && (
             <div className="mb-6">
               <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Technologies:</h4>
               <div className="flex flex-wrap gap-2">
                 {project.technologies.map((tech, i) => (
-                  <span 
-                    key={i} 
+                  <span
+                    key={i}
                     className="px-2.5 py-1 text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300 rounded-md"
                   >
                     {tech}
@@ -420,11 +419,11 @@ const FeaturedProjectCard = ({
               </div>
             </div>
           )}
-          
-          <a 
-            href={`${project.link}`} 
-            target="_blank" 
-            rel="noopener noreferrer" 
+
+          <a
+            href={`${project.link}`}
+            target="_blank"
+            rel="noopener noreferrer"
             className="inline-flex items-center justify-center bg-gradient-to-r from-primary-500 to-sakura-500 text-white font-medium px-6 py-3 rounded-lg hover:opacity-90 transition-all transform hover:scale-[1.03]"
           >
             <FaLink className="mr-2" /> Explore Project

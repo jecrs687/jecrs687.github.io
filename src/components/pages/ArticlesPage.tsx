@@ -8,7 +8,7 @@ interface Article {
   social_image: string;
   title: string;
   description: string;
-  tags: string;
+  tags?: string;
   published_at: string;
 }
 
@@ -36,42 +36,42 @@ const ArticlesPage = ({ data }: { data: ArticlesData }) => {
     if (data.devToArticles && data.devToArticles.length > 0) {
       setArticles(data.devToArticles);
       setFilteredArticles(data.devToArticles);
-      
+
       // Extract all unique tags
       const tags = data.devToArticles
         .map(article => article.tags?.split(', ') || [])
         .flat()
         .filter((tag, index, self) => tag && self.indexOf(tag) === index);
-      
+
       setAllTags(tags);
     }
   }, [data]);
 
   useEffect(() => {
     let result = [...articles];
-    
+
     // Filter by search term
     if (searchTerm) {
-      result = result.filter(article => 
+      result = result.filter(article =>
         article.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
         article.description.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
-    
+
     // Filter by tag
     if (selectedTag) {
-      result = result.filter(article => 
+      result = result.filter(article =>
         article.tags && article.tags.includes(selectedTag)
       );
     }
-    
+
     // Sort by date
     result.sort((a, b) => {
       const dateA = new Date(a.published_at).getTime();
       const dateB = new Date(b.published_at).getTime();
       return sortOrder === 'newest' ? dateB - dateA : dateA - dateB;
     });
-    
+
     setFilteredArticles(result);
   }, [searchTerm, selectedTag, articles, sortOrder]);
 
@@ -108,22 +108,22 @@ const ArticlesPage = ({ data }: { data: ArticlesData }) => {
       {/* Background elements */}
       <div className="absolute inset-0 bg-library-shelves bg-repeat z-0 opacity-20 dark:opacity-10"></div>
       <div className="absolute inset-0 bg-gradient-to-b from-white via-transparent to-white dark:from-gray-900 dark:to-gray-900 z-0"></div>
-      
+
       {/* Main content */}
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         className="relative z-10 pt-16 pb-24 px-4 sm:px-6 lg:px-8"
       >
         <div className="max-w-7xl mx-auto">
-          <motion.div 
+          <motion.div
             className="text-center mb-16"
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <motion.div 
+            <motion.div
               className="mb-6 inline-block"
               initial={{ scale: 0, rotate: 180 }}
               animate={{ scale: 1, rotate: 0 }}
@@ -133,11 +133,11 @@ const ArticlesPage = ({ data }: { data: ArticlesData }) => {
                 <FaBookOpen className="text-3xl" />
               </div>
             </motion.div>
-            
+
             <h1 className="text-3xl sm:text-5xl font-bold mb-6 bg-gradient-to-r from-fuji-600 to-fuji-400 bg-clip-text text-transparent font-heading">
               Library of Knowledge
             </h1>
-            
+
             <motion.div
               className="flex items-center justify-center mb-4"
               initial={{ opacity: 0 }}
@@ -148,14 +148,14 @@ const ArticlesPage = ({ data }: { data: ArticlesData }) => {
               <FaBookOpen className="mx-4 text-fuji-500" />
               <div className="h-px bg-gradient-to-r from-transparent via-fuji-500/50 to-transparent w-24 sm:w-48"></div>
             </motion.div>
-            
+
             <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
               Thoughts, tutorials, and insights on technology and development
             </p>
           </motion.div>
 
           {/* Search and filter panel */}
-          <motion.div 
+          <motion.div
             className="mb-12 max-w-3xl mx-auto rounded-xl backdrop-blur-md bg-white/80 dark:bg-gray-800/80 shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden transition-all"
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
@@ -176,9 +176,9 @@ const ArticlesPage = ({ data }: { data: ArticlesData }) => {
                     onBlur={handleSearchBlur}
                   />
                   <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                  
+
                   {searchTerm && (
-                    <button 
+                    <button
                       onClick={handleClearSearch}
                       className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
                     >
@@ -186,7 +186,7 @@ const ArticlesPage = ({ data }: { data: ArticlesData }) => {
                     </button>
                   )}
                 </div>
-                
+
                 <div className="flex gap-3">
                   <select
                     className="px-4 py-3 rounded-lg bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-fuji-500 focus:border-transparent min-w-[150px] transition-all"
@@ -198,8 +198,8 @@ const ArticlesPage = ({ data }: { data: ArticlesData }) => {
                       <option key={tag} value={tag}>{tag}</option>
                     ))}
                   </select>
-                  
-                  <button 
+
+                  <button
                     onClick={toggleSortOrder}
                     className="px-4 py-3 rounded-lg bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-800 focus:ring-2 focus:ring-fuji-500 focus:border-transparent flex items-center gap-2 transition-all"
                   >
@@ -208,19 +208,19 @@ const ArticlesPage = ({ data }: { data: ArticlesData }) => {
                   </button>
                 </div>
               </div>
-              
+
               {/* Filter pills */}
               {(selectedTag || searchTerm) && (
                 <div className="mt-4 flex flex-wrap gap-2">
                   {selectedTag && (
-                    <motion.span 
+                    <motion.span
                       className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-fuji-100 text-fuji-800 dark:bg-fuji-900/40 dark:text-fuji-200"
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
                       exit={{ scale: 0 }}
                     >
                       <span>Topic: {selectedTag}</span>
-                      <button 
+                      <button
                         className="ml-1 rounded-full hover:bg-fuji-200 dark:hover:bg-fuji-800 p-1"
                         onClick={() => setSelectedTag('')}
                       >
@@ -228,16 +228,16 @@ const ArticlesPage = ({ data }: { data: ArticlesData }) => {
                       </button>
                     </motion.span>
                   )}
-                  
+
                   {searchTerm && (
-                    <motion.span 
+                    <motion.span
                       className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-fuji-100 text-fuji-800 dark:bg-fuji-900/40 dark:text-fuji-200"
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
                       exit={{ scale: 0 }}
                     >
                       <span>Search: {searchTerm}</span>
-                      <button 
+                      <button
                         className="ml-1 rounded-full hover:bg-fuji-200 dark:hover:bg-fuji-800 p-1"
                         onClick={handleClearSearch}
                       >
@@ -252,7 +252,7 @@ const ArticlesPage = ({ data }: { data: ArticlesData }) => {
 
           {/* Results section */}
           {filteredArticles.length === 0 ? (
-            <motion.div 
+            <motion.div
               className="text-center py-20 max-w-md mx-auto bg-white/80 dark:bg-gray-800/80 backdrop-blur-md rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 px-6"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -274,7 +274,7 @@ const ArticlesPage = ({ data }: { data: ArticlesData }) => {
               <p className="text-gray-500 dark:text-gray-400 mb-6">
                 Try adjusting your search or filter criteria
               </p>
-              <button 
+              <button
                 onClick={() => { setSearchTerm(''); setSelectedTag(''); }}
                 className="px-4 py-2 bg-fuji-500 hover:bg-fuji-600 text-white rounded-lg transition-colors"
               >
@@ -282,7 +282,7 @@ const ArticlesPage = ({ data }: { data: ArticlesData }) => {
               </button>
             </motion.div>
           ) : (
-            <motion.div 
+            <motion.div
               className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -295,7 +295,7 @@ const ArticlesPage = ({ data }: { data: ArticlesData }) => {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.5, delay: 0.3 + (index * 0.1) }}
-                  whileHover={{ 
+                  whileHover={{
                     y: -8,
                     boxShadow: '0 20px 25px -5px rgba(139, 92, 246, 0.1), 0 10px 10px -5px rgba(139, 92, 246, 0.04)'
                   }}
@@ -305,9 +305,9 @@ const ArticlesPage = ({ data }: { data: ArticlesData }) => {
                     <div className="relative h-48 overflow-hidden group">
                       {article.social_image ? (
                         <>
-                          <img 
-                            src={article.social_image} 
-                            alt={article.title} 
+                          <img
+                            src={article.social_image}
+                            alt={article.title}
                             className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500"
                           />
                           <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-70"></div>
@@ -317,7 +317,7 @@ const ArticlesPage = ({ data }: { data: ArticlesData }) => {
                           <h3 className="text-white text-xl font-bold text-center">{article.title}</h3>
                         </div>
                       )}
-                      
+
                       <div className="absolute bottom-0 left-0 w-full p-4 text-white">
                         <div className="flex items-center text-sm mb-1 opacity-90">
                           <FaCalendarAlt className="mr-1" />
@@ -325,20 +325,20 @@ const ArticlesPage = ({ data }: { data: ArticlesData }) => {
                         </div>
                       </div>
                     </div>
-                    
+
                     <div className="p-6">
                       <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3 line-clamp-2">
                         {article.title}
                       </h3>
-                      
+
                       <p className="text-gray-600 dark:text-gray-400 mb-4 line-clamp-3 text-sm">
                         {article.description}
                       </p>
-                      
+
                       <div className="flex flex-wrap gap-2 mb-4">
                         {article.tags && article.tags.split(', ').map((tag, idx) => (
-                          <span 
-                            key={idx} 
+                          <span
+                            key={idx}
                             className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-fuji-100 text-fuji-800 dark:bg-fuji-900/40 dark:text-fuji-200"
                           >
                             <FaTag className="mr-1 h-2 w-2" />
@@ -346,7 +346,7 @@ const ArticlesPage = ({ data }: { data: ArticlesData }) => {
                           </span>
                         ))}
                       </div>
-                      
+
                       <div className="flex justify-end">
                         <span className="text-fuji-600 dark:text-fuji-400 text-sm font-medium inline-flex items-center">
                           Read more
@@ -361,14 +361,14 @@ const ArticlesPage = ({ data }: { data: ArticlesData }) => {
               ))}
             </motion.div>
           )}
-          
+
           {/* Showing results count */}
           {filteredArticles.length > 0 && (
             <div className="mt-8 text-center text-sm text-gray-500 dark:text-gray-400">
               Showing {filteredArticles.length} of {articles.length} articles
             </div>
           )}
-          
+
           {/* Decorative elements */}
           <div className="absolute top-40 -left-20 w-40 h-40 bg-fuji-400/10 dark:bg-fuji-400/5 rounded-full blur-3xl"></div>
           <div className="absolute bottom-10 -right-20 w-60 h-60 bg-fuji-500/10 dark:bg-fuji-500/5 rounded-full blur-3xl"></div>

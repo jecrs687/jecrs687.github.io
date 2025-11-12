@@ -53,16 +53,11 @@ const pageTransition = {
 const AnimatedRoutes = () => {
   const location = useLocation();
   const [info, setInfo] = useState<UserInfo>(data as UserInfo);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
   const isMobile = useIsMobile();
 
   useEffect(() => {
     async function loadData() {
       try {
-        setIsLoading(true);
-        setError(null);
-
         const github = await getGithub();
 
         const updatedInfo: UserInfo = {
@@ -79,16 +74,11 @@ const AnimatedRoutes = () => {
         setInfo((prevInfo: UserInfo) => ({ ...prevInfo, ...devTo }));
       } catch (err) {
         console.error('Error loading data:', err);
-        setError(err as Error);
-      } finally {
-        setIsLoading(false);
       }
     }
 
     if (data.githubUser !== '') {
       loadData();
-    } else {
-      setIsLoading(false);
     }
   }, []);
 
@@ -122,7 +112,7 @@ const AnimatedRoutes = () => {
               transition={pageTransition}
               className="scene-wrapper scene-cyber"
             >
-              <ReposPage info={info} />
+              <ReposPage info={{ repos: info.repos || [] }} />
             </motion.div>
           } />
           <Route path="/skills" element={
@@ -146,7 +136,7 @@ const AnimatedRoutes = () => {
               transition={pageTransition}
               className="scene-wrapper scene-library"
             >
-              <ArticlesPage data={info as any} />
+              <ArticlesPage data={info} />
             </motion.div>
           } />
           <Route path="/projects" element={
@@ -158,7 +148,7 @@ const AnimatedRoutes = () => {
               transition={pageTransition}
               className="scene-wrapper scene-studio"
             >
-              <ProjectsPage data={info} />
+              <ProjectsPage data={info as any} />
             </motion.div>
           } />
           <Route path="/instagram" element={

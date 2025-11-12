@@ -9,7 +9,7 @@ interface Repo {
   full_name: string;
   html_url: string;
   name: string;
-  description: string;
+  description: string | null;
   language: string | null;
   fork: boolean;
   created_at: string;
@@ -51,23 +51,23 @@ const ReposPage = ({ info }: ReposPageProps) => {
 
   useEffect(() => {
     let results = [...repos];
-    
+
     // Apply search filter
     if (searchTerm) {
-      results = results.filter(repo => 
+      results = results.filter(repo =>
         repo.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         (repo.description && repo.description.toLowerCase().includes(searchTerm.toLowerCase()))
       );
     }
-    
+
     // Apply language filter
     if (languageFilter !== 'All') {
       results = results.filter(repo => repo.language === languageFilter);
     }
-    
+
     // Apply sorting
     results.sort((a, b) => {
-      switch(sortBy) {
+      switch (sortBy) {
         case 'name':
           return a.name.localeCompare(b.name);
         case 'stars':
@@ -79,7 +79,7 @@ const ReposPage = ({ info }: ReposPageProps) => {
           return new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime();
       }
     });
-    
+
     setFilteredRepos(results);
   }, [repos, searchTerm, languageFilter, sortBy]);
 
@@ -112,31 +112,31 @@ const ReposPage = ({ info }: ReposPageProps) => {
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 pt-8 pb-24 px-4 sm:px-6 lg:px-8 overflow-hidden">
       {/* Background grid pattern - cyber theme */}
       <div className="absolute inset-0 bg-cyber-grid bg-cyber-grid opacity-5 dark:opacity-15 z-0"></div>
-      
+
       {/* Floating tech symbols */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         {techPatternSymbols.map((symbol, i) => (
           <motion.div
             key={i}
             className="absolute text-cyber-500/10 dark:text-cyber-400/10 select-none"
-            initial={{ 
-              x: `${Math.random() * 100}%`, 
+            initial={{
+              x: `${Math.random() * 100}%`,
               y: `${Math.random() * 100}%`,
               opacity: 0.1 + (Math.random() * 0.2),
               scale: 0.5 + (Math.random() * 2),
               rotate: Math.random() * 360
             }}
-            animate={{ 
+            animate={{
               y: ['0%', '100%'],
               rotate: [0, 360],
               opacity: [0.1 + (Math.random() * 0.2), 0.05]
             }}
-            transition={{ 
-              repeat: Infinity, 
+            transition={{
+              repeat: Infinity,
               duration: 15 + (Math.random() * 15),
               ease: "linear"
             }}
-            style={{ 
+            style={{
               fontSize: `${2 + (Math.random() * 5)}rem`,
               left: `${Math.random() * 100}%`,
               filter: 'blur(1px)'
@@ -146,11 +146,11 @@ const ReposPage = ({ info }: ReposPageProps) => {
           </motion.div>
         ))}
       </div>
-      
+
       {/* Main content */}
       <div className="relative z-10 max-w-7xl mx-auto">
         <div className="text-center mb-12">
-          <motion.div 
+          <motion.div
             className="inline-block mb-4"
             initial={{ scale: 0, rotate: 180 }}
             animate={{ scale: 1, rotate: 0 }}
@@ -160,8 +160,8 @@ const ReposPage = ({ info }: ReposPageProps) => {
               <FaTerminal className="text-3xl" />
             </div>
           </motion.div>
-          
-          <motion.h1 
+
+          <motion.h1
             className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4 bg-gradient-to-r from-cyber-400 to-cyber-600 bg-clip-text text-transparent"
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -169,7 +169,7 @@ const ReposPage = ({ info }: ReposPageProps) => {
           >
             Code Repository
           </motion.h1>
-          
+
           <motion.div
             className="flex items-center justify-center mb-2"
             initial={{ opacity: 0 }}
@@ -180,8 +180,8 @@ const ReposPage = ({ info }: ReposPageProps) => {
             <FaNetworkWired className="mx-4 text-cyber-500" />
             <div className="h-px bg-gradient-to-r from-transparent via-cyber-500/50 to-transparent w-24 sm:w-48"></div>
           </motion.div>
-          
-          <motion.p 
+
+          <motion.p
             className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto font-code"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -207,7 +207,7 @@ const ReposPage = ({ info }: ReposPageProps) => {
         </div>
 
         {/* Filters and search */}
-        <motion.div 
+        <motion.div
           className="mb-12 rounded-xl bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm shadow-lg p-6 border border-gray-200 dark:border-gray-700"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -229,11 +229,11 @@ const ReposPage = ({ info }: ReposPageProps) => {
                 />
                 <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
                   <motion.div
-                    animate={{ 
+                    animate={{
                       rotate: searchTerm ? [0, 360] : 0
                     }}
-                    transition={{ 
-                      duration: 0.5, 
+                    transition={{
+                      duration: 0.5,
                       ease: "easeInOut"
                     }}
                   >
@@ -289,14 +289,14 @@ const ReposPage = ({ info }: ReposPageProps) => {
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5, delay: 0.6 }}
         >
-          <span className="text-cyber-500">const</span> repos = <span className="text-cyber-500">&#123;</span> 
-          count: <span className="text-amber-500">{filteredRepos.length}</span> 
+          <span className="text-cyber-500">const</span> repos = <span className="text-cyber-500">&#123;</span>
+          count: <span className="text-amber-500">{filteredRepos.length}</span>
           <span className="text-cyber-500">&#125;;</span>
         </motion.div>
 
         {/* Repository grid */}
         {filteredRepos.length === 0 ? (
-          <motion.div 
+          <motion.div
             className="text-center py-20 rounded-xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm shadow-lg border border-gray-200 dark:border-gray-700"
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -310,7 +310,7 @@ const ReposPage = ({ info }: ReposPageProps) => {
             >
               <FaVirus className="inline-block text-6xl text-cyber-400 dark:text-cyber-500" />
             </motion.div>
-            <motion.h3 
+            <motion.h3
               className="text-xl font-medium text-gray-700 dark:text-gray-300 mb-2 font-code"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -318,7 +318,7 @@ const ReposPage = ({ info }: ReposPageProps) => {
             >
               <span className="text-cyber-500">404</span> // No repositories found
             </motion.h3>
-            <motion.p 
+            <motion.p
               className="text-gray-500 dark:text-gray-400"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -341,8 +341,8 @@ const ReposPage = ({ info }: ReposPageProps) => {
               >
                 {/* Repository language color bar */}
                 {repo.language && (
-                  <div 
-                    className={`h-1.5 w-full bg-opacity-90 dark:bg-opacity-70`} 
+                  <div
+                    className={`h-1.5 w-full bg-opacity-90 dark:bg-opacity-70`}
                     style={{ backgroundColor: languageColors[repo.language] || '#888' }}
                   ></div>
                 )}
@@ -350,9 +350,9 @@ const ReposPage = ({ info }: ReposPageProps) => {
                 <div className="p-6">
                   <div className="flex justify-between items-start mb-3">
                     <h3 className="text-lg font-bold text-gray-900 dark:text-white truncate">
-                      <a 
-                        href={repo.html_url} 
-                        target="_blank" 
+                      <a
+                        href={repo.html_url}
+                        target="_blank"
                         rel="noopener noreferrer"
                         className="hover:text-cyber-500 transition-colors flex items-center group"
                       >
@@ -382,8 +382,8 @@ const ReposPage = ({ info }: ReposPageProps) => {
 
                   <div className="flex flex-wrap gap-2 mb-4">
                     {repo.topics && repo.topics.slice(0, 3).map((topic: string) => (
-                      <span 
-                        key={topic} 
+                      <span
+                        key={topic}
                         className="px-2 py-1 rounded-full bg-cyber-100 dark:bg-cyber-900/30 text-cyber-700 dark:text-cyber-400 text-xs"
                       >
                         {topic}
@@ -394,8 +394,8 @@ const ReposPage = ({ info }: ReposPageProps) => {
                   <div className="flex justify-between items-center">
                     {repo.language ? (
                       <div className="flex items-center">
-                        <span 
-                          className="w-3 h-3 rounded-full mr-1.5" 
+                        <span
+                          className="w-3 h-3 rounded-full mr-1.5"
                           style={{ backgroundColor: languageColors[repo.language] || '#888' }}
                         ></span>
                         <span className="text-sm text-gray-600 dark:text-gray-400">{repo.language}</span>
@@ -403,7 +403,7 @@ const ReposPage = ({ info }: ReposPageProps) => {
                     ) : (
                       <span className="text-sm text-gray-500 dark:text-gray-500">No language detected</span>
                     )}
-                    
+
                     <span className="text-xs text-gray-500 dark:text-gray-400">
                       <span className="font-code text-cyber-500">last_push:</span> {formatDate(repo.updated_at)}
                     </span>
@@ -414,15 +414,15 @@ const ReposPage = ({ info }: ReposPageProps) => {
                   <div className="text-xs text-gray-500 dark:text-gray-400">
                     <span className="font-code text-cyber-500">init:</span> {formatDate(repo.created_at)}
                   </div>
-                  
+
                   <div className="flex space-x-3">
-                    <motion.a 
-                      href={repo.html_url} 
+                    <motion.a
+                      href={repo.html_url}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-gray-600 hover:text-cyber-500 dark:text-gray-300 dark:hover:text-cyber-400 transition-colors"
                       title="View on GitHub"
-                      whileHover={{ 
+                      whileHover={{
                         scale: 1.2,
                         rotate: [0, -10, 10, -10, 0],
                         transition: { duration: 0.5 }
@@ -430,15 +430,15 @@ const ReposPage = ({ info }: ReposPageProps) => {
                     >
                       <GoCode />
                     </motion.a>
-                    
+
                     {repo.homepage && (
-                      <motion.a 
-                        href={repo.homepage} 
+                      <motion.a
+                        href={repo.homepage}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-gray-600 hover:text-cyber-500 dark:text-gray-300 dark:hover:text-cyber-400 transition-colors"
                         title="View deployed site"
-                        whileHover={{ 
+                        whileHover={{
                           scale: 1.2,
                           rotate: [0, 10, -10, 10, 0],
                           transition: { duration: 0.5 }
