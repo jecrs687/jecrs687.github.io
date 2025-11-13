@@ -1121,32 +1121,6 @@ const InstagramLinkPage = () => {
           </div>
         </motion.div>
 
-        {/* Bio Section with Animated Badges */}
-        <motion.div
-          className="mb-6 bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-800/50 rounded-2xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-        >
-          <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
-            {info.bio}
-          </p>
-          <div className="flex flex-wrap gap-2">
-            {info.loves.slice(0, 4).map((item: string, i: number) => (
-              <motion.span
-                key={i}
-                className="px-3 py-1.5 text-xs font-medium bg-gradient-to-r from-blue-500/10 to-purple-500/10 border border-blue-200/50 dark:border-blue-700/50 text-gray-700 dark:text-gray-300 rounded-full cursor-default"
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.5 + i * 0.1 }}
-                whileHover={{ scale: 1.1, borderColor: "rgb(59, 130, 246)" }}
-                whileTap={{ scale: 0.95 }}
-              >
-                {item}
-              </motion.span>
-            ))}
-          </div>
-        </motion.div>
 
         {/* Currently Listening / Status Badge */}
         <motion.div
