@@ -173,12 +173,17 @@ const InstagramLinkPage = () => {
   const [introStage, setIntroStage] = useState(0);
   const [showContent, setShowContent] = useState(false);
   const [scrollY, setScrollY] = useState(0);
+  const [scrollProgress, setScrollProgress] = useState(0);
   const [storyStage, setStoryStage] = useState(0);
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [isScrolling, setIsScrolling] = useState(false);
 
   const lastReactionTime = useRef<number>(0);
   const comboTimeout = useRef<ReturnType<typeof setTimeout>>();
   const shakeTimeoutRef = useRef<ReturnType<typeof setTimeout>>();
   const contentRef = useRef<HTMLDivElement>(null);
+  const scrollTimeoutRef = useRef<ReturnType<typeof setTimeout>>();
+  const rafRef = useRef<number>();
 
   const funFacts = [
     "🌍 Globe-trotter currently based in Malta",
@@ -317,21 +322,58 @@ const InstagramLinkPage = () => {
       setLiveVisitors(Math.floor(Math.random() * 5) + 1);
     }, 5000);
 
-    // Parallax scroll effect
+    // Enhanced parallax scroll effect with RAF for performance
     const handleScroll = () => {
-      if (contentRef.current) {
-        const scrollPosition = window.scrollY;
-        setScrollY(scrollPosition);
-
-        // Story progression based on scroll
-        const viewportHeight = window.innerHeight;
-        if (scrollPosition > viewportHeight * 0.3) setStoryStage(1);
-        if (scrollPosition > viewportHeight * 0.8) setStoryStage(2);
-        if (scrollPosition > viewportHeight * 1.5) setStoryStage(3);
+      if (rafRef.current) {
+        cancelAnimationFrame(rafRef.current);
       }
+
+      rafRef.current = requestAnimationFrame(() => {
+        if (contentRef.current) {
+          const scrollPosition = window.scrollY;
+          const documentHeight = document.documentElement.scrollHeight - window.innerHeight;
+          const progress = documentHeight > 0 ? (scrollPosition / documentHeight) * 100 : 0;
+
+          setScrollY(scrollPosition);
+          setScrollProgress(progress);
+          setIsScrolling(true);
+
+          // Clear existing timeout
+          if (scrollTimeoutRef.current) {
+            clearTimeout(scrollTimeoutRef.current);
+          }
+
+          // Set scrolling to false after scroll ends
+          scrollTimeoutRef.current = setTimeout(() => {
+            setIsScrolling(false);
+          }, 150);
+
+          // Enhanced story progression with smoother transitions
+          const viewportHeight = window.innerHeight;
+          const scrollThresholds = [
+            { threshold: viewportHeight * 0.2, stage: 1 },
+            { threshold: viewportHeight * 0.6, stage: 2 },
+            { threshold: viewportHeight * 1.2, stage: 3 },
+          ];
+
+          for (const { threshold, stage } of scrollThresholds) {
+            if (scrollPosition > threshold) {
+              setStoryStage(stage);
+            }
+          }
+        }
+      });
     };
 
-    window.addEventListener('scroll', handleScroll);
+    // Mouse move handler for parallax effects
+    const handleMouseMove = (e: MouseEvent) => {
+      const x = (e.clientX / window.innerWidth - 0.5) * 2;
+      const y = (e.clientY / window.innerHeight - 0.5) * 2;
+      setMousePosition({ x, y });
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    window.addEventListener('mousemove', handleMouseMove, { passive: true });
     handleScroll(); // Initialize
 
     // Typing effect
@@ -372,6 +414,9 @@ const InstagramLinkPage = () => {
       clearInterval(typingInterval);
       window.removeEventListener('devicemotion', handleShake);
       window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('mousemove', handleMouseMove);
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -1416,6 +1461,43 @@ const InstagramLinkPage = () => {
         )}
       </AnimatePresence>
 
+      {/* Scroll to Top Button */}
+      <AnimatePresence>
+        {showContent && scrollY > 500 && !screenshotMode && (
+          <motion.button
+            initial={{ opacity: 0, scale: 0, rotate: -180 }}
+            animate={{ opacity: 1, scale: 1, rotate: 0 }}
+            exit={{ opacity: 0, scale: 0, rotate: 180 }}
+            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+            className="fixed bottom-8 right-8 w-14 h-14 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-full shadow-2xl flex items-center justify-center z-50 hover:shadow-blue-500/50 transition-shadow group"
+            whileHover={{ scale: 1.1, rotate: 360 }}
+            whileTap={{ scale: 0.9 }}
+            transition={{ type: "spring", stiffness: 260, damping: 20 }}
+          >
+            <motion.div
+              animate={{ y: [-2, 2, -2] }}
+              transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+            >
+              ↑
+            </motion.div>
+            
+            {/* Ripple Effect */}
+            <motion.div
+              className="absolute inset-0 rounded-full border-2 border-blue-400"
+              animate={{
+                scale: [1, 1.5, 1.5],
+                opacity: [0.5, 0, 0],
+              }}
+              transition={{
+                duration: 2,
+                repeat: Infinity,
+                ease: "easeOut"
+              }}
+            />
+          </motion.button>
+        )}
+      </AnimatePresence>
+
       {/* Particle Background */}
       {showParticles && (
         <div className="fixed inset-0 pointer-events-none z-10">
@@ -1479,6 +1561,48 @@ const InstagramLinkPage = () => {
         )}
       </AnimatePresence>
 
+      {/* Scroll Progress Indicator */}
+      <AnimatePresence>
+        {showContent && scrollY > 100 && (
+          <motion.div
+            initial={{ opacity: 0, x: -10 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -10 }}
+            className="fixed left-4 top-1/2 -translate-y-1/2 z-50 hidden md:block"
+          >
+            <div className="flex flex-col gap-3">
+              {[0, 1, 2, 3].map((stage) => (
+                <motion.div
+                  key={stage}
+                  className={`w-2 h-2 rounded-full transition-all ${
+                    storyStage >= stage
+                      ? 'bg-blue-500 dark:bg-blue-400 w-3 h-3'
+                      : 'bg-gray-300 dark:bg-gray-700'
+                  }`}
+                  whileHover={{ scale: 1.5 }}
+                  animate={{
+                    boxShadow: storyStage >= stage 
+                      ? ['0 0 0px rgba(59, 130, 246, 0.5)', '0 0 15px rgba(59, 130, 246, 0.8)', '0 0 0px rgba(59, 130, 246, 0.5)']
+                      : 'none'
+                  }}
+                  transition={{ duration: 2, repeat: Infinity }}
+                />
+              ))}
+            </div>
+            
+            {/* Progress Bar */}
+            <div className="mt-4 w-1 h-32 bg-gray-200 dark:bg-gray-800 rounded-full overflow-hidden">
+              <motion.div
+                className="w-full bg-gradient-to-b from-blue-500 via-purple-500 to-pink-500"
+                style={{
+                  height: `${scrollProgress}%`,
+                }}
+              />
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* STORYTELLING PARALLAX SECTION */}
       <AnimatePresence>
         {showContent && (
@@ -1496,23 +1620,79 @@ const InstagramLinkPage = () => {
                 transform: `translateY(${scrollY * 0.5}px)`,
               }}
             >
-              {/* Animated Background Particles */}
+              {/* Multi-layer Depth Background */}
+              <motion.div
+                className="absolute inset-0 bg-gradient-to-b from-blue-50/30 via-transparent to-purple-50/30 dark:from-blue-950/10 dark:via-transparent dark:to-purple-950/10"
+                style={{
+                  transform: `translateY(${scrollY * 0.3}px) translateX(${mousePosition.x * 10}px)`,
+                }}
+              />
+
+              {/* Animated Background Particles - Multi-layer */}
               <div className="absolute inset-0 pointer-events-none">
-                {[...Array(50)].map((_, i) => (
+                {/* Layer 1: Far Background */}
+                {[...Array(30)].map((_, i) => (
                   <motion.div
-                    key={`bg-particle-${i}`}
-                    className="absolute w-1 h-1 bg-blue-400/30 rounded-full"
+                    key={`bg-particle-far-${i}`}
+                    className="absolute w-0.5 h-0.5 bg-blue-400/20 rounded-full blur-sm"
                     style={{
                       left: `${Math.random() * 100}%`,
                       top: `${Math.random() * 100}%`,
+                      transform: `translateY(${scrollY * 0.1}px)`,
                     }}
                     animate={{
-                      y: [0, -30, 0],
-                      opacity: [0.3, 1, 0.3],
-                      scale: [1, 1.5, 1],
+                      y: [0, -20, 0],
+                      opacity: [0.2, 0.5, 0.2],
+                      scale: [1, 1.3, 1],
+                    }}
+                    transition={{
+                      duration: 4 + Math.random() * 2,
+                      repeat: Infinity,
+                      delay: Math.random() * 2,
+                    }}
+                  />
+                ))}
+
+                {/* Layer 2: Mid Background */}
+                {[...Array(25)].map((_, i) => (
+                  <motion.div
+                    key={`bg-particle-mid-${i}`}
+                    className="absolute w-1 h-1 bg-purple-400/30 rounded-full"
+                    style={{
+                      left: `${Math.random() * 100}%`,
+                      top: `${Math.random() * 100}%`,
+                      transform: `translateY(${scrollY * 0.2}px) translateX(${mousePosition.x * 15}px)`,
+                    }}
+                    animate={{
+                      y: [0, -25, 0],
+                      opacity: [0.3, 0.8, 0.3],
+                      scale: [1, 1.4, 1],
                     }}
                     transition={{
                       duration: 3 + Math.random() * 2,
+                      repeat: Infinity,
+                      delay: Math.random() * 2,
+                    }}
+                  />
+                ))}
+
+                {/* Layer 3: Foreground */}
+                {[...Array(20)].map((_, i) => (
+                  <motion.div
+                    key={`bg-particle-near-${i}`}
+                    className="absolute w-1.5 h-1.5 bg-blue-500/40 rounded-full"
+                    style={{
+                      left: `${Math.random() * 100}%`,
+                      top: `${Math.random() * 100}%`,
+                      transform: `translateY(${scrollY * 0.4}px) translateX(${mousePosition.x * 20}px)`,
+                    }}
+                    animate={{
+                      y: [0, -35, 0],
+                      opacity: [0.4, 1, 0.4],
+                      scale: [1, 1.6, 1],
+                    }}
+                    transition={{
+                      duration: 2.5 + Math.random() * 1.5,
                       repeat: Infinity,
                       delay: Math.random() * 2,
                     }}
@@ -1579,38 +1759,91 @@ const InstagramLinkPage = () => {
                 </motion.div>
               </div>
 
-              {/* Floating Code Snippets */}
-              {['</>', '{}', '[]', '( )', '=>'].map((symbol, i) => (
+              {/* Enhanced Floating Code Snippets with Mouse Parallax */}
+              {['</>', '{}', '[]', '( )', '=>', '<|>', '::'].map((symbol, i) => (
                 <motion.div
                   key={symbol}
-                  className="absolute text-4xl font-mono text-blue-400/20 dark:text-blue-400/10"
+                  className="absolute text-4xl md:text-5xl font-mono text-blue-400/20 dark:text-blue-400/10 select-none"
                   style={{
-                    left: `${20 + i * 15}%`,
-                    top: `${30 + Math.sin(i) * 20}%`,
-                    transform: `translateY(${-scrollY * (0.2 + i * 0.1)}px)`,
+                    left: `${15 + i * 12}%`,
+                    top: `${25 + Math.sin(i * 1.5) * 25}%`,
+                    transform: `
+                      translateY(${-scrollY * (0.15 + i * 0.08)}px) 
+                      translateX(${mousePosition.x * (20 + i * 5)}px)
+                      rotateX(${mousePosition.y * 5}deg)
+                      rotateY(${mousePosition.x * 5}deg)
+                    `,
+                    transformStyle: 'preserve-3d',
+                  }}
+                  animate={{
+                    rotate: [0, 360],
+                    scale: [1, 1.15, 1],
+                  }}
+                  transition={{
+                    rotate: { duration: 15 + i * 3, repeat: Infinity, ease: "linear" },
+                    scale: { duration: 3 + i * 0.5, repeat: Infinity, ease: "easeInOut" }
+                  }}
+                >
+                  <motion.span
+                    animate={{
+                      textShadow: [
+                        '0 0 10px rgba(59, 130, 246, 0.3)',
+                        '0 0 20px rgba(139, 92, 246, 0.4)',
+                        '0 0 10px rgba(59, 130, 246, 0.3)',
+                      ]
+                    }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                  >
+                    {symbol}
+                  </motion.span>
+                </motion.div>
+              ))}
+            </motion.section>
+
+            {/* Story Chapter 2: The Craft - Enhanced */}
+            <motion.section
+              className="min-h-screen flex items-center justify-center relative overflow-hidden"
+              style={{
+                transform: `translateY(${scrollY * 0.25}px)`,
+              }}
+            >
+              {/* Animated Background Gradient */}
+              <motion.div
+                className="absolute inset-0 bg-gradient-to-b from-transparent via-blue-50/50 to-transparent dark:via-blue-950/20"
+                style={{
+                  transform: `translateY(${scrollY * 0.15}px) scale(${1 + scrollProgress * 0.001})`,
+                }}
+              />
+
+              {/* Floating Geometric Shapes */}
+              {[...Array(15)].map((_, i) => (
+                <motion.div
+                  key={`geo-${i}`}
+                  className="absolute"
+                  style={{
+                    left: `${10 + i * 6}%`,
+                    top: `${20 + Math.sin(i * 2) * 30}%`,
+                    transform: `translateY(${-scrollY * (0.12 + i * 0.03)}px) translateX(${mousePosition.x * (15 + i * 3)}px)`,
                   }}
                   animate={{
                     rotate: [0, 360],
                     scale: [1, 1.2, 1],
                   }}
                   transition={{
-                    duration: 10 + i * 2,
-                    repeat: Infinity,
-                    ease: "linear"
+                    rotate: { duration: 20 + i * 5, repeat: Infinity, ease: "linear" },
+                    scale: { duration: 3 + i * 0.5, repeat: Infinity, ease: "easeInOut" }
                   }}
                 >
-                  {symbol}
+                  {i % 3 === 0 ? (
+                    <div className="w-8 h-8 border-2 border-blue-300/30 dark:border-blue-600/20 rounded" />
+                  ) : i % 3 === 1 ? (
+                    <div className="w-8 h-8 border-2 border-purple-300/30 dark:border-purple-600/20 rounded-full" />
+                  ) : (
+                    <div className="w-8 h-8 border-2 border-pink-300/30 dark:border-pink-600/20 transform rotate-45" />
+                  )}
                 </motion.div>
               ))}
-            </motion.section>
 
-            {/* Story Chapter 2: The Craft */}
-            <motion.section
-              className="min-h-screen flex items-center justify-center relative overflow-hidden bg-gradient-to-b from-transparent via-blue-50/50 to-transparent dark:via-blue-950/20"
-              style={{
-                transform: `translateY(${scrollY * 0.3}px)`,
-              }}
-            >
               <div className="max-w-4xl mx-auto px-6 z-10">
                 <motion.div
                   initial={{ opacity: 0, x: -100 }}
@@ -1619,89 +1852,233 @@ const InstagramLinkPage = () => {
                   className="grid md:grid-cols-3 gap-8"
                 >
                   {[
-                    { icon: Code2, title: "Innovation", desc: "Pushing boundaries with cutting-edge technology" },
-                    { icon: Zap, title: "Performance", desc: "Optimized experiences that feel instant" },
-                    { icon: Heart, title: "Passion", desc: "Crafted with care and attention to detail" }
+                    { icon: Code2, title: "Innovation", desc: "Pushing boundaries with cutting-edge technology", gradient: "from-blue-500 to-cyan-500" },
+                    { icon: Zap, title: "Performance", desc: "Optimized experiences that feel instant", gradient: "from-purple-500 to-pink-500" },
+                    { icon: Heart, title: "Passion", desc: "Crafted with care and attention to detail", gradient: "from-orange-500 to-red-500" }
                   ].map((item, i) => (
                     <motion.div
                       key={item.title}
-                      initial={{ opacity: 0, y: 50 }}
-                      animate={{ opacity: storyStage >= 1 ? 1 : 0, y: storyStage >= 1 ? 0 : 50 }}
-                      transition={{ delay: i * 0.2, duration: 0.8 }}
-                      className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl p-8 rounded-2xl border border-gray-200 dark:border-gray-700 hover:border-blue-400 dark:hover:border-blue-500 transition-all hover:scale-105"
+                      initial={{ opacity: 0, y: 50, rotateX: -15 }}
+                      animate={{
+                        opacity: storyStage >= 1 ? 1 : 0,
+                        y: storyStage >= 1 ? 0 : 50,
+                        rotateX: storyStage >= 1 ? 0 : -15
+                      }}
+                      transition={{ delay: i * 0.2, duration: 0.8, type: "spring", stiffness: 100 }}
+                      whileHover={{
+                        scale: 1.05,
+                        rotateY: 5,
+                        z: 50,
+                        transition: { duration: 0.3 }
+                      }}
+                      className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl p-8 rounded-2xl border-2 border-gray-200 dark:border-gray-700 hover:border-transparent transition-all relative overflow-hidden group"
                       style={{
-                        transform: `translateY(${-scrollY * (0.1 + i * 0.05)}px)`,
+                        transform: `translateY(${-scrollY * (0.08 + i * 0.04)}px) translateX(${mousePosition.x * (10 + i * 5)}px)`,
+                        transformStyle: 'preserve-3d',
                       }}
                     >
+                      {/* Gradient Overlay */}
+                      <motion.div
+                        className={`absolute inset-0 bg-gradient-to-br ${item.gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-300`}
+                      />
+
+                      {/* Animated Icon */}
                       <motion.div
                         animate={{
                           rotate: [0, 360],
                         }}
-                        transition={{ duration: 10 + i * 2, repeat: Infinity, ease: "linear" }}
-                        className="mb-4"
+                        transition={{ duration: 12 + i * 3, repeat: Infinity, ease: "linear" }}
+                        className="mb-6 relative"
                       >
-                        <item.icon className="w-12 h-12 text-blue-600 dark:text-blue-400 mx-auto" />
+                        <motion.div
+                          animate={{
+                            scale: [1, 1.1, 1],
+                          }}
+                          transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                        >
+                          <item.icon className={`w-14 h-14 mx-auto bg-gradient-to-r ${item.gradient} bg-clip-text text-transparent`} style={{
+                            filter: 'drop-shadow(0 0 20px currentColor)',
+                          }} />
+                        </motion.div>
                       </motion.div>
-                      <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">{item.title}</h3>
-                      <p className="text-gray-600 dark:text-gray-400">{item.desc}</p>
+
+                      <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3 group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:bg-clip-text" style={{ backgroundImage: item.gradient }}>{item.title}</h3>
+                      <p className="text-gray-600 dark:text-gray-400 leading-relaxed">{item.desc}</p>
+
+                      {/* Corner Accent */}
+                      <motion.div
+                        className={`absolute top-0 right-0 w-20 h-20 bg-gradient-to-br ${item.gradient} opacity-0 group-hover:opacity-20 blur-2xl transition-opacity`}
+                      />
                     </motion.div>
                   ))}
                 </motion.div>
               </div>
             </motion.section>
 
-            {/* Story Chapter 3: The Numbers */}
+            {/* Story Chapter 3: The Numbers - Enhanced with 3D */}
             <motion.section
-              className="min-h-[60vh] flex items-center justify-center relative overflow-hidden"
+              className="min-h-[70vh] flex items-center justify-center relative overflow-hidden"
               style={{
-                transform: `translateY(${scrollY * 0.2}px)`,
+                transform: `translateY(${scrollY * 0.18}px)`,
               }}
             >
-              <div className="max-w-5xl mx-auto px-6 z-10">
+              {/* Radial Gradient Background */}
+              <motion.div
+                className="absolute inset-0"
+                style={{
+                  background: 'radial-gradient(circle at 50% 50%, rgba(59, 130, 246, 0.1), transparent 70%)',
+                  transform: `scale(${1 + scrollProgress * 0.002})`,
+                }}
+              />
+
+              {/* Orbiting Rings */}
+              {[1, 2, 3].map((ring) => (
+                <motion.div
+                  key={`orbit-${ring}`}
+                  className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border border-blue-400/10"
+                  style={{
+                    width: `${300 + ring * 150}px`,
+                    height: `${300 + ring * 150}px`,
+                  }}
+                  animate={{
+                    rotate: ring % 2 === 0 ? 360 : -360,
+                  }}
+                  transition={{
+                    duration: 30 + ring * 10,
+                    repeat: Infinity,
+                    ease: "linear"
+                  }}
+                />
+              ))}
+
+              <div className="max-w-6xl mx-auto px-6 z-10">
                 <motion.div
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: storyStage >= 2 ? 1 : 0, scale: storyStage >= 2 ? 1 : 0.8 }}
-                  transition={{ duration: 1 }}
+                  transition={{ duration: 1, type: "spring" }}
                   className="text-center"
                 >
-                  <h2 className="text-3xl md:text-5xl font-bold text-gray-900 dark:text-white mb-12">
+                  <motion.h2
+                    className="text-3xl md:text-6xl font-bold text-gray-900 dark:text-white mb-4"
+                    animate={{
+                      textShadow: [
+                        '0 0 20px rgba(59, 130, 246, 0.2)',
+                        '0 0 40px rgba(139, 92, 246, 0.3)',
+                        '0 0 20px rgba(59, 130, 246, 0.2)',
+                      ]
+                    }}
+                    transition={{ duration: 3, repeat: Infinity }}
+                  >
                     Impact in Numbers
-                  </h2>
-
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                  </motion.h2>
+                  <p className="text-lg text-gray-600 dark:text-gray-400 mb-16">Metrics that matter</p>
+                  
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
                     {[
-                      { value: "10+", label: "Years Coding", icon: Code2 },
-                      { value: "50+", label: "Projects Built", icon: Zap },
-                      { value: "1M+", label: "Lines of Code", icon: TrendingUp },
-                      { value: "∞", label: "Ideas", icon: Sparkles }
+                      { value: "10+", label: "Years Coding", icon: Code2, gradient: "from-blue-500 via-blue-600 to-cyan-500" },
+                      { value: "50+", label: "Projects Built", icon: Zap, gradient: "from-purple-500 via-purple-600 to-pink-500" },
+                      { value: "1M+", label: "Lines of Code", icon: TrendingUp, gradient: "from-orange-500 via-red-500 to-pink-500" },
+                      { value: "∞", label: "Ideas", icon: Sparkles, gradient: "from-green-500 via-emerald-500 to-teal-500" }
                     ].map((stat, i) => (
                       <motion.div
                         key={stat.label}
-                        initial={{ opacity: 0, y: 30 }}
-                        animate={{ opacity: storyStage >= 2 ? 1 : 0, y: storyStage >= 2 ? 0 : 30 }}
-                        transition={{ delay: i * 0.15, duration: 0.8 }}
-                        className="bg-gradient-to-br from-blue-500 to-purple-600 p-6 rounded-2xl text-white relative overflow-hidden group hover:scale-110 transition-transform"
+                        initial={{ opacity: 0, y: 50, rotateX: -20 }}
+                        animate={{ 
+                          opacity: storyStage >= 2 ? 1 : 0, 
+                          y: storyStage >= 2 ? 0 : 50,
+                          rotateX: storyStage >= 2 ? 0 : -20
+                        }}
+                        transition={{ delay: i * 0.15, duration: 0.8, type: "spring", stiffness: 100 }}
+                        whileHover={{ 
+                          scale: 1.1, 
+                          rotateY: 5,
+                          z: 30,
+                          transition: { duration: 0.3 }
+                        }}
+                        className={`bg-gradient-to-br ${stat.gradient} p-8 rounded-3xl text-white relative overflow-hidden group cursor-pointer`}
                         style={{
-                          transform: `translateY(${-scrollY * 0.08}px)`,
+                          transform: `translateY(${-scrollY * (0.06 + i * 0.02)}px) translateX(${mousePosition.x * (8 + i * 2)}px)`,
+                          transformStyle: 'preserve-3d',
+                          boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3)',
                         }}
                       >
+                        {/* Shine Effect */}
                         <motion.div
-                          className="absolute inset-0 bg-white/20"
+                          className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent"
                           initial={{ x: '-100%' }}
-                          whileHover={{ x: '100%' }}
-                          transition={{ duration: 0.5 }}
+                          whileHover={{ x: '200%' }}
+                          transition={{ duration: 0.6 }}
                         />
-                        <stat.icon className="w-8 h-8 mx-auto mb-2 opacity-80" />
-                        <div className="text-4xl font-black mb-1">{stat.value}</div>
-                        <div className="text-sm opacity-90">{stat.label}</div>
+
+                        {/* Animated Icon */}
+                        <motion.div
+                          animate={{
+                            rotate: [0, 360],
+                            scale: [1, 1.1, 1],
+                          }}
+                          transition={{
+                            rotate: { duration: 20, repeat: Infinity, ease: "linear" },
+                            scale: { duration: 2, repeat: Infinity, ease: "easeInOut" }
+                          }}
+                          className="mb-4 relative z-10"
+                        >
+                          <stat.icon className="w-10 h-10 md:w-12 md:h-12 mx-auto drop-shadow-lg" />
+                        </motion.div>
+
+                        {/* Count */}
+                        <motion.div 
+                          className="text-4xl md:text-5xl font-black mb-2 relative z-10"
+                          animate={{
+                            scale: [1, 1.05, 1],
+                          }}
+                          transition={{
+                            duration: 2,
+                            repeat: Infinity,
+                            ease: "easeInOut"
+                          }}
+                        >
+                          {stat.value}
+                        </motion.div>
+
+                        {/* Label */}
+                        <div className="text-sm md:text-base font-medium opacity-95 relative z-10">{stat.label}</div>
+
+                        {/* Glow Effect */}
+                        <motion.div
+                          className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                          style={{
+                            background: `radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.2), transparent 70%)`,
+                          }}
+                        />
+
+                        {/* Particle Effect on Hover */}
+                        {[...Array(5)].map((_, particleIndex) => (
+                          <motion.div
+                            key={`particle-${particleIndex}`}
+                            className="absolute w-1 h-1 bg-white rounded-full opacity-0 group-hover:opacity-100"
+                            style={{
+                              left: '50%',
+                              top: '50%',
+                            }}
+                            animate={{
+                              x: Math.cos((particleIndex / 5) * Math.PI * 2) * 50,
+                              y: Math.sin((particleIndex / 5) * Math.PI * 2) * 50,
+                              opacity: [0, 1, 0],
+                            }}
+                            transition={{
+                              duration: 1,
+                              delay: particleIndex * 0.1,
+                              repeat: Infinity,
+                              repeatDelay: 0.5
+                            }}
+                          />
+                        ))}
                       </motion.div>
                     ))}
                   </div>
                 </motion.div>
               </div>
-            </motion.section>
-
-            {/* Story Chapter 4: The Tech Stack - 3D Cards */}
+            </motion.section>            {/* Story Chapter 4: The Tech Stack - 3D Cards */}
             <motion.section
               className="min-h-screen flex items-center justify-center relative overflow-hidden bg-gradient-to-b from-transparent via-purple-50/50 to-transparent dark:via-purple-950/20"
               style={{
