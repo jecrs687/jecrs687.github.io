@@ -176,13 +176,11 @@ const InstagramLinkPage = () => {
   const [scrollProgress, setScrollProgress] = useState(0);
   const [storyStage, setStoryStage] = useState(0);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-  const [isScrolling, setIsScrolling] = useState(false);
 
   const lastReactionTime = useRef<number>(0);
   const comboTimeout = useRef<ReturnType<typeof setTimeout>>();
   const shakeTimeoutRef = useRef<ReturnType<typeof setTimeout>>();
   const contentRef = useRef<HTMLDivElement>(null);
-  const scrollTimeoutRef = useRef<ReturnType<typeof setTimeout>>();
   const rafRef = useRef<number>();
 
   const funFacts = [
@@ -336,17 +334,6 @@ const InstagramLinkPage = () => {
 
           setScrollY(scrollPosition);
           setScrollProgress(progress);
-          setIsScrolling(true);
-
-          // Clear existing timeout
-          if (scrollTimeoutRef.current) {
-            clearTimeout(scrollTimeoutRef.current);
-          }
-
-          // Set scrolling to false after scroll ends
-          scrollTimeoutRef.current = setTimeout(() => {
-            setIsScrolling(false);
-          }, 150);
 
           // Enhanced story progression with smoother transitions
           const viewportHeight = window.innerHeight;
@@ -416,7 +403,6 @@ const InstagramLinkPage = () => {
       window.removeEventListener('scroll', handleScroll);
       window.removeEventListener('mousemove', handleMouseMove);
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
-      if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -1480,7 +1466,7 @@ const InstagramLinkPage = () => {
             >
               ↑
             </motion.div>
-            
+
             {/* Ripple Effect */}
             <motion.div
               className="absolute inset-0 rounded-full border-2 border-blue-400"
@@ -1574,14 +1560,13 @@ const InstagramLinkPage = () => {
               {[0, 1, 2, 3].map((stage) => (
                 <motion.div
                   key={stage}
-                  className={`w-2 h-2 rounded-full transition-all ${
-                    storyStage >= stage
-                      ? 'bg-blue-500 dark:bg-blue-400 w-3 h-3'
-                      : 'bg-gray-300 dark:bg-gray-700'
-                  }`}
+                  className={`w-2 h-2 rounded-full transition-all ${storyStage >= stage
+                    ? 'bg-blue-500 dark:bg-blue-400 w-3 h-3'
+                    : 'bg-gray-300 dark:bg-gray-700'
+                    }`}
                   whileHover={{ scale: 1.5 }}
                   animate={{
-                    boxShadow: storyStage >= stage 
+                    boxShadow: storyStage >= stage
                       ? ['0 0 0px rgba(59, 130, 246, 0.5)', '0 0 15px rgba(59, 130, 246, 0.8)', '0 0 0px rgba(59, 130, 246, 0.5)']
                       : 'none'
                   }}
@@ -1589,7 +1574,7 @@ const InstagramLinkPage = () => {
                 />
               ))}
             </div>
-            
+
             {/* Progress Bar */}
             <div className="mt-4 w-1 h-32 bg-gray-200 dark:bg-gray-800 rounded-full overflow-hidden">
               <motion.div
@@ -1615,89 +1600,101 @@ const InstagramLinkPage = () => {
           >
             {/* Story Chapter 1: The Journey Begins */}
             <motion.section
-              className="min-h-screen flex items-center justify-center relative overflow-hidden"
+              className="min-h-screen flex items-center justify-center relative overflow-hidden isolate"
               style={{
-                transform: `translateY(${scrollY * 0.5}px)`,
+                transform: `translateY(${Math.min(scrollY * 0.3, 200)}px)`,
               }}
             >
               {/* Multi-layer Depth Background */}
               <motion.div
-                className="absolute inset-0 bg-gradient-to-b from-blue-50/30 via-transparent to-purple-50/30 dark:from-blue-950/10 dark:via-transparent dark:to-purple-950/10"
+                className="absolute inset-0 bg-gradient-to-b from-blue-50/30 via-transparent to-purple-50/30 dark:from-blue-950/10 dark:via-transparent dark:to-purple-950/10 pointer-events-none"
                 style={{
-                  transform: `translateY(${scrollY * 0.3}px) translateX(${mousePosition.x * 10}px)`,
+                  transform: `translateY(${Math.min(scrollY * 0.15, 100)}px) translateX(${mousePosition.x * 5}px)`,
                 }}
               />
 
-              {/* Animated Background Particles - Multi-layer */}
-              <div className="absolute inset-0 pointer-events-none">
+              {/* Animated Background Particles - Multi-layer with Containment */}
+              <div className="absolute inset-0 pointer-events-none overflow-hidden">
                 {/* Layer 1: Far Background */}
-                {[...Array(30)].map((_, i) => (
-                  <motion.div
-                    key={`bg-particle-far-${i}`}
-                    className="absolute w-0.5 h-0.5 bg-blue-400/20 rounded-full blur-sm"
-                    style={{
-                      left: `${Math.random() * 100}%`,
-                      top: `${Math.random() * 100}%`,
-                      transform: `translateY(${scrollY * 0.1}px)`,
-                    }}
-                    animate={{
-                      y: [0, -20, 0],
-                      opacity: [0.2, 0.5, 0.2],
-                      scale: [1, 1.3, 1],
-                    }}
-                    transition={{
-                      duration: 4 + Math.random() * 2,
-                      repeat: Infinity,
-                      delay: Math.random() * 2,
-                    }}
-                  />
-                ))}
+                {[...Array(30)].map((_, i) => {
+                  const baseLeft = Math.random() * 100;
+                  const baseTop = Math.random() * 100;
+                  return (
+                    <motion.div
+                      key={`bg-particle-far-${i}`}
+                      className="absolute w-0.5 h-0.5 bg-blue-400/20 rounded-full blur-sm"
+                      style={{
+                        left: `${baseLeft}%`,
+                        top: `${baseTop}%`,
+                        transform: `translateY(${Math.min(scrollY * 0.05, 50)}px)`,
+                      }}
+                      animate={{
+                        y: [0, -15, 0],
+                        opacity: [0.2, 0.5, 0.2],
+                        scale: [1, 1.3, 1],
+                      }}
+                      transition={{
+                        duration: 4 + Math.random() * 2,
+                        repeat: Infinity,
+                        delay: Math.random() * 2,
+                      }}
+                    />
+                  );
+                })}
 
                 {/* Layer 2: Mid Background */}
-                {[...Array(25)].map((_, i) => (
-                  <motion.div
-                    key={`bg-particle-mid-${i}`}
-                    className="absolute w-1 h-1 bg-purple-400/30 rounded-full"
-                    style={{
-                      left: `${Math.random() * 100}%`,
-                      top: `${Math.random() * 100}%`,
-                      transform: `translateY(${scrollY * 0.2}px) translateX(${mousePosition.x * 15}px)`,
-                    }}
-                    animate={{
-                      y: [0, -25, 0],
-                      opacity: [0.3, 0.8, 0.3],
-                      scale: [1, 1.4, 1],
-                    }}
-                    transition={{
-                      duration: 3 + Math.random() * 2,
-                      repeat: Infinity,
-                      delay: Math.random() * 2,
-                    }}
-                  />
-                ))}
+                {[...Array(20)].map((_, i) => {
+                  const baseLeft = Math.random() * 100;
+                  const baseTop = Math.random() * 100;
+                  return (
+                    <motion.div
+                      key={`bg-particle-mid-${i}`}
+                      className="absolute w-1 h-1 bg-purple-400/30 rounded-full"
+                      style={{
+                        left: `${baseLeft}%`,
+                        top: `${baseTop}%`,
+                        transform: `translateY(${Math.min(scrollY * 0.08, 80)}px) translateX(${Math.max(-30, Math.min(30, mousePosition.x * 10))}px)`,
+                      }}
+                      animate={{
+                        y: [0, -20, 0],
+                        opacity: [0.3, 0.8, 0.3],
+                        scale: [1, 1.4, 1],
+                      }}
+                      transition={{
+                        duration: 3 + Math.random() * 2,
+                        repeat: Infinity,
+                        delay: Math.random() * 2,
+                      }}
+                    />
+                  );
+                })}
 
                 {/* Layer 3: Foreground */}
-                {[...Array(20)].map((_, i) => (
-                  <motion.div
-                    key={`bg-particle-near-${i}`}
-                    className="absolute w-1.5 h-1.5 bg-blue-500/40 rounded-full"
-                    style={{
-                      left: `${Math.random() * 100}%`,
-                      top: `${Math.random() * 100}%`,
-                      transform: `translateY(${scrollY * 0.4}px) translateX(${mousePosition.x * 20}px)`,
-                    }}
-                    animate={{
-                      y: [0, -35, 0],
-                      opacity: [0.4, 1, 0.4],
-                      scale: [1, 1.6, 1],
-                    }}
-                    transition={{
-                      duration: 2.5 + Math.random() * 1.5,
-                      repeat: Infinity,
-                      delay: Math.random() * 2,
-                    }}
-                  />
-                ))}
+                {[...Array(15)].map((_, i) => {
+                  const baseLeft = Math.random() * 100;
+                  const baseTop = Math.random() * 100;
+                  return (
+                    <motion.div
+                      key={`bg-particle-near-${i}`}
+                      className="absolute w-1.5 h-1.5 bg-blue-500/40 rounded-full"
+                      style={{
+                        left: `${baseLeft}%`,
+                        top: `${baseTop}%`,
+                        transform: `translateY(${Math.min(scrollY * 0.12, 120)}px) translateX(${Math.max(-50, Math.min(50, mousePosition.x * 15))}px)`,
+                      }}
+                      animate={{
+                        y: [0, -25, 0],
+                        opacity: [0.4, 1, 0.4],
+                        scale: [1, 1.6, 1],
+                      }}
+                      transition={{
+                        duration: 2.5 + Math.random() * 1.5,
+                        repeat: Infinity,
+                        delay: Math.random() * 2,
+                      }}
+                    />
+                  );
+                })}
               </div>
 
               <div className="max-w-4xl mx-auto px-6 text-center z-10">
@@ -1759,90 +1756,101 @@ const InstagramLinkPage = () => {
                 </motion.div>
               </div>
 
-              {/* Enhanced Floating Code Snippets with Mouse Parallax */}
-              {['</>', '{}', '[]', '( )', '=>', '<|>', '::'].map((symbol, i) => (
-                <motion.div
-                  key={symbol}
-                  className="absolute text-4xl md:text-5xl font-mono text-blue-400/20 dark:text-blue-400/10 select-none"
-                  style={{
-                    left: `${15 + i * 12}%`,
-                    top: `${25 + Math.sin(i * 1.5) * 25}%`,
-                    transform: `
-                      translateY(${-scrollY * (0.15 + i * 0.08)}px) 
-                      translateX(${mousePosition.x * (20 + i * 5)}px)
-                      rotateX(${mousePosition.y * 5}deg)
-                      rotateY(${mousePosition.x * 5}deg)
-                    `,
-                    transformStyle: 'preserve-3d',
-                  }}
-                  animate={{
-                    rotate: [0, 360],
-                    scale: [1, 1.15, 1],
-                  }}
-                  transition={{
-                    rotate: { duration: 15 + i * 3, repeat: Infinity, ease: "linear" },
-                    scale: { duration: 3 + i * 0.5, repeat: Infinity, ease: "easeInOut" }
-                  }}
-                >
-                  <motion.span
-                    animate={{
-                      textShadow: [
-                        '0 0 10px rgba(59, 130, 246, 0.3)',
-                        '0 0 20px rgba(139, 92, 246, 0.4)',
-                        '0 0 10px rgba(59, 130, 246, 0.3)',
-                      ]
+              {/* Enhanced Floating Code Snippets with Contained Mouse Parallax */}
+              {['</>', '{}', '[]', '( )', '=>', '<|>', '::'].map((symbol, i) => {
+                const baseLeft = 15 + i * 12;
+                const baseTop = 25 + Math.sin(i * 1.5) * 20;
+                return (
+                  <motion.div
+                    key={symbol}
+                    className="absolute text-3xl md:text-4xl font-mono text-blue-400/20 dark:text-blue-400/10 select-none pointer-events-none"
+                    style={{
+                      left: `${baseLeft}%`,
+                      top: `${baseTop}%`,
+                      transform: `
+                        translateY(${Math.min(-scrollY * (0.08 + i * 0.04), 150)}px) 
+                        translateX(${Math.max(-40, Math.min(40, mousePosition.x * (10 + i * 2)))}px)
+                        rotateX(${Math.max(-15, Math.min(15, mousePosition.y * 3))}deg)
+                        rotateY(${Math.max(-15, Math.min(15, mousePosition.x * 3))}deg)
+                      `,
+                      transformStyle: 'preserve-3d',
+                      willChange: 'transform',
                     }}
-                    transition={{ duration: 2, repeat: Infinity }}
+                    animate={{
+                      rotate: [0, 360],
+                      scale: [1, 1.1, 1],
+                    }}
+                    transition={{
+                      rotate: { duration: 15 + i * 3, repeat: Infinity, ease: "linear" },
+                      scale: { duration: 3 + i * 0.5, repeat: Infinity, ease: "easeInOut" }
+                    }}
                   >
-                    {symbol}
-                  </motion.span>
-                </motion.div>
-              ))}
+                    <motion.span
+                      animate={{
+                        textShadow: [
+                          '0 0 10px rgba(59, 130, 246, 0.3)',
+                          '0 0 20px rgba(139, 92, 246, 0.4)',
+                          '0 0 10px rgba(59, 130, 246, 0.3)',
+                        ]
+                      }}
+                      transition={{ duration: 2, repeat: Infinity }}
+                    >
+                      {symbol}
+                    </motion.span>
+                  </motion.div>
+                );
+              })}
             </motion.section>
 
             {/* Story Chapter 2: The Craft - Enhanced */}
             <motion.section
-              className="min-h-screen flex items-center justify-center relative overflow-hidden"
+              className="min-h-screen flex items-center justify-center relative overflow-hidden isolate"
               style={{
-                transform: `translateY(${scrollY * 0.25}px)`,
+                transform: `translateY(${Math.min(scrollY * 0.15, 150)}px)`,
               }}
             >
               {/* Animated Background Gradient */}
               <motion.div
-                className="absolute inset-0 bg-gradient-to-b from-transparent via-blue-50/50 to-transparent dark:via-blue-950/20"
+                className="absolute inset-0 bg-gradient-to-b from-transparent via-blue-50/50 to-transparent dark:via-blue-950/20 pointer-events-none"
                 style={{
-                  transform: `translateY(${scrollY * 0.15}px) scale(${1 + scrollProgress * 0.001})`,
+                  transform: `translateY(${Math.min(scrollY * 0.08, 80)}px) scale(${1 + Math.min(scrollProgress * 0.0005, 0.05)})`,
                 }}
               />
 
-              {/* Floating Geometric Shapes */}
-              {[...Array(15)].map((_, i) => (
-                <motion.div
-                  key={`geo-${i}`}
-                  className="absolute"
-                  style={{
-                    left: `${10 + i * 6}%`,
-                    top: `${20 + Math.sin(i * 2) * 30}%`,
-                    transform: `translateY(${-scrollY * (0.12 + i * 0.03)}px) translateX(${mousePosition.x * (15 + i * 3)}px)`,
-                  }}
-                  animate={{
-                    rotate: [0, 360],
-                    scale: [1, 1.2, 1],
-                  }}
-                  transition={{
-                    rotate: { duration: 20 + i * 5, repeat: Infinity, ease: "linear" },
-                    scale: { duration: 3 + i * 0.5, repeat: Infinity, ease: "easeInOut" }
-                  }}
-                >
-                  {i % 3 === 0 ? (
-                    <div className="w-8 h-8 border-2 border-blue-300/30 dark:border-blue-600/20 rounded" />
-                  ) : i % 3 === 1 ? (
-                    <div className="w-8 h-8 border-2 border-purple-300/30 dark:border-purple-600/20 rounded-full" />
-                  ) : (
-                    <div className="w-8 h-8 border-2 border-pink-300/30 dark:border-pink-600/20 transform rotate-45" />
-                  )}
-                </motion.div>
-              ))}
+              {/* Floating Geometric Shapes with Containment */}
+              <div className="absolute inset-0 pointer-events-none overflow-hidden">
+                {[...Array(12)].map((_, i) => {
+                  const baseLeft = 10 + i * 7;
+                  const baseTop = 20 + Math.sin(i * 2) * 25;
+                  return (
+                    <motion.div
+                      key={`geo-${i}`}
+                      className="absolute"
+                      style={{
+                        left: `${baseLeft}%`,
+                        top: `${baseTop}%`,
+                        transform: `translateY(${Math.min(-scrollY * (0.06 + i * 0.02), 100)}px) translateX(${Math.max(-30, Math.min(30, mousePosition.x * (8 + i * 2)))}px)`,
+                      }}
+                      animate={{
+                        rotate: [0, 360],
+                        scale: [1, 1.15, 1],
+                      }}
+                      transition={{
+                        rotate: { duration: 20 + i * 5, repeat: Infinity, ease: "linear" },
+                        scale: { duration: 3 + i * 0.5, repeat: Infinity, ease: "easeInOut" }
+                      }}
+                    >
+                      {i % 3 === 0 ? (
+                        <div className="w-6 h-6 border-2 border-blue-300/30 dark:border-blue-600/20 rounded" />
+                      ) : i % 3 === 1 ? (
+                        <div className="w-6 h-6 border-2 border-purple-300/30 dark:border-purple-600/20 rounded-full" />
+                      ) : (
+                        <div className="w-6 h-6 border-2 border-pink-300/30 dark:border-pink-600/20 transform rotate-45" />
+                      )}
+                    </motion.div>
+                  );
+                })}
+              </div>
 
               <div className="max-w-4xl mx-auto px-6 z-10">
                 <motion.div
@@ -1917,9 +1925,9 @@ const InstagramLinkPage = () => {
 
             {/* Story Chapter 3: The Numbers - Enhanced with 3D */}
             <motion.section
-              className="min-h-[70vh] flex items-center justify-center relative overflow-hidden"
+              className="min-h-[70vh] flex items-center justify-center relative overflow-hidden isolate"
               style={{
-                transform: `translateY(${scrollY * 0.18}px)`,
+                transform: `translateY(${Math.min(scrollY * 0.12, 120)}px)`,
               }}
             >
               {/* Radial Gradient Background */}
@@ -1935,10 +1943,10 @@ const InstagramLinkPage = () => {
               {[1, 2, 3].map((ring) => (
                 <motion.div
                   key={`orbit-${ring}`}
-                  className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border border-blue-400/10"
+                  className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border border-blue-400/10 pointer-events-none"
                   style={{
-                    width: `${300 + ring * 150}px`,
-                    height: `${300 + ring * 150}px`,
+                    width: `${Math.min(300 + ring * 120, 600)}px`,
+                    height: `${Math.min(300 + ring * 120, 600)}px`,
                   }}
                   animate={{
                     rotate: ring % 2 === 0 ? 360 : -360,
@@ -1972,7 +1980,7 @@ const InstagramLinkPage = () => {
                     Impact in Numbers
                   </motion.h2>
                   <p className="text-lg text-gray-600 dark:text-gray-400 mb-16">Metrics that matter</p>
-                  
+
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
                     {[
                       { value: "10+", label: "Years Coding", icon: Code2, gradient: "from-blue-500 via-blue-600 to-cyan-500" },
@@ -1983,23 +1991,24 @@ const InstagramLinkPage = () => {
                       <motion.div
                         key={stat.label}
                         initial={{ opacity: 0, y: 50, rotateX: -20 }}
-                        animate={{ 
-                          opacity: storyStage >= 2 ? 1 : 0, 
+                        animate={{
+                          opacity: storyStage >= 2 ? 1 : 0,
                           y: storyStage >= 2 ? 0 : 50,
                           rotateX: storyStage >= 2 ? 0 : -20
                         }}
                         transition={{ delay: i * 0.15, duration: 0.8, type: "spring", stiffness: 100 }}
-                        whileHover={{ 
-                          scale: 1.1, 
-                          rotateY: 5,
-                          z: 30,
+                        whileHover={{
+                          scale: 1.05,
+                          rotateY: 3,
+                          z: 20,
                           transition: { duration: 0.3 }
                         }}
                         className={`bg-gradient-to-br ${stat.gradient} p-8 rounded-3xl text-white relative overflow-hidden group cursor-pointer`}
                         style={{
-                          transform: `translateY(${-scrollY * (0.06 + i * 0.02)}px) translateX(${mousePosition.x * (8 + i * 2)}px)`,
+                          transform: `translateY(${Math.max(-80, -scrollY * (0.04 + i * 0.01))}px) translateX(${Math.max(-25, Math.min(25, mousePosition.x * (4 + i)))}px)`,
                           transformStyle: 'preserve-3d',
                           boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3)',
+                          willChange: 'transform',
                         }}
                       >
                         {/* Shine Effect */}
@@ -2026,7 +2035,7 @@ const InstagramLinkPage = () => {
                         </motion.div>
 
                         {/* Count */}
-                        <motion.div 
+                        <motion.div
                           className="text-4xl md:text-5xl font-black mb-2 relative z-10"
                           animate={{
                             scale: [1, 1.05, 1],
@@ -2080,9 +2089,9 @@ const InstagramLinkPage = () => {
               </div>
             </motion.section>            {/* Story Chapter 4: The Tech Stack - 3D Cards */}
             <motion.section
-              className="min-h-screen flex items-center justify-center relative overflow-hidden bg-gradient-to-b from-transparent via-purple-50/50 to-transparent dark:via-purple-950/20"
+              className="min-h-screen flex items-center justify-center relative overflow-hidden isolate bg-gradient-to-b from-transparent via-purple-50/50 to-transparent dark:via-purple-950/20"
               style={{
-                transform: `translateY(${scrollY * 0.15}px)`,
+                transform: `translateY(${Math.min(scrollY * 0.1, 100)}px)`,
               }}
             >
               <div className="max-w-6xl mx-auto px-6 z-10">
@@ -2130,15 +2139,16 @@ const InstagramLinkPage = () => {
                       }}
                       transition={{ delay: i * 0.2, duration: 0.8 }}
                       whileHover={{
-                        scale: 1.05,
-                        rotateY: 5,
-                        z: 50
+                        scale: 1.03,
+                        rotateY: 3,
+                        z: 30
                       }}
                       className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl p-8 rounded-3xl border-2 border-gray-200 dark:border-gray-700 hover:border-transparent relative overflow-hidden group"
                       style={{
-                        transform: `translateY(${-scrollY * (0.05 + i * 0.02)}px)`,
+                        transform: `translateY(${Math.max(-60, -scrollY * (0.03 + i * 0.01))}px)`,
                         transformStyle: 'preserve-3d',
-                        perspective: '1000px'
+                        perspective: '1000px',
+                        willChange: 'transform',
                       }}
                     >
                       {/* Animated gradient background on hover */}
@@ -2178,13 +2188,13 @@ const InstagramLinkPage = () => {
                       </div>
 
                       {/* 3D floating particles */}
-                      {[...Array(5)].map((_, particleIndex) => (
+                      {[...Array(3)].map((_, particleIndex) => (
                         <motion.div
                           key={`particle-${particleIndex}`}
-                          className="absolute w-2 h-2 bg-white/50 rounded-full"
+                          className="absolute w-1.5 h-1.5 bg-white/50 rounded-full pointer-events-none"
                           animate={{
-                            y: [0, -20, 0],
-                            x: [0, Math.sin(particleIndex) * 10, 0],
+                            y: [0, -15, 0],
+                            x: [0, Math.sin(particleIndex) * 8, 0],
                             opacity: [0.5, 1, 0.5],
                           }}
                           transition={{
@@ -2193,8 +2203,8 @@ const InstagramLinkPage = () => {
                             delay: particleIndex * 0.2
                           }}
                           style={{
-                            left: `${20 + particleIndex * 15}%`,
-                            top: `${30 + Math.sin(particleIndex) * 20}%`,
+                            left: `${25 + particleIndex * 20}%`,
+                            top: `${35 + Math.sin(particleIndex) * 15}%`,
                           }}
                         />
                       ))}
