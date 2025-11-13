@@ -169,21 +169,55 @@ const InstagramLinkPage = () => {
   const [dayProgress, setDayProgress] = useState(0);
   const [yearProgress, setYearProgress] = useState(0);
 
+  // Cinema intro state
+  const [introStage, setIntroStage] = useState(0);
+  const [showContent, setShowContent] = useState(false);
+
   const lastReactionTime = useRef<number>(0);
   const comboTimeout = useRef<ReturnType<typeof setTimeout>>();
+  const shakeTimeoutRef = useRef<ReturnType<typeof setTimeout>>();
 
   const funFacts = [
-    "🌍 Digital nomad currently based in Malta",
+    "🌍 Globe-trotter currently based in Malta",
     "💻 Built my first website at age 12",
     "🎮 Gaming enthusiast & tech collector",
     "📚 Always learning new technologies",
     "🎵 Code better with lo-fi beats",
     "🌙 Night owl & early bird hybrid",
-    "☕ Powered by coffee and curiosity"
+    "☕ Powered by coffee and curiosity",
+    "🚀 Turning ideas into reality, one line at a time"
   ];
 
   useEffect(() => {
     window.scrollTo(0, 0);
+
+    // Cinema intro sequence
+    const introSequence = [
+      { delay: 0, stage: 0 },      // Black screen
+      { delay: 1000, stage: 1 },   // Studio logo
+      { delay: 3000, stage: 2 },   // Title card
+      { delay: 5500, stage: 3 },   // Name reveal
+      { delay: 7500, stage: 4 },   // Final transition
+    ];
+
+    introSequence.forEach(({ delay, stage }) => {
+      setTimeout(() => setIntroStage(stage), delay);
+    });
+
+    // End intro and show content with dramatic effect
+    setTimeout(() => {
+      setShowContent(true);
+      // Trigger confetti for grand entrance
+      confetti({
+        particleCount: 150,
+        spread: 120,
+        origin: { y: 0.6 },
+        colors: ['#3b82f6', '#8b5cf6', '#ec4899', '#10b981'],
+        startVelocity: 45,
+        gravity: 1.2,
+        ticks: 300
+      });
+    }, 8500);
 
     // Check dark mode preference
     const darkMode = document.documentElement.classList.contains('dark');
@@ -281,7 +315,7 @@ const InstagramLinkPage = () => {
     }, 5000);
 
     // Typing effect
-    const text = "Digital Nomad & Creative Coder";
+    const text = "Full Stack Developer & Creative Technologist";
     let index = 0;
     const typingInterval = setInterval(() => {
       if (index <= text.length) {
@@ -318,6 +352,7 @@ const InstagramLinkPage = () => {
       clearInterval(typingInterval);
       window.removeEventListener('devicemotion', handleShake);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const checkAchievements = (visitCount: number) => {
@@ -337,16 +372,15 @@ const InstagramLinkPage = () => {
     }
   };
 
-  const handleShake = (() => {
-    let shakeTimeout: ReturnType<typeof setTimeout>;
-    return (event: DeviceMotionEvent) => {
-      const acceleration = event.accelerationIncludingGravity;
-      if (acceleration && (Math.abs(acceleration.x || 0) > 15 || Math.abs(acceleration.y || 0) > 15 || Math.abs(acceleration.z || 0) > 15)) {
-        clearTimeout(shakeTimeout);
-        shakeTimeout = setTimeout(() => shuffleProjects(), 500);
+  const handleShake = (event: DeviceMotionEvent) => {
+    const acceleration = event.accelerationIncludingGravity;
+    if (acceleration && (Math.abs(acceleration.x || 0) > 15 || Math.abs(acceleration.y || 0) > 15 || Math.abs(acceleration.z || 0) > 15)) {
+      if (shakeTimeoutRef.current) {
+        clearTimeout(shakeTimeoutRef.current);
       }
-    };
-  })();
+      shakeTimeoutRef.current = setTimeout(() => shuffleProjects(), 500);
+    }
+  };
 
   const toggleTheme = () => {
     document.documentElement.classList.toggle('dark');
@@ -526,6 +560,551 @@ const InstagramLinkPage = () => {
 
   return (
     <div className={`min-h-screen ${themeColors[colorTheme]} relative transition-colors duration-700`}>
+      {/* CINEMA INTRO OVERLAY */}
+      <AnimatePresence>
+        {!showContent && (
+          <motion.div
+            className="fixed inset-0 z-[9999] bg-black flex items-center justify-center overflow-hidden"
+            exit={{ opacity: 0 }}
+            transition={{ duration: 1 }}
+          >
+            {/* Cinematic Vignette */}
+            <div className="absolute inset-0 bg-gradient-radial from-transparent via-black/50 to-black pointer-events-none" />
+            
+            {/* Film Grain Effect */}
+            <motion.div
+              className="absolute inset-0 opacity-10 pointer-events-none"
+              style={{
+                backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 400 400\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noiseFilter\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.9\' numOctaves=\'4\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noiseFilter)\'/%3E%3C/svg%3E")',
+              }}
+              animate={{ opacity: [0.1, 0.15, 0.1] }}
+              transition={{ duration: 0.5, repeat: Infinity }}
+            />
+
+            {/* Stage 0: Black Screen with Light Leak */}
+            {introStage === 0 && (
+              <motion.div
+                initial={{ opacity: 1 }}
+                animate={{ opacity: 1 }}
+                className="absolute inset-0"
+              >
+                <motion.div
+                  className="absolute top-0 left-1/2 w-1 h-full bg-gradient-to-b from-white/20 via-white/5 to-transparent"
+                  initial={{ x: "-50%", scaleY: 0 }}
+                  animate={{ scaleY: 1 }}
+                  transition={{ duration: 1, ease: "easeOut" }}
+                />
+              </motion.div>
+            )}
+
+            {/* Stage 1: Epic Studio Logo with Particles */}
+            {introStage === 1 && (
+              <motion.div
+                initial={{ scale: 0, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 1.5, opacity: 0 }}
+                transition={{ duration: 0.8, ease: "easeOut" }}
+                className="text-center relative"
+              >
+                {/* Orbiting Particles */}
+                {[...Array(8)].map((_, i) => (
+                  <motion.div
+                    key={i}
+                    className="absolute top-1/2 left-1/2 w-3 h-3"
+                    initial={{ x: -6, y: -6, opacity: 0 }}
+                    animate={{
+                      rotate: 360,
+                      opacity: [0, 1, 1, 0],
+                    }}
+                    transition={{
+                      rotate: { duration: 3, ease: "linear", repeat: Infinity },
+                      opacity: { duration: 0.5, times: [0, 0.2, 0.8, 1] },
+                      delay: i * 0.125
+                    }}
+                    style={{
+                      transformOrigin: '6px 6px',
+                    }}
+                  >
+                    <motion.div
+                      className="w-full h-full rounded-full bg-gradient-to-r from-blue-400 to-purple-500"
+                      animate={{
+                        scale: [1, 1.5, 1],
+                      }}
+                      transition={{
+                        duration: 1,
+                        repeat: Infinity,
+                        delay: i * 0.125
+                      }}
+                      style={{
+                        transform: `translate(${Math.cos((i / 8) * Math.PI * 2) * 80}px, ${Math.sin((i / 8) * Math.PI * 2) * 80}px)`
+                      }}
+                    />
+                  </motion.div>
+                ))}
+
+                {/* Main Logo with 3D Effect */}
+                <motion.div
+                  animate={{
+                    rotateY: [0, 360],
+                    scale: [1, 1.1, 1],
+                  }}
+                  transition={{ 
+                    rotateY: { duration: 2, ease: "easeInOut" },
+                    scale: { duration: 2, ease: "easeInOut", repeat: Infinity }
+                  }}
+                  className="mb-6 relative z-10"
+                  style={{
+                    filter: 'drop-shadow(0 0 30px rgba(59, 130, 246, 0.8)) drop-shadow(0 0 60px rgba(139, 92, 246, 0.6))',
+                  }}
+                >
+                  <Code2 className="w-40 h-40 text-white" />
+                </motion.div>
+
+                {/* Animated Text with Glitch Effect */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.5 }}
+                  className="relative"
+                >
+                  <motion.div
+                    className="text-white text-3xl font-bold tracking-[0.5em] uppercase"
+                    animate={{
+                      textShadow: [
+                        '0 0 20px rgba(59, 130, 246, 0.8)',
+                        '0 0 30px rgba(139, 92, 246, 0.8)',
+                        '0 0 20px rgba(236, 72, 153, 0.8)',
+                        '0 0 30px rgba(59, 130, 246, 0.8)',
+                      ]
+                    }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                  >
+                    CASCONE STUDIOS
+                  </motion.div>
+                </motion.div>
+
+                {/* Energy Rings */}
+                {[1, 2, 3].map((ring) => (
+                  <motion.div
+                    key={ring}
+                    className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-blue-400/30"
+                    initial={{ width: 0, height: 0, opacity: 1 }}
+                    animate={{
+                      width: [0, 400],
+                      height: [0, 400],
+                      opacity: [1, 0],
+                    }}
+                    transition={{
+                      duration: 2,
+                      repeat: Infinity,
+                      delay: ring * 0.6,
+                      ease: "easeOut"
+                    }}
+                  />
+                ))}
+              </motion.div>
+            )}
+
+            {/* Stage 2: Epic Title Card with Matrix Effect */}
+            {introStage === 2 && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.8 }}
+                className="text-center px-8 relative"
+              >
+                {/* Matrix Rain Background */}
+                <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                  {[...Array(20)].map((_, i) => (
+                    <motion.div
+                      key={i}
+                      className="absolute text-blue-400/30 font-mono text-xs"
+                      initial={{ y: -100, opacity: 0 }}
+                      animate={{
+                        y: window.innerHeight + 100,
+                        opacity: [0, 1, 1, 0],
+                      }}
+                      transition={{
+                        duration: 3,
+                        delay: i * 0.1,
+                        ease: "linear",
+                      }}
+                      style={{
+                        left: `${(i / 20) * 100}%`,
+                      }}
+                    >
+                      {Array.from({ length: 20 }, () => String.fromCharCode(33 + Math.random() * 94)).join('\n')}
+                    </motion.div>
+                  ))}
+                </div>
+
+                {/* Animated Top Line */}
+                <motion.div
+                  initial={{ width: 0 }}
+                  animate={{ width: "400px" }}
+                  transition={{ duration: 1, ease: "easeInOut" }}
+                  className="h-0.5 bg-gradient-to-r from-transparent via-blue-400 via-purple-500 to-transparent mx-auto mb-12 relative"
+                >
+                  <motion.div
+                    className="absolute top-1/2 left-0 w-full h-4 -translate-y-1/2"
+                    animate={{
+                      boxShadow: [
+                        '0 0 20px rgba(59, 130, 246, 0.5)',
+                        '0 0 40px rgba(139, 92, 246, 0.5)',
+                        '0 0 20px rgba(59, 130, 246, 0.5)',
+                      ]
+                    }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                  />
+                </motion.div>
+
+                {/* Main Text with 3D Effect */}
+                <motion.div className="relative">
+                  <motion.h2
+                    initial={{ opacity: 0, letterSpacing: "1em", scale: 0.5 }}
+                    animate={{ 
+                      opacity: 1, 
+                      letterSpacing: "0.3em",
+                      scale: 1,
+                    }}
+                    transition={{ duration: 1.5, ease: "easeOut" }}
+                    className="text-white text-4xl md:text-6xl font-bold mb-12 uppercase relative z-10"
+                    style={{
+                      textShadow: '0 0 40px rgba(59, 130, 246, 0.8), 0 0 80px rgba(139, 92, 246, 0.6), 2px 2px 0 rgba(236, 72, 153, 0.5)',
+                    }}
+                  >
+                    PRESENTS
+                  </motion.h2>
+
+                  {/* Rotating Hexagon */}
+                  <motion.div
+                    className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none"
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
+                  >
+                    <svg width="300" height="300" viewBox="0 0 100 100" className="opacity-20">
+                      <motion.polygon
+                        points="50,5 90,25 90,75 50,95 10,75 10,25"
+                        fill="none"
+                        stroke="url(#grad)"
+                        strokeWidth="0.5"
+                        initial={{ pathLength: 0 }}
+                        animate={{ pathLength: 1 }}
+                        transition={{ duration: 2, ease: "easeInOut" }}
+                      />
+                      <defs>
+                        <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                          <stop offset="0%" stopColor="#3b82f6" />
+                          <stop offset="50%" stopColor="#8b5cf6" />
+                          <stop offset="100%" stopColor="#ec4899" />
+                        </linearGradient>
+                      </defs>
+                    </svg>
+                  </motion.div>
+                </motion.div>
+
+                {/* Animated Bottom Line */}
+                <motion.div
+                  initial={{ width: 0 }}
+                  animate={{ width: "400px" }}
+                  transition={{ duration: 1, ease: "easeInOut", delay: 0.3 }}
+                  className="h-0.5 bg-gradient-to-r from-transparent via-purple-500 via-pink-400 to-transparent mx-auto relative"
+                >
+                  <motion.div
+                    className="absolute top-1/2 left-0 w-full h-4 -translate-y-1/2"
+                    animate={{
+                      boxShadow: [
+                        '0 0 20px rgba(139, 92, 246, 0.5)',
+                        '0 0 40px rgba(236, 72, 153, 0.5)',
+                        '0 0 20px rgba(139, 92, 246, 0.5)',
+                      ]
+                    }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                  />
+                </motion.div>
+              </motion.div>
+            )}
+
+            {/* Stage 3: Epic Name Reveal */}
+            {introStage === 3 && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0, scale: 1.2 }}
+                transition={{ duration: 0.8 }}
+                className="text-center px-8 relative"
+              >
+                {/* Multi-layer Spotlight effect */}
+                <motion.div
+                  className="absolute inset-0"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 1 }}
+                >
+                  <motion.div 
+                    className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full blur-3xl"
+                    animate={{
+                      background: [
+                        'radial-gradient(circle, rgba(59, 130, 246, 0.2) 0%, transparent 70%)',
+                        'radial-gradient(circle, rgba(139, 92, 246, 0.2) 0%, transparent 70%)',
+                        'radial-gradient(circle, rgba(236, 72, 153, 0.2) 0%, transparent 70%)',
+                        'radial-gradient(circle, rgba(59, 130, 246, 0.2) 0%, transparent 70%)',
+                      ]
+                    }}
+                    transition={{ duration: 4, repeat: Infinity }}
+                  />
+                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-white/5 rounded-full blur-3xl" />
+                </motion.div>
+
+                {/* Holographic Grid Background */}
+                <div className="absolute inset-0 pointer-events-none overflow-hidden">
+                  <motion.div
+                    className="absolute inset-0"
+                    style={{
+                      backgroundImage: 'linear-gradient(rgba(59, 130, 246, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(139, 92, 246, 0.1) 1px, transparent 1px)',
+                      backgroundSize: '50px 50px',
+                    }}
+                    animate={{
+                      opacity: [0.3, 0.6, 0.3],
+                    }}
+                    transition={{ duration: 3, repeat: Infinity }}
+                  />
+                </div>
+
+                <motion.h1
+                  initial={{ opacity: 0, scale: 0.8, y: 50 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  transition={{ duration: 1, ease: "easeOut" }}
+                  className="text-white text-6xl md:text-8xl font-black mb-8 tracking-tight relative z-10"
+                >
+                  <motion.div className="relative inline-block">
+                    <motion.span
+                      initial={{ opacity: 0, x: -100, rotateY: -90 }}
+                      animate={{ opacity: 1, x: 0, rotateY: 0 }}
+                      transition={{ delay: 0.3, duration: 0.8, type: "spring", stiffness: 100 }}
+                      className="block mb-2"
+                      style={{
+                        textShadow: '0 0 40px rgba(59, 130, 246, 1), 0 0 80px rgba(59, 130, 246, 0.8), 4px 4px 0 rgba(0, 0, 0, 0.3)',
+                      }}
+                    >
+                      EMANUEL
+                    </motion.span>
+                    
+                    {/* Glitch Effect on First Name */}
+                    <motion.span
+                      className="absolute top-0 left-0 block mb-2 text-blue-500 opacity-70"
+                      initial={{ opacity: 0 }}
+                      animate={{ 
+                        opacity: [0, 0.7, 0],
+                        x: [-2, 2, -2],
+                      }}
+                      transition={{ 
+                        delay: 0.5,
+                        duration: 0.3,
+                        repeat: 3,
+                        repeatDelay: 0.5
+                      }}
+                    >
+                      EMANUEL
+                    </motion.span>
+                  </motion.div>
+
+                  <motion.div className="relative inline-block">
+                    <motion.span
+                      initial={{ opacity: 0, x: 100, rotateY: 90 }}
+                      animate={{ opacity: 1, x: 0, rotateY: 0 }}
+                      transition={{ delay: 0.6, duration: 0.8, type: "spring", stiffness: 100 }}
+                      className="block bg-gradient-to-r from-blue-400 via-purple-400 via-pink-400 to-orange-400 bg-clip-text text-transparent"
+                      style={{
+                        filter: 'drop-shadow(0 0 30px rgba(139, 92, 246, 0.8)) drop-shadow(0 0 60px rgba(236, 72, 153, 0.6))',
+                      }}
+                    >
+                      CASCONE
+                    </motion.span>
+
+                    {/* Glitch Effect on Last Name */}
+                    <motion.span
+                      className="absolute top-0 left-0 block bg-gradient-to-r from-pink-400 to-purple-400 bg-clip-text text-transparent opacity-60"
+                      initial={{ opacity: 0 }}
+                      animate={{ 
+                        opacity: [0, 0.6, 0],
+                        x: [2, -2, 2],
+                      }}
+                      transition={{ 
+                        delay: 0.8,
+                        duration: 0.3,
+                        repeat: 3,
+                        repeatDelay: 0.5
+                      }}
+                    >
+                      CASCONE
+                    </motion.span>
+                  </motion.div>
+                </motion.h1>
+
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 1.2, duration: 0.8 }}
+                  className="relative z-10"
+                >
+                  {/* Animated Social Handle */}
+                  <motion.div 
+                    className="inline-flex items-center gap-3 px-6 py-3 bg-white/5 backdrop-blur-xl border border-white/20 rounded-full"
+                    animate={{
+                      boxShadow: [
+                        '0 0 20px rgba(59, 130, 246, 0.3)',
+                        '0 0 40px rgba(139, 92, 246, 0.5)',
+                        '0 0 20px rgba(59, 130, 246, 0.3)',
+                      ]
+                    }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                  >
+                    <motion.div
+                      animate={{ rotate: 360 }}
+                      transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+                    >
+                      <Github className="w-5 h-5 text-blue-400" />
+                    </motion.div>
+                    <span className="text-white text-xl font-mono tracking-wider">@jecrs687</span>
+                  </motion.div>
+                </motion.div>
+
+                {/* Lens flare effect */}
+                <motion.div
+                  className="absolute top-1/2 left-1/2 w-2 h-2 bg-white rounded-full"
+                  initial={{ scale: 0, opacity: 0 }}
+                  animate={{
+                    scale: [0, 100, 0],
+                    opacity: [0, 0.5, 0],
+                  }}
+                  transition={{ delay: 0.5, duration: 1.5 }}
+                />
+
+                {/* Floating Sparkles & Icons */}
+                {[...Array(20)].map((_, i) => {
+                  const icons = [Sparkles, Zap, TrendingUp, Code2];
+                  const Icon = icons[i % icons.length];
+                  const colors = ['text-blue-400', 'text-purple-400', 'text-pink-400', 'text-cyan-400', 'text-yellow-400'];
+                  
+                  return (
+                    <motion.div
+                      key={i}
+                      className="absolute"
+                      initial={{
+                        x: Math.cos((i / 20) * Math.PI * 2) * 150,
+                        y: Math.sin((i / 20) * Math.PI * 2) * 150,
+                        opacity: 0,
+                        scale: 0
+                      }}
+                      animate={{
+                        x: Math.cos((i / 20) * Math.PI * 2) * (250 + Math.sin(i) * 100),
+                        y: Math.sin((i / 20) * Math.PI * 2) * (250 + Math.cos(i) * 100),
+                        opacity: [0, 1, 1, 0],
+                        scale: [0, 1.5, 1, 0],
+                        rotate: [0, 360, 720],
+                      }}
+                      transition={{
+                        delay: i * 0.08,
+                        duration: 3,
+                        repeat: Infinity,
+                        repeatDelay: 0.5,
+                        ease: "easeInOut"
+                      }}
+                      style={{
+                        left: '50%',
+                        top: '50%',
+                      }}
+                    >
+                      <Icon className={`w-5 h-5 ${colors[i % colors.length]}`} style={{
+                        filter: 'drop-shadow(0 0 8px currentColor)'
+                      }} />
+                    </motion.div>
+                  );
+                })}
+
+                {/* Energy Burst Lines */}
+                {[...Array(12)].map((_, i) => (
+                  <motion.div
+                    key={`line-${i}`}
+                    className="absolute top-1/2 left-1/2 origin-left h-0.5 bg-gradient-to-r from-blue-400 to-transparent"
+                    initial={{ width: 0, opacity: 0, rotate: (i / 12) * 360 }}
+                    animate={{
+                      width: [0, 200, 0],
+                      opacity: [0, 1, 0],
+                    }}
+                    transition={{
+                      delay: 1.5 + i * 0.05,
+                      duration: 1,
+                      ease: "easeOut"
+                    }}
+                    style={{
+                      transform: `rotate(${(i / 12) * 360}deg)`,
+                    }}
+                  />
+                ))}
+              </motion.div>
+            )}
+
+            {/* Stage 4: Transition Out */}
+            {introStage === 4 && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="absolute inset-0 bg-gradient-to-b from-black via-transparent to-black"
+              >
+                {/* Camera Flash Effect */}
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: [0, 1, 0] }}
+                  transition={{ duration: 0.5, times: [0, 0.5, 1] }}
+                  className="absolute inset-0 bg-white"
+                />
+                
+                <motion.div
+                  initial={{ scaleX: 0 }}
+                  animate={{ scaleX: 1 }}
+                  transition={{ duration: 0.8, ease: "easeInOut" }}
+                  className="absolute top-0 left-0 right-0 h-1/2 bg-black origin-left"
+                />
+                <motion.div
+                  initial={{ scaleX: 0 }}
+                  animate={{ scaleX: 1 }}
+                  transition={{ duration: 0.8, ease: "easeInOut" }}
+                  className="absolute bottom-0 left-0 right-0 h-1/2 bg-black origin-right"
+                />
+              </motion.div>
+            )}
+
+            {/* Cinematic Bars (Top & Bottom) */}
+            <div className="absolute top-0 left-0 right-0 h-16 bg-black pointer-events-none" />
+            <div className="absolute bottom-0 left-0 right-0 h-16 bg-black pointer-events-none" />
+
+            {/* Skip Intro Button */}
+            <motion.button
+              initial={{ opacity: 0 }}
+              animate={{ opacity: introStage >= 1 ? 0.7 : 0 }}
+              whileHover={{ opacity: 1, scale: 1.05 }}
+              onClick={() => {
+                setIntroStage(4);
+                setTimeout(() => {
+                  setShowContent(true);
+                  confetti({
+                    particleCount: 100,
+                    spread: 100,
+                    origin: { y: 0.6 }
+                  });
+                }, 500);
+              }}
+              className="absolute bottom-24 right-8 px-6 py-3 bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/30 rounded-full text-white text-sm font-medium transition-all z-50"
+            >
+              Skip Intro →
+            </motion.button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Animated Background Gradient */}
       {colorTheme !== 'default' && (
         <motion.div
@@ -806,13 +1385,18 @@ const InstagramLinkPage = () => {
         )}
       </AnimatePresence>
 
-      <div className="max-w-lg mx-auto px-4 py-12">
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: showContent ? 1 : 0 }}
+        transition={{ duration: 1, delay: 0.5 }}
+        className="max-w-lg mx-auto px-4 py-12"
+      >
         {/* Profile Section */}
         <motion.div
           className="text-center mb-12"
           initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
+          animate={{ opacity: showContent ? 1 : 0, y: showContent ? 0 : 20 }}
+          transition={{ duration: 0.8, delay: 0.8 }}
         >
           {/* Avatar */}
           <motion.div
@@ -1312,7 +1896,7 @@ const InstagramLinkPage = () => {
             ))}
           </div>
         </motion.div>
-      </div>
+      </motion.div>
     </div>
   );
 };
