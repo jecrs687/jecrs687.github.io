@@ -4,6 +4,7 @@ import path from 'path';
 
 // https://vite.dev/config/
 export default defineConfig({
+  base: '/',
   plugins: [react()],
   resolve: {
     alias: {
@@ -17,14 +18,15 @@ export default defineConfig({
     },
   },
   build: {
+    sourcemap: true,
     target: 'esnext',
     minify: 'terser',
     rollupOptions: {
       output: {
         manualChunks: {
           'react-vendor': ['react', 'react-dom', 'react-router-dom'],
-          '3d-vendor': ['three', '@react-three/fiber', '@react-three/drei'],
-          'animation-vendor': ['framer-motion', 'react-spring', '@react-spring/three'],
+          '3d-vendor': ['three', '@react-three/fiber', '@react-three/drei', '@react-spring/three'],
+          'animation-vendor': ['framer-motion', 'react-spring'],
           'charts-vendor': ['recharts'],
         },
       },
