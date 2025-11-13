@@ -172,10 +172,13 @@ const InstagramLinkPage = () => {
   // Cinema intro state
   const [introStage, setIntroStage] = useState(0);
   const [showContent, setShowContent] = useState(false);
+  const [scrollY, setScrollY] = useState(0);
+  const [storyStage, setStoryStage] = useState(0);
 
   const lastReactionTime = useRef<number>(0);
   const comboTimeout = useRef<ReturnType<typeof setTimeout>>();
   const shakeTimeoutRef = useRef<ReturnType<typeof setTimeout>>();
+  const contentRef = useRef<HTMLDivElement>(null);
 
   const funFacts = [
     "🌍 Globe-trotter currently based in Malta",
@@ -314,6 +317,23 @@ const InstagramLinkPage = () => {
       setLiveVisitors(Math.floor(Math.random() * 5) + 1);
     }, 5000);
 
+    // Parallax scroll effect
+    const handleScroll = () => {
+      if (contentRef.current) {
+        const scrollPosition = window.scrollY;
+        setScrollY(scrollPosition);
+
+        // Story progression based on scroll
+        const viewportHeight = window.innerHeight;
+        if (scrollPosition > viewportHeight * 0.3) setStoryStage(1);
+        if (scrollPosition > viewportHeight * 0.8) setStoryStage(2);
+        if (scrollPosition > viewportHeight * 1.5) setStoryStage(3);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    handleScroll(); // Initialize
+
     // Typing effect
     const text = "Full Stack Developer & Creative Technologist";
     let index = 0;
@@ -351,6 +371,7 @@ const InstagramLinkPage = () => {
       clearInterval(ageInterval);
       clearInterval(typingInterval);
       window.removeEventListener('devicemotion', handleShake);
+      window.removeEventListener('scroll', handleScroll);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -401,7 +422,7 @@ const InstagramLinkPage = () => {
     if (navigator.share) {
       try {
         await navigator.share({
-          title: 'Emanuel Cascone',
+          title: 'Emma | leli',
           text: 'Check out my links!',
           url: window.location.href,
         });
@@ -570,7 +591,7 @@ const InstagramLinkPage = () => {
           >
             {/* Cinematic Vignette */}
             <div className="absolute inset-0 bg-gradient-radial from-transparent via-black/50 to-black pointer-events-none" />
-            
+
             {/* Film Grain Effect */}
             <motion.div
               className="absolute inset-0 opacity-10 pointer-events-none"
@@ -597,7 +618,7 @@ const InstagramLinkPage = () => {
               </motion.div>
             )}
 
-            {/* Stage 1: Epic Studio Logo with Particles */}
+            {/* Stage 1: Minimal Epic Logo */}
             {introStage === 1 && (
               <motion.div
                 initial={{ scale: 0, opacity: 0 }}
@@ -607,7 +628,7 @@ const InstagramLinkPage = () => {
                 className="text-center relative"
               >
                 {/* Orbiting Particles */}
-                {[...Array(8)].map((_, i) => (
+                {[...Array(16)].map((_, i) => (
                   <motion.div
                     key={i}
                     className="absolute top-1/2 left-1/2 w-3 h-3"
@@ -617,9 +638,9 @@ const InstagramLinkPage = () => {
                       opacity: [0, 1, 1, 0],
                     }}
                     transition={{
-                      rotate: { duration: 3, ease: "linear", repeat: Infinity },
+                      rotate: { duration: 4, ease: "linear", repeat: Infinity },
                       opacity: { duration: 0.5, times: [0, 0.2, 0.8, 1] },
-                      delay: i * 0.125
+                      delay: i * 0.08
                     }}
                     style={{
                       transformOrigin: '6px 6px',
@@ -633,79 +654,81 @@ const InstagramLinkPage = () => {
                       transition={{
                         duration: 1,
                         repeat: Infinity,
-                        delay: i * 0.125
+                        delay: i * 0.08
                       }}
                       style={{
-                        transform: `translate(${Math.cos((i / 8) * Math.PI * 2) * 80}px, ${Math.sin((i / 8) * Math.PI * 2) * 80}px)`
+                        transform: `translate(${Math.cos((i / 16) * Math.PI * 2) * 100}px, ${Math.sin((i / 16) * Math.PI * 2) * 100}px)`
                       }}
                     />
                   </motion.div>
                 ))}
 
-                {/* Main Logo with 3D Effect */}
+                {/* Main Logo with Enhanced 3D Effect */}
                 <motion.div
                   animate={{
                     rotateY: [0, 360],
-                    scale: [1, 1.1, 1],
+                    rotateZ: [0, 0, 0, 360],
+                    scale: [1, 1.2, 1],
                   }}
-                  transition={{ 
-                    rotateY: { duration: 2, ease: "easeInOut" },
+                  transition={{
+                    rotateY: { duration: 2.5, ease: "easeInOut" },
+                    rotateZ: { duration: 8, ease: "linear", repeat: Infinity },
                     scale: { duration: 2, ease: "easeInOut", repeat: Infinity }
                   }}
-                  className="mb-6 relative z-10"
+                  className="relative z-10"
                   style={{
-                    filter: 'drop-shadow(0 0 30px rgba(59, 130, 246, 0.8)) drop-shadow(0 0 60px rgba(139, 92, 246, 0.6))',
+                    filter: 'drop-shadow(0 0 40px rgba(59, 130, 246, 1)) drop-shadow(0 0 80px rgba(139, 92, 246, 0.8)) drop-shadow(0 0 120px rgba(236, 72, 153, 0.6))',
                   }}
                 >
-                  <Code2 className="w-40 h-40 text-white" />
-                </motion.div>
-
-                {/* Animated Text with Glitch Effect */}
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.5 }}
-                  className="relative"
-                >
-                  <motion.div
-                    className="text-white text-3xl font-bold tracking-[0.5em] uppercase"
-                    animate={{
-                      textShadow: [
-                        '0 0 20px rgba(59, 130, 246, 0.8)',
-                        '0 0 30px rgba(139, 92, 246, 0.8)',
-                        '0 0 20px rgba(236, 72, 153, 0.8)',
-                        '0 0 30px rgba(59, 130, 246, 0.8)',
-                      ]
-                    }}
-                    transition={{ duration: 2, repeat: Infinity }}
-                  >
-                    CASCONE STUDIOS
-                  </motion.div>
+                  <Code2 className="w-48 h-48 text-white" />
                 </motion.div>
 
                 {/* Energy Rings */}
-                {[1, 2, 3].map((ring) => (
+                {[1, 2, 3, 4, 5].map((ring) => (
                   <motion.div
                     key={ring}
-                    className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-blue-400/30"
+                    className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border-2"
+                    style={{
+                      borderColor: ring % 2 === 0 ? 'rgba(59, 130, 246, 0.3)' : 'rgba(139, 92, 246, 0.3)'
+                    }}
                     initial={{ width: 0, height: 0, opacity: 1 }}
                     animate={{
-                      width: [0, 400],
-                      height: [0, 400],
+                      width: [0, 600],
+                      height: [0, 600],
                       opacity: [1, 0],
                     }}
                     transition={{
-                      duration: 2,
+                      duration: 2.5,
                       repeat: Infinity,
-                      delay: ring * 0.6,
+                      delay: ring * 0.4,
                       ease: "easeOut"
                     }}
                   />
                 ))}
-              </motion.div>
-            )}
 
-            {/* Stage 2: Epic Title Card with Matrix Effect */}
+                {/* Particle Explosion */}
+                {[...Array(30)].map((_, i) => (
+                  <motion.div
+                    key={`particle-${i}`}
+                    className="absolute top-1/2 left-1/2 w-1 h-1 rounded-full bg-white"
+                    initial={{ scale: 0, x: 0, y: 0, opacity: 0 }}
+                    animate={{
+                      scale: [0, 1, 0],
+                      x: Math.cos((i / 30) * Math.PI * 2) * 200,
+                      y: Math.sin((i / 30) * Math.PI * 2) * 200,
+                      opacity: [0, 1, 0],
+                    }}
+                    transition={{
+                      duration: 2,
+                      delay: 0.5 + (i * 0.02),
+                      ease: "easeOut",
+                      repeat: Infinity,
+                      repeatDelay: 0.5
+                    }}
+                  />
+                ))}
+              </motion.div>
+            )}            {/* Stage 2: Epic Title Card with Matrix Effect */}
             {introStage === 2 && (
               <motion.div
                 initial={{ opacity: 0 }}
@@ -714,30 +737,67 @@ const InstagramLinkPage = () => {
                 transition={{ duration: 0.8 }}
                 className="text-center px-8 relative"
               >
-                {/* Matrix Rain Background */}
+                {/* Enhanced Matrix Rain Background */}
                 <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                  {[...Array(20)].map((_, i) => (
+                  {[...Array(30)].map((_, i) => (
                     <motion.div
                       key={i}
-                      className="absolute text-blue-400/30 font-mono text-xs"
+                      className="absolute font-mono text-xs"
+                      style={{
+                        left: `${(i / 30) * 100}%`,
+                        color: i % 3 === 0 ? 'rgba(59, 130, 246, 0.4)' : i % 3 === 1 ? 'rgba(139, 92, 246, 0.4)' : 'rgba(236, 72, 153, 0.4)'
+                      }}
                       initial={{ y: -100, opacity: 0 }}
                       animate={{
-                        y: window.innerHeight + 100,
+                        y: typeof window !== 'undefined' ? window.innerHeight + 100 : 1000,
                         opacity: [0, 1, 1, 0],
                       }}
                       transition={{
-                        duration: 3,
-                        delay: i * 0.1,
+                        duration: 2 + Math.random(),
+                        delay: i * 0.08,
                         ease: "linear",
-                      }}
-                      style={{
-                        left: `${(i / 20) * 100}%`,
+                        repeat: Infinity,
+                        repeatDelay: Math.random() * 2
                       }}
                     >
-                      {Array.from({ length: 20 }, () => String.fromCharCode(33 + Math.random() * 94)).join('\n')}
+                      {Array.from({ length: 25 }, () => String.fromCharCode(33 + Math.random() * 94)).join('\n')}
                     </motion.div>
                   ))}
                 </div>
+
+                {/* Geometric Shapes Flying Through */}
+                {[...Array(8)].map((_, i) => (
+                  <motion.div
+                    key={`shape-${i}`}
+                    className="absolute"
+                    initial={{
+                      x: -100,
+                      y: Math.random() * (typeof window !== 'undefined' ? window.innerHeight : 800),
+                      opacity: 0,
+                      rotate: 0,
+                      scale: 0.5
+                    }}
+                    animate={{
+                      x: typeof window !== 'undefined' ? window.innerWidth + 100 : 1000,
+                      opacity: [0, 0.6, 0],
+                      rotate: 360,
+                      scale: [0.5, 1.5, 0.5]
+                    }}
+                    transition={{
+                      duration: 3,
+                      delay: i * 0.2,
+                      ease: "easeInOut"
+                    }}
+                  >
+                    {i % 3 === 0 ? (
+                      <div className="w-8 h-8 border-2 border-blue-400" />
+                    ) : i % 3 === 1 ? (
+                      <div className="w-8 h-8 rounded-full border-2 border-purple-400" />
+                    ) : (
+                      <div className="w-8 h-8 border-2 border-pink-400 transform rotate-45" />
+                    )}
+                  </motion.div>
+                ))}
 
                 {/* Animated Top Line */}
                 <motion.div
@@ -763,8 +823,8 @@ const InstagramLinkPage = () => {
                 <motion.div className="relative">
                   <motion.h2
                     initial={{ opacity: 0, letterSpacing: "1em", scale: 0.5 }}
-                    animate={{ 
-                      opacity: 1, 
+                    animate={{
+                      opacity: 1,
                       letterSpacing: "0.3em",
                       scale: 1,
                     }}
@@ -842,7 +902,7 @@ const InstagramLinkPage = () => {
                   animate={{ opacity: 1 }}
                   transition={{ duration: 1 }}
                 >
-                  <motion.div 
+                  <motion.div
                     className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full blur-3xl"
                     animate={{
                       background: [
@@ -890,16 +950,16 @@ const InstagramLinkPage = () => {
                     >
                       EMANUEL
                     </motion.span>
-                    
+
                     {/* Glitch Effect on First Name */}
                     <motion.span
                       className="absolute top-0 left-0 block mb-2 text-blue-500 opacity-70"
                       initial={{ opacity: 0 }}
-                      animate={{ 
+                      animate={{
                         opacity: [0, 0.7, 0],
                         x: [-2, 2, -2],
                       }}
-                      transition={{ 
+                      transition={{
                         delay: 0.5,
                         duration: 0.3,
                         repeat: 3,
@@ -927,11 +987,11 @@ const InstagramLinkPage = () => {
                     <motion.span
                       className="absolute top-0 left-0 block bg-gradient-to-r from-pink-400 to-purple-400 bg-clip-text text-transparent opacity-60"
                       initial={{ opacity: 0 }}
-                      animate={{ 
+                      animate={{
                         opacity: [0, 0.6, 0],
                         x: [2, -2, 2],
                       }}
-                      transition={{ 
+                      transition={{
                         delay: 0.8,
                         duration: 0.3,
                         repeat: 3,
@@ -950,7 +1010,7 @@ const InstagramLinkPage = () => {
                   className="relative z-10"
                 >
                   {/* Animated Social Handle */}
-                  <motion.div 
+                  <motion.div
                     className="inline-flex items-center gap-3 px-6 py-3 bg-white/5 backdrop-blur-xl border border-white/20 rounded-full"
                     animate={{
                       boxShadow: [
@@ -987,7 +1047,7 @@ const InstagramLinkPage = () => {
                   const icons = [Sparkles, Zap, TrendingUp, Code2];
                   const Icon = icons[i % icons.length];
                   const colors = ['text-blue-400', 'text-purple-400', 'text-pink-400', 'text-cyan-400', 'text-yellow-400'];
-                  
+
                   return (
                     <motion.div
                       key={i}
@@ -1047,60 +1107,94 @@ const InstagramLinkPage = () => {
               </motion.div>
             )}
 
-            {/* Stage 4: Transition Out */}
+            {/* Stage 4: Epic Transition Out */}
             {introStage === 4 && (
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 className="absolute inset-0 bg-gradient-to-b from-black via-transparent to-black"
               >
-                {/* Camera Flash Effect */}
+                {/* Multiple Camera Flash Effects */}
                 <motion.div
                   initial={{ opacity: 0 }}
-                  animate={{ opacity: [0, 1, 0] }}
-                  transition={{ duration: 0.5, times: [0, 0.5, 1] }}
+                  animate={{ opacity: [0, 0.3, 0, 0.6, 0, 1, 0] }}
+                  transition={{ duration: 0.8, times: [0, 0.2, 0.3, 0.5, 0.6, 0.8, 1] }}
                   className="absolute inset-0 bg-white"
                 />
-                
+
+                {/* Spiral Vortex Effect */}
+                {[...Array(20)].map((_, i) => (
+                  <motion.div
+                    key={`vortex-${i}`}
+                    className="absolute top-1/2 left-1/2 rounded-full border-2 border-blue-400/50"
+                    initial={{
+                      width: 0,
+                      height: 0,
+                      opacity: 1,
+                      rotate: 0
+                    }}
+                    animate={{
+                      width: 2000,
+                      height: 2000,
+                      opacity: 0,
+                      rotate: 360
+                    }}
+                    transition={{
+                      duration: 1,
+                      delay: i * 0.03,
+                      ease: "easeOut"
+                    }}
+                    style={{
+                      marginLeft: '-1000px',
+                      marginTop: '-1000px'
+                    }}
+                  />
+                ))}
+
+                {/* Particle Burst */}
+                {[...Array(100)].map((_, i) => (
+                  <motion.div
+                    key={`burst-${i}`}
+                    className="absolute top-1/2 left-1/2 w-2 h-2 rounded-full"
+                    style={{
+                      background: i % 3 === 0 ? '#3b82f6' : i % 3 === 1 ? '#8b5cf6' : '#ec4899'
+                    }}
+                    initial={{
+                      scale: 0,
+                      x: 0,
+                      y: 0,
+                      opacity: 1
+                    }}
+                    animate={{
+                      scale: [0, 1, 0],
+                      x: Math.cos((i / 100) * Math.PI * 2) * (200 + Math.random() * 300),
+                      y: Math.sin((i / 100) * Math.PI * 2) * (200 + Math.random() * 300),
+                      opacity: [1, 1, 0]
+                    }}
+                    transition={{
+                      duration: 0.8,
+                      delay: i * 0.005,
+                      ease: "easeOut"
+                    }}
+                  />
+                ))}
+
                 <motion.div
                   initial={{ scaleX: 0 }}
                   animate={{ scaleX: 1 }}
-                  transition={{ duration: 0.8, ease: "easeInOut" }}
+                  transition={{ duration: 0.8, ease: "easeInOut", delay: 0.3 }}
                   className="absolute top-0 left-0 right-0 h-1/2 bg-black origin-left"
                 />
                 <motion.div
                   initial={{ scaleX: 0 }}
                   animate={{ scaleX: 1 }}
-                  transition={{ duration: 0.8, ease: "easeInOut" }}
+                  transition={{ duration: 0.8, ease: "easeInOut", delay: 0.3 }}
                   className="absolute bottom-0 left-0 right-0 h-1/2 bg-black origin-right"
                 />
               </motion.div>
-            )}
-
-            {/* Cinematic Bars (Top & Bottom) */}
+            )}            {/* Cinematic Bars (Top & Bottom) */}
             <div className="absolute top-0 left-0 right-0 h-16 bg-black pointer-events-none" />
             <div className="absolute bottom-0 left-0 right-0 h-16 bg-black pointer-events-none" />
-
-            {/* Skip Intro Button */}
-            <motion.button
-              initial={{ opacity: 0 }}
-              animate={{ opacity: introStage >= 1 ? 0.7 : 0 }}
-              whileHover={{ opacity: 1, scale: 1.05 }}
-              onClick={() => {
-                setIntroStage(4);
-                setTimeout(() => {
-                  setShowContent(true);
-                  confetti({
-                    particleCount: 100,
-                    spread: 100,
-                    origin: { y: 0.6 }
-                  });
-                }, 500);
-              }}
-              className="absolute bottom-24 right-8 px-6 py-3 bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/30 rounded-full text-white text-sm font-medium transition-all z-50"
-            >
-              Skip Intro →
-            </motion.button>
           </motion.div>
         )}
       </AnimatePresence>
@@ -1385,6 +1479,357 @@ const InstagramLinkPage = () => {
         )}
       </AnimatePresence>
 
+      {/* STORYTELLING PARALLAX SECTION */}
+      <AnimatePresence>
+        {showContent && (
+          <motion.div
+            ref={contentRef}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 1.5 }}
+            className="relative"
+          >
+            {/* Story Chapter 1: The Journey Begins */}
+            <motion.section
+              className="min-h-screen flex items-center justify-center relative overflow-hidden"
+              style={{
+                transform: `translateY(${scrollY * 0.5}px)`,
+              }}
+            >
+              {/* Animated Background Particles */}
+              <div className="absolute inset-0 pointer-events-none">
+                {[...Array(50)].map((_, i) => (
+                  <motion.div
+                    key={`bg-particle-${i}`}
+                    className="absolute w-1 h-1 bg-blue-400/30 rounded-full"
+                    style={{
+                      left: `${Math.random() * 100}%`,
+                      top: `${Math.random() * 100}%`,
+                    }}
+                    animate={{
+                      y: [0, -30, 0],
+                      opacity: [0.3, 1, 0.3],
+                      scale: [1, 1.5, 1],
+                    }}
+                    transition={{
+                      duration: 3 + Math.random() * 2,
+                      repeat: Infinity,
+                      delay: Math.random() * 2,
+                    }}
+                  />
+                ))}
+              </div>
+
+              <div className="max-w-4xl mx-auto px-6 text-center z-10">
+                <motion.div
+                  initial={{ opacity: 0, y: 50 }}
+                  animate={{ opacity: storyStage >= 0 ? 1 : 0, y: storyStage >= 0 ? 0 : 50 }}
+                  transition={{ duration: 1, delay: 0.5 }}
+                >
+                  <motion.div
+                    className="mb-8"
+                    animate={{
+                      scale: [1, 1.05, 1],
+                    }}
+                    transition={{ duration: 3, repeat: Infinity }}
+                  >
+                    <Sparkles className="w-16 h-16 mx-auto text-blue-400 mb-4" style={{
+                      filter: 'drop-shadow(0 0 20px rgba(59, 130, 246, 0.8))'
+                    }} />
+                  </motion.div>
+
+                  <motion.h2
+                    className="text-4xl md:text-6xl font-bold text-gray-900 dark:text-white mb-6"
+                    style={{
+                      textShadow: '0 0 30px rgba(59, 130, 246, 0.3)',
+                    }}
+                  >
+                    Every Line of Code Tells a Story
+                  </motion.h2>
+
+                  <motion.p
+                    className="text-xl md:text-2xl text-gray-600 dark:text-gray-400 leading-relaxed mb-8"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: storyStage >= 0 ? 1 : 0 }}
+                    transition={{ delay: 1, duration: 1 }}
+                  >
+                    From a curious 12-year-old crafting first websites, to building experiences that inspire millions.
+                  </motion.p>
+
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: storyStage >= 0 ? 1 : 0, scale: storyStage >= 0 ? 1 : 0.8 }}
+                    transition={{ delay: 1.5, duration: 0.8 }}
+                    className="flex items-center justify-center gap-4 text-sm text-gray-500 dark:text-gray-500"
+                  >
+                    <motion.div
+                      animate={{ rotate: 360 }}
+                      transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+                    >
+                      <Globe className="w-5 h-5" />
+                    </motion.div>
+                    <span>Scroll to explore the journey</span>
+                    <motion.div
+                      animate={{ y: [0, 5, 0] }}
+                      transition={{ duration: 1.5, repeat: Infinity }}
+                    >
+                      ↓
+                    </motion.div>
+                  </motion.div>
+                </motion.div>
+              </div>
+
+              {/* Floating Code Snippets */}
+              {['</>', '{}', '[]', '( )', '=>'].map((symbol, i) => (
+                <motion.div
+                  key={symbol}
+                  className="absolute text-4xl font-mono text-blue-400/20 dark:text-blue-400/10"
+                  style={{
+                    left: `${20 + i * 15}%`,
+                    top: `${30 + Math.sin(i) * 20}%`,
+                    transform: `translateY(${-scrollY * (0.2 + i * 0.1)}px)`,
+                  }}
+                  animate={{
+                    rotate: [0, 360],
+                    scale: [1, 1.2, 1],
+                  }}
+                  transition={{
+                    duration: 10 + i * 2,
+                    repeat: Infinity,
+                    ease: "linear"
+                  }}
+                >
+                  {symbol}
+                </motion.div>
+              ))}
+            </motion.section>
+
+            {/* Story Chapter 2: The Craft */}
+            <motion.section
+              className="min-h-screen flex items-center justify-center relative overflow-hidden bg-gradient-to-b from-transparent via-blue-50/50 to-transparent dark:via-blue-950/20"
+              style={{
+                transform: `translateY(${scrollY * 0.3}px)`,
+              }}
+            >
+              <div className="max-w-4xl mx-auto px-6 z-10">
+                <motion.div
+                  initial={{ opacity: 0, x: -100 }}
+                  animate={{ opacity: storyStage >= 1 ? 1 : 0, x: storyStage >= 1 ? 0 : -100 }}
+                  transition={{ duration: 1 }}
+                  className="grid md:grid-cols-3 gap-8"
+                >
+                  {[
+                    { icon: Code2, title: "Innovation", desc: "Pushing boundaries with cutting-edge technology" },
+                    { icon: Zap, title: "Performance", desc: "Optimized experiences that feel instant" },
+                    { icon: Heart, title: "Passion", desc: "Crafted with care and attention to detail" }
+                  ].map((item, i) => (
+                    <motion.div
+                      key={item.title}
+                      initial={{ opacity: 0, y: 50 }}
+                      animate={{ opacity: storyStage >= 1 ? 1 : 0, y: storyStage >= 1 ? 0 : 50 }}
+                      transition={{ delay: i * 0.2, duration: 0.8 }}
+                      className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl p-8 rounded-2xl border border-gray-200 dark:border-gray-700 hover:border-blue-400 dark:hover:border-blue-500 transition-all hover:scale-105"
+                      style={{
+                        transform: `translateY(${-scrollY * (0.1 + i * 0.05)}px)`,
+                      }}
+                    >
+                      <motion.div
+                        animate={{
+                          rotate: [0, 360],
+                        }}
+                        transition={{ duration: 10 + i * 2, repeat: Infinity, ease: "linear" }}
+                        className="mb-4"
+                      >
+                        <item.icon className="w-12 h-12 text-blue-600 dark:text-blue-400 mx-auto" />
+                      </motion.div>
+                      <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">{item.title}</h3>
+                      <p className="text-gray-600 dark:text-gray-400">{item.desc}</p>
+                    </motion.div>
+                  ))}
+                </motion.div>
+              </div>
+            </motion.section>
+
+            {/* Story Chapter 3: The Numbers */}
+            <motion.section
+              className="min-h-[60vh] flex items-center justify-center relative overflow-hidden"
+              style={{
+                transform: `translateY(${scrollY * 0.2}px)`,
+              }}
+            >
+              <div className="max-w-5xl mx-auto px-6 z-10">
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: storyStage >= 2 ? 1 : 0, scale: storyStage >= 2 ? 1 : 0.8 }}
+                  transition={{ duration: 1 }}
+                  className="text-center"
+                >
+                  <h2 className="text-3xl md:text-5xl font-bold text-gray-900 dark:text-white mb-12">
+                    Impact in Numbers
+                  </h2>
+
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                    {[
+                      { value: "10+", label: "Years Coding", icon: Code2 },
+                      { value: "50+", label: "Projects Built", icon: Zap },
+                      { value: "1M+", label: "Lines of Code", icon: TrendingUp },
+                      { value: "∞", label: "Ideas", icon: Sparkles }
+                    ].map((stat, i) => (
+                      <motion.div
+                        key={stat.label}
+                        initial={{ opacity: 0, y: 30 }}
+                        animate={{ opacity: storyStage >= 2 ? 1 : 0, y: storyStage >= 2 ? 0 : 30 }}
+                        transition={{ delay: i * 0.15, duration: 0.8 }}
+                        className="bg-gradient-to-br from-blue-500 to-purple-600 p-6 rounded-2xl text-white relative overflow-hidden group hover:scale-110 transition-transform"
+                        style={{
+                          transform: `translateY(${-scrollY * 0.08}px)`,
+                        }}
+                      >
+                        <motion.div
+                          className="absolute inset-0 bg-white/20"
+                          initial={{ x: '-100%' }}
+                          whileHover={{ x: '100%' }}
+                          transition={{ duration: 0.5 }}
+                        />
+                        <stat.icon className="w-8 h-8 mx-auto mb-2 opacity-80" />
+                        <div className="text-4xl font-black mb-1">{stat.value}</div>
+                        <div className="text-sm opacity-90">{stat.label}</div>
+                      </motion.div>
+                    ))}
+                  </div>
+                </motion.div>
+              </div>
+            </motion.section>
+
+            {/* Story Chapter 4: The Tech Stack - 3D Cards */}
+            <motion.section
+              className="min-h-screen flex items-center justify-center relative overflow-hidden bg-gradient-to-b from-transparent via-purple-50/50 to-transparent dark:via-purple-950/20"
+              style={{
+                transform: `translateY(${scrollY * 0.15}px)`,
+              }}
+            >
+              <div className="max-w-6xl mx-auto px-6 z-10">
+                <motion.div
+                  initial={{ opacity: 0, y: 50 }}
+                  animate={{ opacity: storyStage >= 3 ? 1 : 0, y: storyStage >= 3 ? 0 : 50 }}
+                  transition={{ duration: 1 }}
+                  className="text-center mb-16"
+                >
+                  <h2 className="text-3xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">
+                    Master of Technologies
+                  </h2>
+                  <p className="text-xl text-gray-600 dark:text-gray-400">
+                    Building with the best tools in the industry
+                  </p>
+                </motion.div>
+
+                <div className="grid md:grid-cols-3 gap-8">
+                  {[
+                    {
+                      category: "Frontend",
+                      techs: ["React", "TypeScript", "Tailwind", "Next.js"],
+                      gradient: "from-blue-500 to-cyan-500",
+                      icon: Code2
+                    },
+                    {
+                      category: "Backend",
+                      techs: ["Node.js", "Python", "PostgreSQL", "Redis"],
+                      gradient: "from-purple-500 to-pink-500",
+                      icon: Zap
+                    },
+                    {
+                      category: "Tools",
+                      techs: ["Docker", "AWS", "Git", "CI/CD"],
+                      gradient: "from-orange-500 to-red-500",
+                      icon: TrendingUp
+                    }
+                  ].map((stack, i) => (
+                    <motion.div
+                      key={stack.category}
+                      initial={{ opacity: 0, rotateY: -90 }}
+                      animate={{
+                        opacity: storyStage >= 3 ? 1 : 0,
+                        rotateY: storyStage >= 3 ? 0 : -90
+                      }}
+                      transition={{ delay: i * 0.2, duration: 0.8 }}
+                      whileHover={{
+                        scale: 1.05,
+                        rotateY: 5,
+                        z: 50
+                      }}
+                      className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl p-8 rounded-3xl border-2 border-gray-200 dark:border-gray-700 hover:border-transparent relative overflow-hidden group"
+                      style={{
+                        transform: `translateY(${-scrollY * (0.05 + i * 0.02)}px)`,
+                        transformStyle: 'preserve-3d',
+                        perspective: '1000px'
+                      }}
+                    >
+                      {/* Animated gradient background on hover */}
+                      <motion.div
+                        className={`absolute inset-0 bg-gradient-to-br ${stack.gradient} opacity-0 group-hover:opacity-10 transition-opacity`}
+                      />
+
+                      <motion.div
+                        animate={{ rotate: 360 }}
+                        transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+                        className="mb-6"
+                      >
+                        <stack.icon className={`w-16 h-16 mx-auto bg-gradient-to-r ${stack.gradient} bg-clip-text text-transparent`} style={{
+                          filter: 'drop-shadow(0 0 20px currentColor)'
+                        }} />
+                      </motion.div>
+
+                      <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
+                        {stack.category}
+                      </h3>
+
+                      <div className="space-y-3">
+                        {stack.techs.map((tech, techIndex) => (
+                          <motion.div
+                            key={tech}
+                            initial={{ opacity: 0, x: -20 }}
+                            animate={{
+                              opacity: storyStage >= 3 ? 1 : 0,
+                              x: storyStage >= 3 ? 0 : -20
+                            }}
+                            transition={{ delay: i * 0.2 + techIndex * 0.1 + 0.3 }}
+                            className={`px-4 py-2 rounded-full bg-gradient-to-r ${stack.gradient} text-white text-sm font-semibold text-center`}
+                          >
+                            {tech}
+                          </motion.div>
+                        ))}
+                      </div>
+
+                      {/* 3D floating particles */}
+                      {[...Array(5)].map((_, particleIndex) => (
+                        <motion.div
+                          key={`particle-${particleIndex}`}
+                          className="absolute w-2 h-2 bg-white/50 rounded-full"
+                          animate={{
+                            y: [0, -20, 0],
+                            x: [0, Math.sin(particleIndex) * 10, 0],
+                            opacity: [0.5, 1, 0.5],
+                          }}
+                          transition={{
+                            duration: 2 + particleIndex * 0.5,
+                            repeat: Infinity,
+                            delay: particleIndex * 0.2
+                          }}
+                          style={{
+                            left: `${20 + particleIndex * 15}%`,
+                            top: `${30 + Math.sin(particleIndex) * 20}%`,
+                          }}
+                        />
+                      ))}
+                    </motion.div>
+                  ))}
+                </div>
+              </div>
+            </motion.section>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: showContent ? 1 : 0 }}
@@ -1417,7 +1862,7 @@ const InstagramLinkPage = () => {
           >
             <img
               src="/assets/profile.jpg"
-              alt="Emanuel Cascone"
+              alt="Emma | leli"
               className="w-full h-full object-cover rounded-full border-4 border-white dark:border-gray-800 shadow-lg"
             />
             <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 border-4 border-white dark:border-gray-900 rounded-full"></div>
@@ -1441,7 +1886,7 @@ const InstagramLinkPage = () => {
             transition={{ delay: 0.2 }}
           >
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-              Emanuel Cascone
+              Emma | leli
             </h1>
             <p className="text-gray-600 dark:text-gray-400 mb-1 font-mono">
               {typedText}
