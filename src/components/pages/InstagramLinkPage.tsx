@@ -65,37 +65,101 @@ const SocialLink = ({
   };
 
   return (
-    <motion.a
-      href={href}
-      target="_blank"
-      rel="noopener noreferrer"
-      onClick={handleClick}
-      className={`relative w-full flex items-center justify-center gap-3 p-4 mb-3 rounded-lg bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 transition-all duration-200 group ${colorClasses[color as keyof typeof colorClasses]}`}
-      initial={{ opacity: 0, scale: 0.9 }}
-      whileInView={{ opacity: 1, scale: 1 }}
-      whileTap={{ scale: 0.95 }}
-      viewport={{ once: true }}
+    <motion.div
+      style={{
+        perspective: 1200,
+        transformStyle: 'preserve-3d',
+      }}
+      className="mb-3"
     >
-      <motion.div
-        className="w-10 h-10 rounded-lg flex items-center justify-center bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 group-hover:bg-white/20 group-hover:text-white transition-colors"
-        animate={clicked ? { scale: [1, 1.2, 1], rotate: [0, 10, -10, 0] } : {}}
+      <motion.a
+        href={href}
+        target="_blank"
+        rel="noopener noreferrer"
+        onClick={handleClick}
+        className={`relative w-full flex items-center justify-center gap-3 p-4 rounded-lg bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 transition-all duration-200 group ${colorClasses[color as keyof typeof colorClasses]} overflow-hidden`}
+        initial={{ opacity: 0, scale: 0.9, rotateX: -20 }}
+        whileInView={{ opacity: 1, scale: 1, rotateX: 0 }}
+        whileHover={{ 
+          scale: 1.02,
+          rotateX: 3,
+          rotateY: -2,
+          z: 30,
+          boxShadow: "0 20px 40px rgba(0,0,0,0.2)"
+        }}
+        whileTap={{ scale: 0.98 }}
+        viewport={{ once: true }}
+        style={{
+          transformStyle: 'preserve-3d',
+          boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
+        }}
       >
-        <Icon className="w-5 h-5" />
-      </motion.div>
-      <div className="font-semibold text-gray-900 dark:text-white group-hover:text-white transition-colors">
-        {text}
-      </div>
-      <AnimatePresence>
-        {clicked && (
-          <motion.div
-            initial={{ scale: 0, opacity: 1 }}
-            animate={{ scale: 2, opacity: 0 }}
-            exit={{ opacity: 0 }}
-            className="absolute inset-0 border-2 border-blue-500 rounded-lg pointer-events-none"
-          />
-        )}
-      </AnimatePresence>
-    </motion.a>
+        {/* 3D Depth Layer */}
+        <div 
+          className="absolute inset-0 bg-gradient-to-br from-gray-100/50 to-transparent dark:from-gray-700/50 rounded-lg"
+          style={{ transform: 'translateZ(-15px)' }}
+        />
+        
+        {/* Icon with 3D effect */}
+        <motion.div
+          className="w-10 h-10 rounded-lg flex items-center justify-center bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 group-hover:bg-white/20 group-hover:text-white transition-colors relative z-10"
+          animate={clicked ? { 
+            scale: [1, 1.3, 1], 
+            rotate: [0, 15, -15, 0],
+            rotateY: [0, 360],
+          } : {}}
+          transition={{ duration: 0.6 }}
+          style={{ 
+            transform: 'translateZ(20px)',
+            transformStyle: 'preserve-3d',
+            boxShadow: '0 5px 15px rgba(0,0,0,0.2)',
+          }}
+        >
+          <Icon className="w-5 h-5" />
+        </motion.div>
+        
+        {/* Text with depth */}
+        <div 
+          className="font-semibold text-gray-900 dark:text-white group-hover:text-white transition-colors relative z-10"
+          style={{ transform: 'translateZ(15px)' }}
+        >
+          {text}
+        </div>
+        
+        {/* 3D Shine effect */}
+        <motion.div
+          className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
+          initial={{ x: '-100%' }}
+          whileHover={{ x: '200%' }}
+          transition={{ duration: 0.6 }}
+          style={{ transform: 'translateZ(10px)' }}
+        />
+        
+        {/* Click ripple */}
+        <AnimatePresence>
+          {clicked && (
+            <>
+              <motion.div
+                initial={{ scale: 0, opacity: 1 }}
+                animate={{ scale: 2.5, opacity: 0 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.6 }}
+                className="absolute inset-0 border-2 border-blue-500 rounded-lg pointer-events-none"
+                style={{ transform: 'translateZ(25px)' }}
+              />
+              <motion.div
+                initial={{ scale: 0.5, opacity: 1 }}
+                animate={{ scale: 1.5, opacity: 0 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.4 }}
+                className="absolute inset-0 bg-blue-500/30 rounded-lg pointer-events-none blur-md"
+                style={{ transform: 'translateZ(20px)' }}
+              />
+            </>
+          )}
+        </AnimatePresence>
+      </motion.a>
+    </motion.div>
   );
 };
 
@@ -105,39 +169,110 @@ interface Project {
 }
 
 const ProjectCard = ({ project, index }: { project: Project; index: number }) => {
+  const [isFlipped, setIsFlipped] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
 
   return (
-    <motion.a
-      href={project.link}
-      target="_blank"
-      rel="noopener noreferrer"
-      onHoverStart={() => setIsHovered(true)}
-      onHoverEnd={() => setIsHovered(false)}
-      className="relative block bg-white dark:bg-gray-800 rounded-xl border-2 border-gray-200 dark:border-gray-700 overflow-hidden group"
-      initial={{ opacity: 0, scale: 0.9 }}
-      whileInView={{ opacity: 1, scale: 1 }}
-      whileHover={{ scale: 1.05, borderColor: "#3b82f6" }}
-      whileTap={{ scale: 0.95 }}
-      transition={{ delay: index * 0.05 }}
-      viewport={{ once: true }}
+    <div
+      style={{
+        perspective: 1500,
+        transformStyle: 'preserve-3d',
+      }}
+      className="relative"
     >
-      <div className="p-4 aspect-square flex flex-col items-center justify-center text-center">
-        <motion.div
-          animate={isHovered ? { rotate: 360 } : { rotate: 0 }}
-          transition={{ duration: 0.5 }}
-          className="mb-2"
-        >
-          <Code2 className="w-8 h-8 text-blue-600 dark:text-blue-400" />
-        </motion.div>
-        <h3 className="font-semibold text-gray-900 dark:text-white capitalize text-sm leading-tight">
-          {project.name}
-        </h3>
-      </div>
       <motion.div
-        className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-purple-500/10 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
-      />
-    </motion.a>
+        onHoverStart={() => setIsHovered(true)}
+        onHoverEnd={() => setIsHovered(false)}
+        onClick={() => setIsFlipped(!isFlipped)}
+        className="relative cursor-pointer"
+        initial={{ opacity: 0, scale: 0.9, rotateY: -180 }}
+        whileInView={{ opacity: 1, scale: 1, rotateY: 0 }}
+        transition={{ delay: index * 0.1, type: "spring", stiffness: 100 }}
+        viewport={{ once: true }}
+        style={{
+          transformStyle: 'preserve-3d',
+        }}
+        animate={{
+          rotateY: isFlipped ? 180 : 0,
+        }}
+        whileHover={{
+          scale: 1.05,
+          rotateX: 5,
+          z: 30,
+        }}
+      >
+        {/* Front Face */}
+        <motion.div
+          className="relative block bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 rounded-xl border-2 border-gray-200 dark:border-gray-700 overflow-hidden group"
+          style={{
+            backfaceVisibility: 'hidden',
+            transformStyle: 'preserve-3d',
+            boxShadow: '0 10px 40px rgba(0,0,0,0.15)',
+          }}
+        >
+          <div className="p-4 aspect-square flex flex-col items-center justify-center text-center relative z-10">
+            <motion.div
+              animate={isHovered ? { 
+                rotate: 360,
+                scale: [1, 1.2, 1],
+              } : { rotate: 0 }}
+              transition={{ duration: 0.6 }}
+              className="mb-2"
+              style={{ transform: 'translateZ(20px)' }}
+            >
+              <Code2 className="w-8 h-8 text-blue-600 dark:text-blue-400" />
+            </motion.div>
+            <h3 
+              className="font-semibold text-gray-900 dark:text-white capitalize text-sm leading-tight"
+              style={{ transform: 'translateZ(15px)' }}
+            >
+              {project.name}
+            </h3>
+            <motion.div 
+              className="mt-2 text-xs text-gray-500 dark:text-gray-400"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: isHovered ? 1 : 0 }}
+              style={{ transform: 'translateZ(10px)' }}
+            >
+              Click to flip
+            </motion.div>
+          </div>
+          
+          {/* Gradient overlay */}
+          <motion.div
+            className="absolute inset-0 bg-gradient-to-br from-blue-500/10 via-purple-500/10 to-pink-500/10"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: isHovered ? 1 : 0 }}
+            style={{ transform: 'translateZ(5px)' }}
+          />
+          
+          {/* 3D Corner accents */}
+          <div className="absolute top-2 right-2 w-8 h-8 border-t-2 border-r-2 border-blue-400/30 rounded-tr-lg" style={{ transform: 'translateZ(8px)' }} />
+          <div className="absolute bottom-2 left-2 w-8 h-8 border-b-2 border-l-2 border-purple-400/30 rounded-bl-lg" style={{ transform: 'translateZ(8px)' }} />
+        </motion.div>
+
+        {/* Back Face */}
+        <motion.a
+          href={project.link}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="absolute inset-0 bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl border-2 border-blue-400 overflow-hidden flex items-center justify-center p-4 text-center"
+          style={{
+            backfaceVisibility: 'hidden',
+            transform: 'rotateY(180deg)',
+            transformStyle: 'preserve-3d',
+            boxShadow: '0 10px 40px rgba(59, 130, 246, 0.3)',
+          }}
+          whileHover={{ scale: 1.02 }}
+        >
+          <div style={{ transform: 'translateZ(20px)' }}>
+            <Sparkles className="w-8 h-8 text-white mx-auto mb-2" />
+            <div className="text-white font-bold text-sm">View Project</div>
+            <div className="text-white/80 text-xs mt-1">Click to visit</div>
+          </div>
+        </motion.a>
+      </motion.div>
+    </div>
   );
 };
 
@@ -612,6 +747,40 @@ const InstagramLinkPage = () => {
 
   return (
     <div className={`min-h-screen ${themeColors[colorTheme]} relative transition-colors duration-700`}>
+      {/* 3D Morphing Blob Background */}
+      {showContent && (
+        <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
+          {[1, 2, 3].map((blob) => (
+            <motion.div
+              key={`blob-${blob}`}
+              className="absolute rounded-full blur-3xl opacity-20"
+              style={{
+                background: blob === 1 
+                  ? 'radial-gradient(circle, #3b82f6 0%, transparent 70%)'
+                  : blob === 2
+                  ? 'radial-gradient(circle, #8b5cf6 0%, transparent 70%)'
+                  : 'radial-gradient(circle, #ec4899 0%, transparent 70%)',
+                width: `${300 + blob * 100}px`,
+                height: `${300 + blob * 100}px`,
+                left: blob === 1 ? '10%' : blob === 2 ? '70%' : '40%',
+                top: blob === 1 ? '20%' : blob === 2 ? '60%' : '80%',
+              }}
+              animate={{
+                x: [0, blob * 30, 0, -blob * 20, 0],
+                y: [0, -blob * 40, blob * 30, 0, 0],
+                scale: [1, 1.2, 0.8, 1.1, 1],
+                rotate: [0, 90, 180, 270, 360],
+              }}
+              transition={{
+                duration: 20 + blob * 5,
+                repeat: Infinity,
+                ease: "easeInOut",
+              }}
+            />
+          ))}
+        </div>
+      )}
+      
       {/* CINEMA INTRO OVERLAY */}
       <AnimatePresence>
         {!showContent && (
@@ -2221,7 +2390,11 @@ const InstagramLinkPage = () => {
         initial={{ opacity: 0 }}
         animate={{ opacity: showContent ? 1 : 0 }}
         transition={{ duration: 1, delay: 0.5 }}
-        className="max-w-lg mx-auto px-4 py-12"
+        className="max-w-lg mx-auto px-4 py-12 relative z-10"
+        style={{
+          perspective: 1500,
+          transformStyle: 'preserve-3d',
+        }}
       >
         {/* Profile Section */}
         <motion.div
@@ -2230,11 +2403,22 @@ const InstagramLinkPage = () => {
           animate={{ opacity: showContent ? 1 : 0, y: showContent ? 0 : 20 }}
           transition={{ duration: 0.8, delay: 0.8 }}
         >
-          {/* Avatar */}
+          {/* Avatar - 3D Tilt Effect */}
           <motion.div
             className="w-28 h-28 mx-auto mb-6 relative cursor-pointer select-none"
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
+            style={{
+              transformStyle: 'preserve-3d',
+              perspective: 1000,
+            }}
+            whileHover={{
+              scale: 1.1,
+              rotateX: mousePosition.y * 5,
+              rotateY: mousePosition.x * 5,
+              z: 50,
+              transition: { duration: 0.3 }
+            }}
             transition={{ delay: 0.1 }}
             onDoubleClick={handleDoubleTap}
             onTouchStart={(e) => {
@@ -2483,7 +2667,7 @@ const InstagramLinkPage = () => {
             </motion.div>
           )}
 
-          {/* Achievement Badges */}
+          {/* Achievement Badges - 3D Floating Islands */}
           <AnimatePresence>
             {achievements.length > 0 && (
               <motion.div
@@ -2491,14 +2675,40 @@ const InstagramLinkPage = () => {
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.8, y: 20 }}
                 className="mt-4 flex flex-wrap gap-2 justify-center"
+                style={{
+                  perspective: 1000,
+                  transformStyle: 'preserve-3d',
+                }}
               >
                 {achievements.map((achievement, index) => (
                   <motion.div
                     key={achievement}
-                    initial={{ opacity: 0, scale: 0 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: index * 0.1 }}
-                    className="px-3 py-1 bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300 rounded-full text-xs font-semibold flex items-center gap-1 border-2 border-yellow-300 dark:border-yellow-700"
+                    initial={{ opacity: 0, scale: 0, rotateX: -90 }}
+                    animate={{ 
+                      opacity: 1, 
+                      scale: 1,
+                      rotateX: 0,
+                      y: [0, -8, 0],
+                    }}
+                    transition={{ 
+                      delay: index * 0.1,
+                      y: {
+                        duration: 2 + index * 0.3,
+                        repeat: Infinity,
+                        ease: "easeInOut"
+                      }
+                    }}
+                    whileHover={{
+                      scale: 1.15,
+                      rotateY: 15,
+                      z: 30,
+                      boxShadow: "0 25px 50px rgba(0,0,0,0.25)"
+                    }}
+                    className="px-3 py-1 bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300 rounded-full text-xs font-semibold flex items-center gap-1 border-2 border-yellow-300 dark:border-yellow-700 cursor-pointer"
+                    style={{
+                      transformStyle: 'preserve-3d',
+                      boxShadow: '0 10px 30px rgba(0,0,0,0.15)',
+                    }}
                   >
                     <Trophy className="w-3 h-3" />
                     {achievement}
@@ -2509,48 +2719,145 @@ const InstagramLinkPage = () => {
           </AnimatePresence>
         </motion.div>
 
-        {/* Instagram-style Story Highlights */}
+        {/* Instagram-style Story Highlights - 3D Carousel */}
         <motion.div
           className="mb-8 overflow-x-auto scrollbar-hide"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.35 }}
+          style={{
+            perspective: 1500,
+            transformStyle: 'preserve-3d',
+          }}
         >
-          <div className="flex gap-4 justify-start px-2">
+          <div className="flex gap-6 justify-start px-2">
             {highlights.map((highlight, i) => (
               <motion.div
                 key={highlight.label}
-                className="flex flex-col items-center gap-2 cursor-pointer group"
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.4 + i * 0.1 }}
-                whileTap={{ scale: 0.9 }}
+                className="flex flex-col items-center gap-2 cursor-pointer group relative"
+                initial={{ opacity: 0, scale: 0.8, rotateY: -90 }}
+                animate={{ 
+                  opacity: 1, 
+                  scale: 1,
+                  rotateY: 0,
+                }}
+                transition={{ 
+                  delay: 0.4 + i * 0.1,
+                  type: "spring",
+                  stiffness: 100
+                }}
+                whileHover={{ 
+                  scale: 1.15,
+                  rotateY: 15,
+                  z: 50,
+                }}
+                whileTap={{ scale: 0.95 }}
+                style={{
+                  transformStyle: 'preserve-3d',
+                }}
               >
-                <div className={`w-16 h-16 rounded-full bg-gradient-to-br ${highlight.color} p-0.5`}>
-                  <div className="w-full h-full rounded-full bg-white dark:bg-gray-800 flex items-center justify-center">
-                    <highlight.icon className="w-7 h-7 text-gray-700 dark:text-gray-300" />
+                {/* 3D Ring Effect */}
+                <motion.div
+                  className="absolute inset-0 rounded-full"
+                  style={{
+                    background: `linear-gradient(135deg, ${highlight.color.split(' ')[1]}, ${highlight.color.split(' ')[3]})`,
+                    transform: 'translateZ(-20px)',
+                    filter: 'blur(10px)',
+                  }}
+                  initial={{ opacity: 0 }}
+                  whileHover={{ opacity: 0.6 }}
+                />
+                
+                <motion.div 
+                  className={`w-16 h-16 rounded-full bg-gradient-to-br ${highlight.color} p-0.5 relative`}
+                  animate={{
+                    boxShadow: [
+                      '0 0 0 0 rgba(59, 130, 246, 0)',
+                      '0 0 0 8px rgba(59, 130, 246, 0.1)',
+                      '0 0 0 0 rgba(59, 130, 246, 0)',
+                    ],
+                  }}
+                  transition={{
+                    duration: 2,
+                    repeat: Infinity,
+                    delay: i * 0.3,
+                  }}
+                  style={{
+                    transformStyle: 'preserve-3d',
+                  }}
+                >
+                  <div 
+                    className="w-full h-full rounded-full bg-white dark:bg-gray-800 flex items-center justify-center"
+                    style={{ transform: 'translateZ(10px)' }}
+                  >
+                    <motion.div
+                      animate={{ 
+                        rotate: [0, 10, -10, 0],
+                        scale: [1, 1.1, 1],
+                      }}
+                      transition={{
+                        duration: 2,
+                        repeat: Infinity,
+                        delay: i * 0.2,
+                      }}
+                    >
+                      <highlight.icon className="w-7 h-7 text-gray-700 dark:text-gray-300" />
+                    </motion.div>
                   </div>
-                </div>
-                <span className="text-xs text-gray-600 dark:text-gray-400">{highlight.label}</span>
+                </motion.div>
+                
+                <motion.span 
+                  className="text-xs text-gray-600 dark:text-gray-400 font-medium"
+                  style={{ transform: 'translateZ(15px)' }}
+                >
+                  {highlight.label}
+                </motion.span>
               </motion.div>
             ))}
           </div>
         </motion.div>
 
 
-        {/* Currently Listening / Status Badge */}
+        {/* Currently Listening / Status Badge - 3D Vinyl Effect */}
         <motion.div
-          className="mb-6 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-xl border border-green-200 dark:border-green-800 p-4 flex items-center gap-3"
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.6 }}
+          className="mb-6 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-xl border border-green-200 dark:border-green-800 p-4 flex items-center gap-3 relative overflow-hidden"
+          initial={{ opacity: 0, x: -20, rotateY: -45 }}
+          animate={{ opacity: 1, x: 0, rotateY: 0 }}
+          transition={{ delay: 0.6, type: "spring" }}
+          whileHover={{ 
+            scale: 1.02,
+            boxShadow: "0 15px 35px rgba(34, 197, 94, 0.2)"
+          }}
+          style={{
+            perspective: 1000,
+            transformStyle: 'preserve-3d',
+            boxShadow: '0 8px 25px rgba(34, 197, 94, 0.1)',
+          }}
         >
+          {/* 3D Vinyl Record */}
           <motion.div
-            animate={{ scale: [1, 1.2, 1] }}
-            transition={{ duration: 2, repeat: Infinity }}
-            className="flex-shrink-0"
+            animate={{ 
+              rotate: 360,
+              scale: [1, 1.1, 1],
+            }}
+            transition={{ 
+              rotate: { duration: 3, repeat: Infinity, ease: "linear" },
+              scale: { duration: 2, repeat: Infinity }
+            }}
+            className="flex-shrink-0 relative"
+            style={{
+              transformStyle: 'preserve-3d',
+              transform: 'translateZ(15px)',
+            }}
           >
-            <Music className="w-5 h-5 text-green-600 dark:text-green-400" />
+            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-green-600 to-emerald-600 flex items-center justify-center relative">
+              {/* Vinyl grooves */}
+              <div className="absolute inset-2 rounded-full border-2 border-green-400/30" />
+              <div className="absolute inset-3 rounded-full border border-green-400/20" />
+              <div className="absolute inset-4 rounded-full bg-gray-900 flex items-center justify-center">
+                <Music className="w-4 h-4 text-green-400" />
+              </div>
+            </div>
           </motion.div>
           <div className="flex-1 min-w-0">
             <div className="text-xs text-green-600 dark:text-green-400 font-medium mb-0.5">
@@ -2582,46 +2889,84 @@ const InstagramLinkPage = () => {
           </motion.div>
         </motion.div>
 
-        {/* Quick Stats Cards */}
+        {/* Quick Stats Cards - 3D Stacked Layers Effect */}
         <motion.div
           className="mb-8 grid grid-cols-3 gap-3"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.65 }}
+          style={{
+            perspective: 1200,
+            transformStyle: 'preserve-3d',
+          }}
         >
-          <motion.div
-            className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 text-center"
-            whileHover={{ scale: 1.05, borderColor: "#3b82f6" }}
-          >
-            <div className="text-2xl font-bold text-blue-600 dark:text-blue-400 mb-1">
-              {projects.length}+
-            </div>
-            <div className="text-xs text-gray-600 dark:text-gray-400">
-              Projects
-            </div>
-          </motion.div>
-          <motion.div
-            className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 text-center"
-            whileHover={{ scale: 1.05, borderColor: "#8b5cf6" }}
-          >
-            <div className="text-2xl font-bold text-purple-600 dark:text-purple-400 mb-1">
-              3+
-            </div>
-            <div className="text-xs text-gray-600 dark:text-gray-400">
-              Languages
-            </div>
-          </motion.div>
-          <motion.div
-            className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 text-center"
-            whileHover={{ scale: 1.05, borderColor: "#10b981" }}
-          >
-            <div className="text-2xl font-bold text-green-600 dark:text-green-400 mb-1">
-              ∞
-            </div>
-            <div className="text-xs text-gray-600 dark:text-gray-400">
-              Ideas
-            </div>
-          </motion.div>
+          {[
+            { value: `${projects.length}+`, label: "Projects", color: "#3b82f6", gradient: "from-blue-500 to-blue-600" },
+            { value: "3+", label: "Languages", color: "#8b5cf6", gradient: "from-purple-500 to-purple-600" },
+            { value: "∞", label: "Ideas", color: "#10b981", gradient: "from-green-500 to-green-600" }
+          ].map((stat, index) => (
+            <motion.div
+              key={stat.label}
+              className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 text-center relative overflow-hidden"
+              initial={{ rotateY: -90, opacity: 0 }}
+              animate={{ rotateY: 0, opacity: 1 }}
+              transition={{ 
+                delay: 0.65 + index * 0.1,
+                type: "spring",
+                stiffness: 100
+              }}
+              whileHover={{ 
+                scale: 1.08,
+                rotateY: 5,
+                rotateX: 5,
+                z: 40,
+                borderColor: stat.color,
+                boxShadow: `0 20px 40px ${stat.color}40`,
+              }}
+              style={{
+                transformStyle: 'preserve-3d',
+                boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
+              }}
+            >
+              {/* Gradient overlay on hover */}
+              <motion.div
+                className={`absolute inset-0 bg-gradient-to-br ${stat.gradient} opacity-0`}
+                whileHover={{ opacity: 0.1 }}
+                transition={{ duration: 0.3 }}
+              />
+              
+              {/* 3D depth layer */}
+              <div 
+                className="absolute inset-0 bg-gradient-to-br from-gray-100/50 to-transparent dark:from-gray-700/50 rounded-xl"
+                style={{ transform: 'translateZ(-10px)' }}
+              />
+              
+              <div className="relative" style={{ transform: 'translateZ(20px)' }}>
+                <motion.div 
+                  className="text-2xl font-bold mb-1"
+                  style={{ 
+                    backgroundImage: `linear-gradient(135deg, ${stat.color}, ${stat.color}dd)`,
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                    backgroundClip: 'text',
+                  }}
+                  animate={{ 
+                    scale: [1, 1.05, 1],
+                  }}
+                  transition={{ 
+                    duration: 2,
+                    repeat: Infinity,
+                    delay: index * 0.3
+                  }}
+                >
+                  {stat.value}
+                </motion.div>
+                <div className="text-xs text-gray-600 dark:text-gray-400 font-medium">
+                  {stat.label}
+                </div>
+              </div>
+            </motion.div>
+          ))}
         </motion.div>
 
         {/* Social Links Section */}
@@ -2689,23 +3034,88 @@ const InstagramLinkPage = () => {
           </div>
         </motion.div>
 
-        {/* Footer with Fun Interaction */}
+        {/* Footer with Fun Interaction - 3D Floating Button */}
         <motion.div
           className="text-center pt-6"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.7 }}
+          style={{
+            perspective: 1200,
+            transformStyle: 'preserve-3d',
+          }}
         >
           <motion.div
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
+            animate={{
+              y: [0, -8, 0],
+            }}
+            transition={{
+              duration: 3,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+            whileHover={{ 
+              scale: 1.08,
+              rotateX: -10,
+              rotateY: 5,
+              z: 40,
+            }}
+            whileTap={{ 
+              scale: 0.95,
+              rotateX: 5,
+            }}
+            style={{
+              transformStyle: 'preserve-3d',
+            }}
           >
             <Link
               to="/"
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 text-white font-medium hover:from-blue-700 hover:to-purple-700 transition-all shadow-lg hover:shadow-xl"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 text-white font-medium hover:from-blue-700 hover:to-purple-700 transition-all shadow-lg hover:shadow-xl relative overflow-hidden"
+              style={{
+                transformStyle: 'preserve-3d',
+                boxShadow: '0 10px 40px rgba(59, 130, 246, 0.3)',
+              }}
             >
-              <Sparkles className="w-4 h-4" />
-              Explore Full Portfolio
+              {/* 3D depth layers */}
+              <div 
+                className="absolute inset-0 bg-gradient-to-r from-blue-700 to-purple-700 rounded-full"
+                style={{ transform: 'translateZ(-5px)' }}
+              />
+              <div 
+                className="absolute inset-0 bg-gradient-to-r from-blue-800 to-purple-800 rounded-full"
+                style={{ transform: 'translateZ(-10px)' }}
+              />
+              
+              {/* Content layer */}
+              <span className="relative z-10 flex items-center gap-2" style={{ transform: 'translateZ(15px)' }}>
+                <motion.div
+                  animate={{
+                    rotate: [0, 360],
+                    scale: [1, 1.2, 1],
+                  }}
+                  transition={{
+                    duration: 3,
+                    repeat: Infinity,
+                    ease: "easeInOut"
+                  }}
+                >
+                  <Sparkles className="w-4 h-4" />
+                </motion.div>
+                Explore Full Portfolio
+              </span>
+              
+              {/* Shimmer effect */}
+              <motion.div
+                className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent"
+                initial={{ x: '-100%' }}
+                animate={{ x: '200%' }}
+                transition={{
+                  duration: 2,
+                  repeat: Infinity,
+                  repeatDelay: 1,
+                }}
+                style={{ transform: 'translateZ(20px)' }}
+              />
             </Link>
           </motion.div>
           <p className="text-xs text-gray-500 dark:text-gray-600 mt-6">
