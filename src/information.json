@@ -47,8 +47,8 @@
                 "link": "https://wordpanda.app/"
             },
             {
-                "name": "Thesify",
-                "link": "https://thesify.vercel.app/"
+                "name": "Tesify",
+                "link": "https://tesify.app/"
             },
             {
                 "name": "Meetnow",
@@ -83,10 +83,26 @@
             },
             {
                 "name": "English",
-                "percent": 95
+                "percent": 100
             }
         ],
         "technologies": [
+            {
+                "name": "Nextjs",
+                "percent": 90
+            },
+            {
+                "name": "Nodejs",
+                "percent": 90
+            },
+            {
+                "name": ".NET Core",
+                "percent": 85
+            },
+            {
+                "name": "TypeScript",
+                "percent": 90
+            },
             {
                 "name": "Reactjs",
                 "percent": 80
@@ -118,6 +134,10 @@
             {
                 "name": "SQL",
                 "percent": 85
+            },
+            {
+                "name": "C++",
+                "percent": 90
             },
             {
                 "name": "C",

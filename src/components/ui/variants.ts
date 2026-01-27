@@ -1,36 +1,36 @@
-/**
- * Component variant definitions
- * Separated for better Fast Refresh compatibility
- */
-
 import { cva } from 'class-variance-authority';
 
 export const buttonVariants = cva(
-    'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg text-sm font-medium ring-offset-white transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sakura-500 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50',
+    'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg text-sm font-medium ring-offset-white transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sakura-500 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 select-none',
     {
         variants: {
             variant: {
                 default:
-                    'bg-sakura-500 text-white hover:bg-sakura-600 active:scale-95 shadow-lg shadow-sakura-500/20',
+                    'bg-sakura-500 text-white hover:bg-sakura-600 active:scale-[0.98] shadow-lg shadow-sakura-500/20 hover:shadow-xl hover:shadow-sakura-500/30',
                 destructive:
-                    'bg-red-500 text-white hover:bg-red-600 active:scale-95',
+                    'bg-red-500 text-white hover:bg-red-600 active:scale-[0.98] shadow-lg shadow-red-500/20',
                 outline:
-                    'border-2 border-sakura-500 text-sakura-600 dark:text-sakura-400 hover:bg-sakura-50 dark:hover:bg-sakura-900/10 active:scale-95',
+                    'border-2 border-sakura-500 text-sakura-600 dark:text-sakura-400 hover:bg-sakura-50 dark:hover:bg-sakura-900/10 active:scale-[0.98]',
                 secondary:
-                    'bg-gray-100 text-gray-900 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700 active:scale-95',
+                    'bg-gray-100 text-gray-900 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700 active:scale-[0.98]',
                 ghost:
                     'hover:bg-sakura-50 hover:text-sakura-600 dark:hover:bg-sakura-900/10 dark:hover:text-sakura-400',
                 link:
                     'text-sakura-600 underline-offset-4 hover:underline dark:text-sakura-400',
                 gradient:
-                    'bg-gradient-to-r from-sakura-500 to-cyber-500 text-white hover:from-sakura-600 hover:to-cyber-600 active:scale-95 shadow-lg',
+                    'bg-gradient-to-r from-sakura-500 via-fuji-500 to-cyber-500 text-white hover:from-sakura-600 hover:via-fuji-600 hover:to-cyber-600 active:scale-[0.98] shadow-lg hover:shadow-xl',
+                glass:
+                    'bg-white/10 backdrop-blur-md border border-white/20 text-white hover:bg-white/20 active:scale-[0.98]',
             },
             size: {
                 default: 'h-10 px-4 py-2',
+                xs: 'h-7 rounded px-2 text-xs',
                 sm: 'h-9 rounded-md px-3',
                 lg: 'h-11 rounded-lg px-8',
                 xl: 'h-14 rounded-xl px-10 text-base',
                 icon: 'h-10 w-10',
+                iconSm: 'h-8 w-8',
+                iconLg: 'h-12 w-12',
             },
         },
         defaultVariants: {
@@ -53,9 +53,9 @@ export const badgeVariants = cva(
                     'border-transparent bg-red-500 text-white hover:bg-red-600',
                 outline: 'text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600',
                 success:
-                    'border-transparent bg-green-500 text-white hover:bg-green-600',
+                    'border-transparent bg-emerald-500 text-white hover:bg-emerald-600',
                 warning:
-                    'border-transparent bg-yellow-500 text-white hover:bg-yellow-600',
+                    'border-transparent bg-amber-500 text-white hover:bg-amber-600',
                 info:
                     'border-transparent bg-blue-500 text-white hover:bg-blue-600',
                 cyber:
@@ -64,6 +64,8 @@ export const badgeVariants = cva(
                     'border-transparent bg-matcha-500 text-white hover:bg-matcha-600',
                 gradient:
                     'border-transparent bg-gradient-to-r from-sakura-500 to-cyber-500 text-white',
+                glass:
+                    'bg-white/10 backdrop-blur-md border-white/20 text-white',
             },
             size: {
                 default: 'px-2.5 py-0.5 text-xs',
@@ -75,6 +77,31 @@ export const badgeVariants = cva(
         defaultVariants: {
             variant: 'default',
             size: 'default',
+        },
+    }
+);
+
+export const inputVariants = cva(
+    'flex w-full rounded-lg border bg-white px-3 py-2 text-sm transition-all duration-200 file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-gray-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-gray-900 dark:placeholder:text-gray-500',
+    {
+        variants: {
+            variant: {
+                default:
+                    'border-gray-200 dark:border-gray-700 focus-visible:ring-sakura-500 focus-visible:border-sakura-500',
+                error:
+                    'border-red-500 focus-visible:ring-red-500 text-red-900 placeholder:text-red-400',
+                success:
+                    'border-emerald-500 focus-visible:ring-emerald-500',
+            },
+            inputSize: {
+                default: 'h-10',
+                sm: 'h-9 text-sm',
+                lg: 'h-12 text-base',
+            },
+        },
+        defaultVariants: {
+            variant: 'default',
+            inputSize: 'default',
         },
     }
 );

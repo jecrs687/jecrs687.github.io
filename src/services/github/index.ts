@@ -1,0 +1,1 @@
+export { getGitHubData } from './api';

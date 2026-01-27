@@ -1,0 +1,1 @@
+export { getDevToArticles } from './api';

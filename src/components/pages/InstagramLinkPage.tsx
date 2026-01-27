@@ -80,7 +80,7 @@ const SocialLink = ({
         className={`relative w-full flex items-center justify-center gap-3 p-4 rounded-lg bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 transition-all duration-200 group ${colorClasses[color as keyof typeof colorClasses]} overflow-hidden`}
         initial={{ opacity: 0, scale: 0.9, rotateX: -20 }}
         whileInView={{ opacity: 1, scale: 1, rotateX: 0 }}
-        whileHover={{ 
+        whileHover={{
           scale: 1.02,
           rotateX: 3,
           rotateY: -2,
@@ -95,21 +95,21 @@ const SocialLink = ({
         }}
       >
         {/* 3D Depth Layer */}
-        <div 
+        <div
           className="absolute inset-0 bg-gradient-to-br from-gray-100/50 to-transparent dark:from-gray-700/50 rounded-lg"
           style={{ transform: 'translateZ(-15px)' }}
         />
-        
+
         {/* Icon with 3D effect */}
         <motion.div
           className="w-10 h-10 rounded-lg flex items-center justify-center bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 group-hover:bg-white/20 group-hover:text-white transition-colors relative z-10"
-          animate={clicked ? { 
-            scale: [1, 1.3, 1], 
+          animate={clicked ? {
+            scale: [1, 1.3, 1],
             rotate: [0, 15, -15, 0],
             rotateY: [0, 360],
           } : {}}
           transition={{ duration: 0.6 }}
-          style={{ 
+          style={{
             transform: 'translateZ(20px)',
             transformStyle: 'preserve-3d',
             boxShadow: '0 5px 15px rgba(0,0,0,0.2)',
@@ -117,15 +117,15 @@ const SocialLink = ({
         >
           <Icon className="w-5 h-5" />
         </motion.div>
-        
+
         {/* Text with depth */}
-        <div 
+        <div
           className="font-semibold text-gray-900 dark:text-white group-hover:text-white transition-colors relative z-10"
           style={{ transform: 'translateZ(15px)' }}
         >
           {text}
         </div>
-        
+
         {/* 3D Shine effect */}
         <motion.div
           className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
@@ -134,7 +134,7 @@ const SocialLink = ({
           transition={{ duration: 0.6 }}
           style={{ transform: 'translateZ(10px)' }}
         />
-        
+
         {/* Click ripple */}
         <AnimatePresence>
           {clicked && (
@@ -212,7 +212,7 @@ const ProjectCard = ({ project, index }: { project: Project; index: number }) =>
         >
           <div className="p-4 aspect-square flex flex-col items-center justify-center text-center relative z-10">
             <motion.div
-              animate={isHovered ? { 
+              animate={isHovered ? {
                 rotate: 360,
                 scale: [1, 1.2, 1],
               } : { rotate: 0 }}
@@ -222,13 +222,13 @@ const ProjectCard = ({ project, index }: { project: Project; index: number }) =>
             >
               <Code2 className="w-8 h-8 text-blue-600 dark:text-blue-400" />
             </motion.div>
-            <h3 
+            <h3
               className="font-semibold text-gray-900 dark:text-white capitalize text-sm leading-tight"
               style={{ transform: 'translateZ(15px)' }}
             >
               {project.name}
             </h3>
-            <motion.div 
+            <motion.div
               className="mt-2 text-xs text-gray-500 dark:text-gray-400"
               initial={{ opacity: 0 }}
               animate={{ opacity: isHovered ? 1 : 0 }}
@@ -237,7 +237,7 @@ const ProjectCard = ({ project, index }: { project: Project; index: number }) =>
               Click to flip
             </motion.div>
           </div>
-          
+
           {/* Gradient overlay */}
           <motion.div
             className="absolute inset-0 bg-gradient-to-br from-blue-500/10 via-purple-500/10 to-pink-500/10"
@@ -245,7 +245,7 @@ const ProjectCard = ({ project, index }: { project: Project; index: number }) =>
             animate={{ opacity: isHovered ? 1 : 0 }}
             style={{ transform: 'translateZ(5px)' }}
           />
-          
+
           {/* 3D Corner accents */}
           <div className="absolute top-2 right-2 w-8 h-8 border-t-2 border-r-2 border-blue-400/30 rounded-tr-lg" style={{ transform: 'translateZ(8px)' }} />
           <div className="absolute bottom-2 left-2 w-8 h-8 border-b-2 border-l-2 border-purple-400/30 rounded-bl-lg" style={{ transform: 'translateZ(8px)' }} />
@@ -755,11 +755,11 @@ const InstagramLinkPage = () => {
               key={`blob-${blob}`}
               className="absolute rounded-full blur-3xl opacity-20"
               style={{
-                background: blob === 1 
+                background: blob === 1
                   ? 'radial-gradient(circle, #3b82f6 0%, transparent 70%)'
                   : blob === 2
-                  ? 'radial-gradient(circle, #8b5cf6 0%, transparent 70%)'
-                  : 'radial-gradient(circle, #ec4899 0%, transparent 70%)',
+                    ? 'radial-gradient(circle, #8b5cf6 0%, transparent 70%)'
+                    : 'radial-gradient(circle, #ec4899 0%, transparent 70%)',
                 width: `${300 + blob * 100}px`,
                 height: `${300 + blob * 100}px`,
                 left: blob === 1 ? '10%' : blob === 2 ? '70%' : '40%',
@@ -780,7 +780,7 @@ const InstagramLinkPage = () => {
           ))}
         </div>
       )}
-      
+
       {/* CINEMA INTRO OVERLAY */}
       <AnimatePresence>
         {!showContent && (
@@ -1767,18 +1767,23 @@ const InstagramLinkPage = () => {
             transition={{ duration: 1.5 }}
             className="relative"
           >
-            {/* Story Chapter 1: The Journey Begins */}
+            {/* Story Chapter 1: The Journey Begins - SIMPLIFIED */}
             <motion.section
               className="min-h-screen flex items-center justify-center relative overflow-hidden isolate"
               style={{
                 transform: `translateY(${Math.min(scrollY * 0.3, 200)}px)`,
               }}
             >
-              {/* Multi-layer Depth Background */}
+              {/* Simple Subtle Background */}
               <motion.div
-                className="absolute inset-0 bg-gradient-to-b from-blue-50/30 via-transparent to-purple-50/30 dark:from-blue-950/10 dark:via-transparent dark:to-purple-950/10 pointer-events-none"
-                style={{
-                  transform: `translateY(${Math.min(scrollY * 0.15, 100)}px) translateX(${mousePosition.x * 5}px)`,
+                className="absolute inset-0 bg-gradient-to-b from-blue-50/20 via-transparent to-purple-50/20 dark:from-blue-950/10 dark:via-transparent dark:to-purple-950/10"
+                animate={{
+                  opacity: [0.5, 0.8, 0.5],
+                }}
+                transition={{
+                  duration: 8,
+                  repeat: Infinity,
+                  ease: "easeInOut"
                 }}
               />
 
@@ -1868,53 +1873,81 @@ const InstagramLinkPage = () => {
 
               <div className="max-w-4xl mx-auto px-6 text-center z-10">
                 <motion.div
-                  initial={{ opacity: 0, y: 50 }}
-                  animate={{ opacity: storyStage >= 0 ? 1 : 0, y: storyStage >= 0 ? 0 : 50 }}
-                  transition={{ duration: 1, delay: 0.5 }}
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: storyStage >= 0 ? 1 : 0, y: storyStage >= 0 ? 0 : 30 }}
+                  transition={{ duration: 0.8 }}
                 >
+                  {/* Simple Icon */}
                   <motion.div
                     className="mb-8"
                     animate={{
-                      scale: [1, 1.05, 1],
+                      y: [0, -10, 0],
                     }}
-                    transition={{ duration: 3, repeat: Infinity }}
+                    transition={{ 
+                      duration: 3, 
+                      repeat: Infinity,
+                      ease: "easeInOut"
+                    }}
                   >
-                    <Sparkles className="w-16 h-16 mx-auto text-blue-400 mb-4" style={{
-                      filter: 'drop-shadow(0 0 20px rgba(59, 130, 246, 0.8))'
-                    }} />
+                    <Sparkles className="w-16 h-16 mx-auto text-blue-500" />
                   </motion.div>
 
-                  <motion.h2
-                    className="text-4xl md:text-6xl font-bold text-gray-900 dark:text-white mb-6"
-                    style={{
-                      textShadow: '0 0 30px rgba(59, 130, 246, 0.3)',
-                    }}
-                  >
-                    Every Line of Code Tells a Story
-                  </motion.h2>
+                  {/* Clean Title */}
+                  <h2 className="text-5xl md:text-6xl font-bold text-gray-900 dark:text-white mb-6">
+                    Every Line of Code
+                    <br />
+                    <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                      Tells a Story
+                    </span>
+                  </h2>
 
+                  {/* Simple Description */}
                   <motion.p
-                    className="text-xl md:text-2xl text-gray-600 dark:text-gray-400 leading-relaxed mb-8"
+                    className="text-lg md:text-xl text-gray-600 dark:text-gray-400 leading-relaxed mb-12 max-w-2xl mx-auto"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: storyStage >= 0 ? 1 : 0 }}
-                    transition={{ delay: 1, duration: 1 }}
+                    transition={{ delay: 0.3 }}
                   >
                     From a curious 12-year-old crafting first websites, to building experiences that inspire millions.
                   </motion.p>
 
+                  {/* Simple Milestone Stats */}
                   <motion.div
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: storyStage >= 0 ? 1 : 0, scale: storyStage >= 0 ? 1 : 0.8 }}
-                    transition={{ delay: 1.5, duration: 0.8 }}
-                    className="flex items-center justify-center gap-4 text-sm text-gray-500 dark:text-gray-500"
+                    className="flex items-center justify-center gap-8 flex-wrap mb-12"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: storyStage >= 0 ? 1 : 0 }}
+                    transition={{ delay: 0.5 }}
                   >
-                    <motion.div
-                      animate={{ rotate: 360 }}
-                      transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-                    >
-                      <Globe className="w-5 h-5" />
-                    </motion.div>
-                    <span>Scroll to explore the journey</span>
+                    {[
+                      { value: "10+", label: "Years Coding" },
+                      { value: "50+", label: "Projects" },
+                      { value: "∞", label: "Ideas" }
+                    ].map((stat, idx) => (
+                      <motion.div
+                        key={stat.label}
+                        className="text-center"
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: storyStage >= 0 ? 1 : 0, scale: storyStage >= 0 ? 1 : 0.8 }}
+                        transition={{ delay: 0.6 + idx * 0.1 }}
+                      >
+                        <div className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-1">
+                          {stat.value}
+                        </div>
+                        <div className="text-sm text-gray-500 dark:text-gray-400">
+                          {stat.label}
+                        </div>
+                      </motion.div>
+                    ))}
+                  </motion.div>
+
+                  {/* Simple Scroll Prompt */}
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: storyStage >= 0 ? 1 : 0 }}
+                    transition={{ delay: 0.8 }}
+                    className="flex items-center justify-center gap-3 text-sm text-gray-500 dark:text-gray-400"
+                  >
+                    <span>Scroll to explore</span>
                     <motion.div
                       animate={{ y: [0, 5, 0] }}
                       transition={{ duration: 1.5, repeat: Infinity }}
@@ -2256,130 +2289,526 @@ const InstagramLinkPage = () => {
                   </div>
                 </motion.div>
               </div>
-            </motion.section>            {/* Story Chapter 4: The Tech Stack - 3D Cards */}
+            </motion.section>            {/* Story Chapter 4: The Tech Stack - REDESIGNED */}
             <motion.section
-              className="min-h-screen flex items-center justify-center relative overflow-hidden isolate bg-gradient-to-b from-transparent via-purple-50/50 to-transparent dark:via-purple-950/20"
+              className="min-h-screen flex items-center justify-center relative overflow-hidden isolate"
               style={{
                 transform: `translateY(${Math.min(scrollY * 0.1, 100)}px)`,
               }}
             >
-              <div className="max-w-6xl mx-auto px-6 z-10">
+              {/* Advanced Animated Background */}
+              <div className="absolute inset-0 overflow-hidden">
+                {/* Gradient Mesh Background */}
+                <motion.div
+                  className="absolute inset-0"
+                  style={{
+                    background: 'radial-gradient(circle at 20% 30%, rgba(59, 130, 246, 0.15), transparent 50%), radial-gradient(circle at 80% 70%, rgba(139, 92, 246, 0.15), transparent 50%), radial-gradient(circle at 50% 50%, rgba(236, 72, 153, 0.1), transparent 60%)',
+                  }}
+                  animate={{
+                    scale: [1, 1.1, 1],
+                    rotate: [0, 5, 0],
+                  }}
+                  transition={{
+                    duration: 20,
+                    repeat: Infinity,
+                    ease: "easeInOut"
+                  }}
+                />
+
+                {/* Floating Grid Pattern */}
+                <motion.div
+                  className="absolute inset-0 opacity-5"
+                  style={{
+                    backgroundImage: 'linear-gradient(rgba(59, 130, 246, 0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(59, 130, 246, 0.5) 1px, transparent 1px)',
+                    backgroundSize: '50px 50px',
+                  }}
+                  animate={{
+                    backgroundPosition: ['0px 0px', '50px 50px'],
+                  }}
+                  transition={{
+                    duration: 20,
+                    repeat: Infinity,
+                    ease: "linear"
+                  }}
+                />
+
+                {/* Orbiting Tech Symbols */}
+                {[...Array(8)].map((_, i) => (
+                  <motion.div
+                    key={`tech-orbit-${i}`}
+                    className="absolute"
+                    style={{
+                      left: '50%',
+                      top: '50%',
+                    }}
+                    animate={{
+                      rotate: 360,
+                    }}
+                    transition={{
+                      duration: 40 + i * 5,
+                      repeat: Infinity,
+                      ease: "linear",
+                    }}
+                  >
+                    <motion.div
+                      className="w-3 h-3 rounded-full bg-gradient-to-r from-blue-400 to-purple-400 blur-sm"
+                      style={{
+                        transform: `translateX(${200 + i * 50}px)`,
+                      }}
+                      animate={{
+                        scale: [1, 1.5, 1],
+                        opacity: [0.3, 0.8, 0.3],
+                      }}
+                      transition={{
+                        duration: 2 + i * 0.3,
+                        repeat: Infinity,
+                      }}
+                    />
+                  </motion.div>
+                ))}
+              </div>
+
+              <div className="max-w-7xl mx-auto px-6 z-10 relative">
+                {/* Enhanced Header */}
                 <motion.div
                   initial={{ opacity: 0, y: 50 }}
                   animate={{ opacity: storyStage >= 3 ? 1 : 0, y: storyStage >= 3 ? 0 : 50 }}
                   transition={{ duration: 1 }}
-                  className="text-center mb-16"
+                  className="text-center mb-20"
                 >
-                  <h2 className="text-3xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">
+                  {/* Icon Badge */}
+                  <motion.div
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-blue-500/10 to-purple-500/10 border border-blue-500/20 mb-6"
+                    animate={{
+                      boxShadow: [
+                        '0 0 0 0 rgba(59, 130, 246, 0)',
+                        '0 0 0 10px rgba(59, 130, 246, 0.1)',
+                        '0 0 0 0 rgba(59, 130, 246, 0)',
+                      ],
+                    }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                  >
+                    <Code2 className="w-5 h-5 text-blue-500" />
+                    <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">Tech Arsenal</span>
+                  </motion.div>
+
+                  {/* Main Title */}
+                  <motion.h2
+                    className="text-4xl md:text-7xl font-black mb-6"
+                    style={{
+                      background: 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 50%, #ec4899 100%)',
+                      WebkitBackgroundClip: 'text',
+                      WebkitTextFillColor: 'transparent',
+                      backgroundClip: 'text',
+                    }}
+                    animate={{
+                      backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'],
+                    }}
+                    transition={{
+                      duration: 5,
+                      repeat: Infinity,
+                      ease: "linear"
+                    }}
+                  >
                     Master of Technologies
-                  </h2>
-                  <p className="text-xl text-gray-600 dark:text-gray-400">
-                    Building with the best tools in the industry
-                  </p>
+                  </motion.h2>
+
+                  {/* Subtitle with typing effect */}
+                  <motion.p
+                    className="text-lg md:text-2xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: storyStage >= 3 ? 1 : 0 }}
+                    transition={{ delay: 0.5 }}
+                  >
+                    Crafting digital experiences with cutting-edge tools and frameworks
+                  </motion.p>
+
+                  {/* Tech Stats Line */}
+                  <motion.div
+                    className="flex items-center justify-center gap-8 mt-8 flex-wrap"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: storyStage >= 3 ? 1 : 0, y: storyStage >= 3 ? 0 : 20 }}
+                    transition={{ delay: 0.8 }}
+                  >
+                    {[
+                      { label: "Languages", value: "10+" },
+                      { label: "Frameworks", value: "15+" },
+                      { label: "Years Exp", value: "5+" }
+                    ].map((stat, i) => (
+                      <motion.div
+                        key={stat.label}
+                        className="text-center"
+                        initial={{ scale: 0 }}
+                        animate={{ scale: storyStage >= 3 ? 1 : 0 }}
+                        transition={{ delay: 1 + i * 0.1, type: "spring" }}
+                      >
+                        <div className="text-3xl font-bold bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text text-transparent">
+                          {stat.value}
+                        </div>
+                        <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                          {stat.label}
+                        </div>
+                      </motion.div>
+                    ))}
+                  </motion.div>
                 </motion.div>
 
-                <div className="grid md:grid-cols-3 gap-8">
+                {/* Revolutionary Tech Stack Grid */}
+                <div className="grid md:grid-cols-3 gap-6 lg:gap-8">
                   {[
                     {
                       category: "Frontend",
-                      techs: ["React", "TypeScript", "Tailwind", "Next.js"],
-                      gradient: "from-blue-500 to-cyan-500",
-                      icon: Code2
+                      description: "Pixel-perfect interfaces",
+                      techs: [
+                        { name: "React", level: 95, color: "#61dafb" },
+                        { name: "TypeScript", level: 90, color: "#3178c6" },
+                        { name: "Tailwind", level: 98, color: "#06b6d4" },
+                        { name: "Next.js", level: 88, color: "#000000" },
+                      ],
+                      gradient: "from-blue-500 via-cyan-500 to-blue-600",
+                      bgGradient: "from-blue-500/5 to-cyan-500/5",
+                      icon: Code2,
+                      iconColor: "text-blue-500"
                     },
                     {
                       category: "Backend",
-                      techs: ["Node.js", "Python", "PostgreSQL", "Redis"],
-                      gradient: "from-purple-500 to-pink-500",
-                      icon: Zap
+                      description: "Scalable architectures",
+                      techs: [
+                        { name: "Node.js", level: 92, color: "#339933" },
+                        { name: "Python", level: 85, color: "#3776ab" },
+                        { name: "PostgreSQL", level: 88, color: "#336791" },
+                        { name: "Redis", level: 80, color: "#dc382d" },
+                      ],
+                      gradient: "from-purple-500 via-pink-500 to-purple-600",
+                      bgGradient: "from-purple-500/5 to-pink-500/5",
+                      icon: Zap,
+                      iconColor: "text-purple-500"
                     },
                     {
-                      category: "Tools",
-                      techs: ["Docker", "AWS", "Git", "CI/CD"],
-                      gradient: "from-orange-500 to-red-500",
-                      icon: TrendingUp
+                      category: "DevOps",
+                      description: "Cloud & automation",
+                      techs: [
+                        { name: "Docker", level: 90, color: "#2496ed" },
+                        { name: "AWS", level: 85, color: "#ff9900" },
+                        { name: "Git", level: 95, color: "#f05032" },
+                        { name: "CI/CD", level: 88, color: "#6366f1" },
+                      ],
+                      gradient: "from-orange-500 via-red-500 to-orange-600",
+                      bgGradient: "from-orange-500/5 to-red-500/5",
+                      icon: TrendingUp,
+                      iconColor: "text-orange-500"
                     }
                   ].map((stack, i) => (
                     <motion.div
                       key={stack.category}
-                      initial={{ opacity: 0, rotateY: -90 }}
+                      initial={{ opacity: 0, y: 100, rotateX: -30 }}
                       animate={{
                         opacity: storyStage >= 3 ? 1 : 0,
-                        rotateY: storyStage >= 3 ? 0 : -90
+                        y: storyStage >= 3 ? 0 : 100,
+                        rotateX: storyStage >= 3 ? 0 : -30
                       }}
-                      transition={{ delay: i * 0.2, duration: 0.8 }}
-                      whileHover={{
-                        scale: 1.03,
-                        rotateY: 3,
-                        z: 30
+                      transition={{
+                        delay: i * 0.2,
+                        duration: 0.8,
+                        type: "spring",
+                        stiffness: 100
                       }}
-                      className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl p-8 rounded-3xl border-2 border-gray-200 dark:border-gray-700 hover:border-transparent relative overflow-hidden group"
+                      className="group relative"
                       style={{
-                        transform: `translateY(${Math.max(-60, -scrollY * (0.03 + i * 0.01))}px)`,
+                        perspective: 1500,
                         transformStyle: 'preserve-3d',
-                        perspective: '1000px',
-                        willChange: 'transform',
                       }}
                     >
-                      {/* Animated gradient background on hover */}
                       <motion.div
-                        className={`absolute inset-0 bg-gradient-to-br ${stack.gradient} opacity-0 group-hover:opacity-10 transition-opacity`}
-                      />
-
-                      <motion.div
-                        animate={{ rotate: 360 }}
-                        transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-                        className="mb-6"
+                        whileHover={{
+                          scale: 1.05,
+                          rotateY: 5,
+                          rotateX: 5,
+                          z: 50,
+                        }}
+                        className="relative bg-white/80 dark:bg-gray-900/80 backdrop-blur-2xl rounded-3xl border border-gray-200/50 dark:border-gray-700/50 overflow-hidden"
+                        style={{
+                          transformStyle: 'preserve-3d',
+                          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.15)',
+                        }}
                       >
-                        <stack.icon className={`w-16 h-16 mx-auto bg-gradient-to-r ${stack.gradient} bg-clip-text text-transparent`} style={{
-                          filter: 'drop-shadow(0 0 20px currentColor)'
-                        }} />
-                      </motion.div>
-
-                      <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
-                        {stack.category}
-                      </h3>
-
-                      <div className="space-y-3">
-                        {stack.techs.map((tech, techIndex) => (
-                          <motion.div
-                            key={tech}
-                            initial={{ opacity: 0, x: -20 }}
-                            animate={{
-                              opacity: storyStage >= 3 ? 1 : 0,
-                              x: storyStage >= 3 ? 0 : -20
-                            }}
-                            transition={{ delay: i * 0.2 + techIndex * 0.1 + 0.3 }}
-                            className={`px-4 py-2 rounded-full bg-gradient-to-r ${stack.gradient} text-white text-sm font-semibold text-center`}
-                          >
-                            {tech}
-                          </motion.div>
-                        ))}
-                      </div>
-
-                      {/* 3D floating particles */}
-                      {[...Array(3)].map((_, particleIndex) => (
+                        {/* Gradient Background Layer */}
                         <motion.div
-                          key={`particle-${particleIndex}`}
-                          className="absolute w-1.5 h-1.5 bg-white/50 rounded-full pointer-events-none"
+                          className={`absolute inset-0 bg-gradient-to-br ${stack.bgGradient} opacity-0 group-hover:opacity-100 transition-opacity duration-500`}
+                        />
+
+                        {/* Animated Border Glow */}
+                        <motion.div
+                          className={`absolute inset-0 rounded-3xl bg-gradient-to-r ${stack.gradient} opacity-0 group-hover:opacity-20 blur-xl`}
                           animate={{
-                            y: [0, -15, 0],
-                            x: [0, Math.sin(particleIndex) * 8, 0],
-                            opacity: [0.5, 1, 0.5],
+                            scale: [1, 1.1, 1],
                           }}
                           transition={{
-                            duration: 2 + particleIndex * 0.5,
+                            duration: 2,
                             repeat: Infinity,
-                            delay: particleIndex * 0.2
-                          }}
-                          style={{
-                            left: `${25 + particleIndex * 20}%`,
-                            top: `${35 + Math.sin(particleIndex) * 15}%`,
                           }}
                         />
-                      ))}
+
+                        {/* Content */}
+                        <div className="relative p-8" style={{ transform: 'translateZ(30px)' }}>
+                          {/* Header Section */}
+                          <div className="mb-8">
+                            {/* Floating Icon */}
+                            <motion.div
+                              className="mb-6 relative"
+                              animate={{
+                                y: [0, -10, 0],
+                                rotate: [0, 5, 0, -5, 0],
+                              }}
+                              transition={{
+                                duration: 4,
+                                repeat: Infinity,
+                                ease: "easeInOut"
+                              }}
+                            >
+                              <motion.div
+                                className={`w-20 h-20 mx-auto rounded-2xl bg-gradient-to-br ${stack.gradient} p-1 relative`}
+                                whileHover={{ rotate: 360 }}
+                                transition={{ duration: 0.6 }}
+                              >
+                                <div className="w-full h-full bg-white dark:bg-gray-900 rounded-xl flex items-center justify-center">
+                                  <stack.icon className={`w-10 h-10 ${stack.iconColor}`} />
+                                </div>
+
+                                {/* Orbiting dots */}
+                                {[...Array(3)].map((_, idx) => (
+                                  <motion.div
+                                    key={idx}
+                                    className={`absolute w-2 h-2 rounded-full bg-gradient-to-r ${stack.gradient}`}
+                                    style={{
+                                      top: '50%',
+                                      left: '50%',
+                                    }}
+                                    animate={{
+                                      rotate: 360,
+                                    }}
+                                    transition={{
+                                      duration: 3 + idx,
+                                      repeat: Infinity,
+                                      ease: "linear",
+                                    }}
+                                  >
+                                    <div style={{ transform: `translate(-50%, -50%) translateX(${35 + idx * 5}px)` }} />
+                                  </motion.div>
+                                ))}
+                              </motion.div>
+                            </motion.div>
+
+                            {/* Title & Description */}
+                            <h3 className="text-3xl font-black text-gray-900 dark:text-white mb-2 text-center">
+                              {stack.category}
+                            </h3>
+                            <p className="text-sm text-gray-500 dark:text-gray-400 text-center">
+                              {stack.description}
+                            </p>
+                          </div>
+
+                          {/* Tech Stack with Progress Bars */}
+                          <div className="space-y-4">
+                            {stack.techs.map((tech, techIndex) => (
+                              <motion.div
+                                key={tech.name}
+                                initial={{ opacity: 0, x: -30 }}
+                                animate={{
+                                  opacity: storyStage >= 3 ? 1 : 0,
+                                  x: storyStage >= 3 ? 0 : -30
+                                }}
+                                transition={{
+                                  delay: i * 0.2 + techIndex * 0.1 + 0.5,
+                                  type: "spring"
+                                }}
+                                whileHover={{ x: 5 }}
+                                className="group/tech"
+                              >
+                                {/* Tech Name & Level */}
+                                <div className="flex items-center justify-between mb-2">
+                                  <div className="flex items-center gap-2">
+                                    <motion.div
+                                      className="w-2 h-2 rounded-full"
+                                      style={{ backgroundColor: tech.color }}
+                                      animate={{
+                                        scale: [1, 1.3, 1],
+                                        opacity: [0.7, 1, 0.7],
+                                      }}
+                                      transition={{
+                                        duration: 2,
+                                        repeat: Infinity,
+                                        delay: techIndex * 0.2,
+                                      }}
+                                    />
+                                    <span className="text-sm font-bold text-gray-700 dark:text-gray-300">
+                                      {tech.name}
+                                    </span>
+                                  </div>
+                                  <motion.span
+                                    className="text-xs font-mono font-bold"
+                                    style={{
+                                      background: `linear-gradient(135deg, ${tech.color}, ${tech.color}cc)`,
+                                      WebkitBackgroundClip: 'text',
+                                      WebkitTextFillColor: 'transparent',
+                                    }}
+                                    initial={{ opacity: 0 }}
+                                    whileHover={{ scale: 1.2 }}
+                                  >
+                                    {tech.level}%
+                                  </motion.span>
+                                </div>
+
+                                {/* Animated Progress Bar */}
+                                <div className="relative h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                                  <motion.div
+                                    className="absolute inset-y-0 left-0 rounded-full"
+                                    style={{
+                                      background: `linear-gradient(90deg, ${tech.color}, ${tech.color}cc)`,
+                                    }}
+                                    initial={{ width: 0 }}
+                                    animate={{
+                                      width: storyStage >= 3 ? `${tech.level}%` : 0
+                                    }}
+                                    transition={{
+                                      delay: i * 0.2 + techIndex * 0.15 + 0.8,
+                                      duration: 1,
+                                      ease: "easeOut"
+                                    }}
+                                  />
+
+                                  {/* Shimmer effect */}
+                                  <motion.div
+                                    className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent"
+                                    animate={{
+                                      x: ['-100%', '200%'],
+                                    }}
+                                    transition={{
+                                      duration: 2,
+                                      repeat: Infinity,
+                                      delay: i * 0.3 + techIndex * 0.2,
+                                      repeatDelay: 3,
+                                    }}
+                                  />
+                                </div>
+                              </motion.div>
+                            ))}
+                          </div>
+
+                          {/* Decorative Corner Elements */}
+                          <div className="absolute top-4 right-4 w-16 h-16 border-t-2 border-r-2 rounded-tr-2xl opacity-10"
+                            style={{ borderColor: stack.techs[0].color }}
+                          />
+                          <div className="absolute bottom-4 left-4 w-16 h-16 border-b-2 border-l-2 rounded-bl-2xl opacity-10"
+                            style={{ borderColor: stack.techs[0].color }}
+                          />
+                        </div>
+
+                        {/* Hover Particles */}
+                        {[...Array(6)].map((_, particleIndex) => (
+                          <motion.div
+                            key={`hover-particle-${particleIndex}`}
+                            className="absolute w-1 h-1 rounded-full opacity-0 group-hover:opacity-100 pointer-events-none"
+                            style={{
+                              background: `linear-gradient(135deg, ${stack.techs[0].color}, ${stack.techs[1].color})`,
+                              left: `${20 + particleIndex * 10}%`,
+                              top: `${10 + Math.sin(particleIndex) * 30}%`,
+                            }}
+                            animate={{
+                              y: [0, -30, 0],
+                              opacity: [0, 1, 0],
+                              scale: [0, 1.5, 0],
+                            }}
+                            transition={{
+                              duration: 2,
+                              repeat: Infinity,
+                              delay: particleIndex * 0.2,
+                            }}
+                          />
+                        ))}
+                      </motion.div>
+
+                      {/* 3D Shadow Layer */}
+                      <div
+                        className={`absolute inset-0 bg-gradient-to-br ${stack.gradient} opacity-20 blur-2xl rounded-3xl`}
+                        style={{
+                          transform: 'translateZ(-30px) scale(0.95)',
+                          zIndex: -1,
+                        }}
+                      />
                     </motion.div>
                   ))}
                 </div>
+
+                {/* Tech Achievement Highlights */}
+                <motion.div
+                  className="mt-20 text-center"
+                  initial={{ opacity: 0, y: 50 }}
+                  animate={{ opacity: storyStage >= 3 ? 1 : 0, y: storyStage >= 3 ? 0 : 50 }}
+                  transition={{ delay: 1.5, duration: 0.8 }}
+                >
+                  <motion.div
+                    className="inline-flex items-center gap-3 px-6 py-3 rounded-full bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950/30 dark:to-purple-950/30 border border-blue-200/50 dark:border-blue-800/50"
+                    whileHover={{ scale: 1.05 }}
+                    animate={{
+                      boxShadow: [
+                        '0 0 0 0 rgba(59, 130, 246, 0)',
+                        '0 0 0 15px rgba(59, 130, 246, 0.1)',
+                        '0 0 0 0 rgba(59, 130, 246, 0)',
+                      ],
+                    }}
+                    transition={{
+                      boxShadow: { duration: 2, repeat: Infinity },
+                    }}
+                  >
+                    <Sparkles className="w-5 h-5 text-blue-500" />
+                    <span className="text-sm font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                      Always learning, always building
+                    </span>
+                    <Sparkles className="w-5 h-5 text-purple-500" />
+                  </motion.div>
+
+                  {/* Quick Tech Badges */}
+                  <motion.div
+                    className="flex flex-wrap items-center justify-center gap-3 mt-8 max-w-2xl mx-auto"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: storyStage >= 3 ? 1 : 0 }}
+                    transition={{ delay: 2 }}
+                  >
+                    {[
+                      { icon: "⚡", text: "Performance Optimized" },
+                      { icon: "🎨", text: "Pixel Perfect" },
+                      { icon: "🔒", text: "Security First" },
+                      { icon: "📱", text: "Mobile Ready" },
+                      { icon: "♿", text: "Accessible" },
+                      { icon: "🚀", text: "Fast Delivery" },
+                    ].map((badge, i) => (
+                      <motion.div
+                        key={badge.text}
+                        initial={{ opacity: 0, scale: 0 }}
+                        animate={{
+                          opacity: storyStage >= 3 ? 1 : 0,
+                          scale: storyStage >= 3 ? 1 : 0,
+                        }}
+                        transition={{
+                          delay: 2 + i * 0.1,
+                          type: "spring",
+                          stiffness: 200
+                        }}
+                        whileHover={{
+                          scale: 1.1,
+                          rotate: [0, -5, 5, 0],
+                        }}
+                        className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-shadow cursor-default"
+                      >
+                        <span className="text-base">{badge.icon}</span>
+                        <span className="text-xs font-medium text-gray-700 dark:text-gray-300">
+                          {badge.text}
+                        </span>
+                      </motion.div>
+                    ))}
+                  </motion.div>
+                </motion.div>
               </div>
             </motion.section>
           </motion.div>
@@ -2684,13 +3113,13 @@ const InstagramLinkPage = () => {
                   <motion.div
                     key={achievement}
                     initial={{ opacity: 0, scale: 0, rotateX: -90 }}
-                    animate={{ 
-                      opacity: 1, 
+                    animate={{
+                      opacity: 1,
                       scale: 1,
                       rotateX: 0,
                       y: [0, -8, 0],
                     }}
-                    transition={{ 
+                    transition={{
                       delay: index * 0.1,
                       y: {
                         duration: 2 + index * 0.3,
@@ -2736,17 +3165,17 @@ const InstagramLinkPage = () => {
                 key={highlight.label}
                 className="flex flex-col items-center gap-2 cursor-pointer group relative"
                 initial={{ opacity: 0, scale: 0.8, rotateY: -90 }}
-                animate={{ 
-                  opacity: 1, 
+                animate={{
+                  opacity: 1,
                   scale: 1,
                   rotateY: 0,
                 }}
-                transition={{ 
+                transition={{
                   delay: 0.4 + i * 0.1,
                   type: "spring",
                   stiffness: 100
                 }}
-                whileHover={{ 
+                whileHover={{
                   scale: 1.15,
                   rotateY: 15,
                   z: 50,
@@ -2767,8 +3196,8 @@ const InstagramLinkPage = () => {
                   initial={{ opacity: 0 }}
                   whileHover={{ opacity: 0.6 }}
                 />
-                
-                <motion.div 
+
+                <motion.div
                   className={`w-16 h-16 rounded-full bg-gradient-to-br ${highlight.color} p-0.5 relative`}
                   animate={{
                     boxShadow: [
@@ -2786,12 +3215,12 @@ const InstagramLinkPage = () => {
                     transformStyle: 'preserve-3d',
                   }}
                 >
-                  <div 
+                  <div
                     className="w-full h-full rounded-full bg-white dark:bg-gray-800 flex items-center justify-center"
                     style={{ transform: 'translateZ(10px)' }}
                   >
                     <motion.div
-                      animate={{ 
+                      animate={{
                         rotate: [0, 10, -10, 0],
                         scale: [1, 1.1, 1],
                       }}
@@ -2805,8 +3234,8 @@ const InstagramLinkPage = () => {
                     </motion.div>
                   </div>
                 </motion.div>
-                
-                <motion.span 
+
+                <motion.span
                   className="text-xs text-gray-600 dark:text-gray-400 font-medium"
                   style={{ transform: 'translateZ(15px)' }}
                 >
@@ -2824,7 +3253,7 @@ const InstagramLinkPage = () => {
           initial={{ opacity: 0, x: -20, rotateY: -45 }}
           animate={{ opacity: 1, x: 0, rotateY: 0 }}
           transition={{ delay: 0.6, type: "spring" }}
-          whileHover={{ 
+          whileHover={{
             scale: 1.02,
             boxShadow: "0 15px 35px rgba(34, 197, 94, 0.2)"
           }}
@@ -2836,11 +3265,11 @@ const InstagramLinkPage = () => {
         >
           {/* 3D Vinyl Record */}
           <motion.div
-            animate={{ 
+            animate={{
               rotate: 360,
               scale: [1, 1.1, 1],
             }}
-            transition={{ 
+            transition={{
               rotate: { duration: 3, repeat: Infinity, ease: "linear" },
               scale: { duration: 2, repeat: Infinity }
             }}
@@ -2910,12 +3339,12 @@ const InstagramLinkPage = () => {
               className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 text-center relative overflow-hidden"
               initial={{ rotateY: -90, opacity: 0 }}
               animate={{ rotateY: 0, opacity: 1 }}
-              transition={{ 
+              transition={{
                 delay: 0.65 + index * 0.1,
                 type: "spring",
                 stiffness: 100
               }}
-              whileHover={{ 
+              whileHover={{
                 scale: 1.08,
                 rotateY: 5,
                 rotateX: 5,
@@ -2934,26 +3363,26 @@ const InstagramLinkPage = () => {
                 whileHover={{ opacity: 0.1 }}
                 transition={{ duration: 0.3 }}
               />
-              
+
               {/* 3D depth layer */}
-              <div 
+              <div
                 className="absolute inset-0 bg-gradient-to-br from-gray-100/50 to-transparent dark:from-gray-700/50 rounded-xl"
                 style={{ transform: 'translateZ(-10px)' }}
               />
-              
+
               <div className="relative" style={{ transform: 'translateZ(20px)' }}>
-                <motion.div 
+                <motion.div
                   className="text-2xl font-bold mb-1"
-                  style={{ 
+                  style={{
                     backgroundImage: `linear-gradient(135deg, ${stat.color}, ${stat.color}dd)`,
                     WebkitBackgroundClip: 'text',
                     WebkitTextFillColor: 'transparent',
                     backgroundClip: 'text',
                   }}
-                  animate={{ 
+                  animate={{
                     scale: [1, 1.05, 1],
                   }}
-                  transition={{ 
+                  transition={{
                     duration: 2,
                     repeat: Infinity,
                     delay: index * 0.3
@@ -3054,13 +3483,13 @@ const InstagramLinkPage = () => {
               repeat: Infinity,
               ease: "easeInOut"
             }}
-            whileHover={{ 
+            whileHover={{
               scale: 1.08,
               rotateX: -10,
               rotateY: 5,
               z: 40,
             }}
-            whileTap={{ 
+            whileTap={{
               scale: 0.95,
               rotateX: 5,
             }}
@@ -3077,15 +3506,15 @@ const InstagramLinkPage = () => {
               }}
             >
               {/* 3D depth layers */}
-              <div 
+              <div
                 className="absolute inset-0 bg-gradient-to-r from-blue-700 to-purple-700 rounded-full"
                 style={{ transform: 'translateZ(-5px)' }}
               />
-              <div 
+              <div
                 className="absolute inset-0 bg-gradient-to-r from-blue-800 to-purple-800 rounded-full"
                 style={{ transform: 'translateZ(-10px)' }}
               />
-              
+
               {/* Content layer */}
               <span className="relative z-10 flex items-center gap-2" style={{ transform: 'translateZ(15px)' }}>
                 <motion.div
@@ -3103,7 +3532,7 @@ const InstagramLinkPage = () => {
                 </motion.div>
                 Explore Full Portfolio
               </span>
-              
+
               {/* Shimmer effect */}
               <motion.div
                 className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent"

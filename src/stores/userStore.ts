@@ -1,12 +1,8 @@
-/**
- * Zustand Store for User Data Management
- * Manages user information, repos, and articles
- */
-
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
-import type { UserInfo, GitHubRepo, Article } from '../types';
+import type { UserInfo, GitHubRepo, Article } from '@/types';
+import { FIVE_MINUTES_MS } from '@/lib';
 
 interface UserState {
     userInfo: UserInfo | null;
@@ -23,22 +19,22 @@ interface UserState {
     setError: (error: Error | null) => void;
     updateLastFetched: () => void;
     reset: () => void;
-
-    // Computed/derived state
     shouldRefetch: () => boolean;
 }
 
-const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+const initialState = {
+    userInfo: null,
+    repos: [],
+    articles: [],
+    isLoading: false,
+    error: null,
+    lastFetched: null,
+};
 
 export const useUserStore = create<UserState>()(
     persist(
         immer((set, get) => ({
-            userInfo: null,
-            repos: [],
-            articles: [],
-            isLoading: false,
-            error: null,
-            lastFetched: null,
+            ...initialState,
 
             setUserInfo: (info) =>
                 set((state) => {
@@ -72,27 +68,21 @@ export const useUserStore = create<UserState>()(
 
             reset: () =>
                 set((state) => {
-                    state.userInfo = null;
-                    state.repos = [];
-                    state.articles = [];
-                    state.isLoading = false;
-                    state.error = null;
-                    state.lastFetched = null;
+                    Object.assign(state, initialState);
                 }),
 
             shouldRefetch: () => {
                 const { lastFetched } = get();
-                if (!lastFetched) return true;
-                return Date.now() - lastFetched > CACHE_DURATION;
+                return !lastFetched || Date.now() - lastFetched > FIVE_MINUTES_MS;
             },
         })),
         {
             name: 'user-storage',
-            partialize: (state) => ({
-                userInfo: state.userInfo,
-                repos: state.repos,
-                articles: state.articles,
-                lastFetched: state.lastFetched,
+            partialize: ({ userInfo, repos, articles, lastFetched }) => ({
+                userInfo,
+                repos,
+                articles,
+                lastFetched,
             }),
         }
     )

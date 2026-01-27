@@ -1,11 +1,6 @@
-/**
- * Enhanced Card Component
- * Flexible card with variants for different use cases
- */
-
 import * as React from 'react';
 import { cva, type VariantProps } from 'class-variance-authority';
-import { cn } from '@/lib/utils';
+import { cn } from '@/lib';
 
 const cardVariants = cva(
     'rounded-xl transition-all duration-300',
@@ -14,9 +9,10 @@ const cardVariants = cva(
             variant: {
                 default: 'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700',
                 elevated: 'bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl',
-                glass: 'bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-200/50 dark:border-gray-700/50',
+                glass: 'bg-white/80 dark:bg-gray-800/80 backdrop-blur-md border border-white/20 dark:border-gray-700/50',
                 gradient: 'bg-gradient-to-br from-sakura-50 to-cyber-50 dark:from-sakura-900/20 dark:to-cyber-900/20 border border-sakura-200 dark:border-sakura-800',
                 outline: 'border-2 border-gray-200 dark:border-gray-700 hover:border-sakura-300 dark:hover:border-sakura-700',
+                neon: 'bg-gray-900 border border-sakura-500/50 shadow-lg shadow-sakura-500/20',
             },
             padding: {
                 none: '',
@@ -26,9 +22,10 @@ const cardVariants = cva(
             },
             hover: {
                 none: '',
-                lift: 'hover:-translate-y-1 hover:shadow-xl',
-                glow: 'hover:shadow-lg hover:shadow-sakura-500/20',
-                scale: 'hover:scale-[1.02]',
+                lift: 'hover:-translate-y-1 hover:shadow-xl cursor-pointer',
+                glow: 'hover:shadow-lg hover:shadow-sakura-500/20 cursor-pointer',
+                scale: 'hover:scale-[1.02] cursor-pointer',
+                border: 'hover:border-sakura-400 dark:hover:border-sakura-600 cursor-pointer',
             },
         },
         defaultVariants: {
