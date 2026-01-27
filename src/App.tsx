@@ -8,6 +8,7 @@ import { useIsMobile } from '@/hooks';
 import Navbar from '@/components/layout/Navbar';
 import LoadingScreen from '@/components/common/LoadingScreen';
 import ErrorBoundary from '@/components/common/ErrorBoundary';
+import { ScrollProgress, CursorFollower } from '@/components/ui';
 import data from '@/information.json';
 import type { UserInfo } from '@/types';
 
@@ -199,6 +200,12 @@ const App = () => {
     return (
         <ThemeProvider>
             <SceneProvider>
+                {/* Scroll Progress Indicator */}
+                {!isInstagramPage && <ScrollProgress position="top" color="gradient" height={3} />}
+
+                {/* Custom Cursor (desktop only) */}
+                {!isInstagramPage && <CursorFollower enabled={true} />}
+
                 <div className="flex flex-col min-h-screen bg-gradient-to-br from-gray-50 via-pink-50/10 to-gray-100 dark:from-gray-900 dark:via-indigo-900/5 dark:to-gray-800 transition-colors duration-500">
                     {!isInstagramPage && (
                         <div className="fixed top-0 left-0 right-0 z-50 w-[250px]">

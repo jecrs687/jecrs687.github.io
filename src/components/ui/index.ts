@@ -31,3 +31,13 @@ export { Modal, ConfirmModal } from './Modal';
 export { ToastProvider, useToast } from './Toast';
 
 export { buttonVariants, badgeVariants, inputVariants } from './variants';
+
+export {
+    CursorFollower,
+    ScrollProgress,
+    Magnetic,
+    TextReveal,
+    Spotlight,
+    FloatingElement,
+    TiltCard
+} from './InteractiveFeatures';

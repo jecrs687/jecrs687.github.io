@@ -18,9 +18,9 @@ export const createGetRequest = <T>(
     endpoint: string = '',
     params: Record<string, unknown> = {}
 ): Promise<T> =>
-    client
-        .get<T>(endpoint, { params })
-        .then(handleResponse)
-        .catch(handleError(fallback));
+        client
+            .get<T>(endpoint, { params })
+            .then(handleResponse)
+            .catch(handleError(fallback));
 
 export { createApiClient };

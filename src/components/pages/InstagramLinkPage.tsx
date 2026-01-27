@@ -1,3574 +1,575 @@
 /**
- * Instagram Bio Link Page
- * Optimized for Instagram visitors with engaging interactions
+ * Instagram Link Page - "You've Been Hacked" Edition
+ * 
+ * A fun, lightweight page that playfully shows visitors what data
+ * websites can collect just by them visiting.
  */
 
-import { useEffect, useState, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useState, useEffect, useCallback, memo } from 'react';
 import { Link } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   Github,
   Linkedin,
   Instagram,
-  Globe,
-  BookOpen,
-  Code2,
+  Mail,
+  ExternalLink,
+  Terminal,
+  Wifi,
+  Monitor,
+  Clock,
+  Globe2,
+  Battery,
+  Cpu,
   MapPin,
-  Music,
+  Eye,
+  Shield,
+  Skull,
+  Heart,
   Sparkles,
-  Zap,
-  TrendingUp,
-  Share2,
-  Copy,
-  Check,
-  Moon,
-  Sun,
-  Trophy,
-  Users,
-  Camera,
-  Shuffle,
-  Palette,
-  Flame,
-  QrCode,
-  PartyPopper,
-  Heart
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
-import { QRCodeSVG } from 'qrcode.react';
 import info from '../../information.json';
 
-// Instagram-style link component with click tracking
-const SocialLink = ({
-  href,
-  icon: Icon,
-  text,
-  color = "gray"
+// ============================================================================
+// TYPES
+// ============================================================================
+
+interface VisitorData {
+  browser: string;
+  os: string;
+  screenSize: string;
+  colorDepth: string;
+  timezone: string;
+  language: string;
+  cookiesEnabled: boolean;
+  doNotTrack: boolean;
+  online: boolean;
+  deviceMemory: string;
+  hardwareConcurrency: string;
+  connectionType: string;
+  platform: string;
+  vendor: string;
+  touchSupport: boolean;
+  localTime: string;
+  referrer: string;
+  historyLength: number;
+}
+
+// ============================================================================
+// VISITOR DATA COLLECTION
+// ============================================================================
+
+const getBrowserInfo = (): string => {
+  const ua = navigator.userAgent;
+  if (ua.includes('Firefox')) return 'Firefox 🦊';
+  if (ua.includes('Edg')) return 'Edge 🌐';
+  if (ua.includes('Chrome')) return 'Chrome 🔵';
+  if (ua.includes('Safari')) return 'Safari 🧭';
+  if (ua.includes('Opera')) return 'Opera 🔴';
+  return 'Unknown Browser 🌐';
+};
+
+const getOSInfo = (): string => {
+  const ua = navigator.userAgent;
+  if (ua.includes('Win')) return 'Windows 🪟';
+  if (ua.includes('Mac')) return 'macOS 🍎';
+  if (ua.includes('Linux')) return 'Linux 🐧';
+  if (ua.includes('Android')) return 'Android 🤖';
+  if (ua.includes('iPhone') || ua.includes('iPad')) return 'iOS 📱';
+  return 'Unknown OS 💻';
+};
+
+const getConnectionType = (): string => {
+  const nav = navigator as Navigator & { connection?: { effectiveType?: string } };
+  return nav.connection?.effectiveType?.toUpperCase() || 'Unknown';
+};
+
+const collectVisitorData = (): VisitorData => ({
+  browser: getBrowserInfo(),
+  os: getOSInfo(),
+  screenSize: `${window.screen.width}x${window.screen.height}`,
+  colorDepth: `${window.screen.colorDepth}-bit`,
+  timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+  language: navigator.language,
+  cookiesEnabled: navigator.cookieEnabled,
+  doNotTrack: navigator.doNotTrack === '1',
+  online: navigator.onLine,
+  deviceMemory: `${(navigator as Navigator & { deviceMemory?: number }).deviceMemory || '?'} GB`,
+  hardwareConcurrency: `${navigator.hardwareConcurrency || '?'} cores`,
+  connectionType: getConnectionType(),
+  platform: navigator.platform,
+  vendor: navigator.vendor || 'Unknown',
+  touchSupport: 'ontouchstart' in window,
+  localTime: new Date().toLocaleTimeString(),
+  referrer: document.referrer || 'Direct visit',
+  historyLength: window.history.length,
+});
+
+// ============================================================================
+// HACKER TERMINAL EFFECT
+// ============================================================================
+
+const HackerTerminal = memo(({
+  data,
+  onComplete
 }: {
-  href: string;
-  icon: React.ComponentType<{ className?: string }>;
-  text: string;
-  color?: string;
+  data: VisitorData;
+  onComplete: () => void;
 }) => {
-  const [clicked, setClicked] = useState(false);
+  const [lines, setLines] = useState<string[]>([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [showCursor, setShowCursor] = useState(true);
 
-  const colorClasses = {
-    gray: "hover:bg-gray-900 dark:hover:bg-white hover:border-gray-900",
-    blue: "hover:bg-blue-600 hover:border-blue-600",
-    pink: "hover:bg-gradient-to-r hover:from-purple-600 hover:to-pink-600 hover:border-transparent",
-    green: "hover:bg-green-600 hover:border-green-600",
-    black: "hover:bg-black hover:border-black",
-  };
+  const terminalLines = [
+    '> INITIALIZING CONNECTION...',
+    '> ACCESSING TARGET DEVICE...',
+    '> ████████████████████ 100%',
+    '> ',
+    '> ⚠️  TARGET ACQUIRED ⚠️',
+    '> ',
+    `> 🖥️  BROWSER: ${data.browser}`,
+    `> 💻 OS: ${data.os}`,
+    `> 📐 SCREEN: ${data.screenSize}`,
+    `> 🌍 TIMEZONE: ${data.timezone}`,
+    `> 🗣️  LANGUAGE: ${data.language}`,
+    `> 🧠 CPU CORES: ${data.hardwareConcurrency}`,
+    `> 💾 RAM: ${data.deviceMemory}`,
+    `> 📡 CONNECTION: ${data.connectionType}`,
+    `> 🔗 REFERRER: ${data.referrer.slice(0, 30)}${data.referrer.length > 30 ? '...' : ''}`,
+    `> 🍪 COOKIES: ${data.cookiesEnabled ? 'ENABLED' : 'DISABLED'}`,
+    `> 👆 TOUCH: ${data.touchSupport ? 'YES' : 'NO'}`,
+    '> ',
+    '> 🔓 ACCESS GRANTED',
+    '> ',
+    '> Just kidding! 😄',
+    '> This is what ANY website can see.',
+    '> Stay safe online! 🛡️',
+  ];
 
-  const handleClick = () => {
-    setClicked(true);
-    setTimeout(() => setClicked(false), 300);
-  };
+  // Blinking cursor effect
+  useEffect(() => {
+    const cursorInterval = setInterval(() => {
+      setShowCursor(prev => !prev);
+    }, 500);
+    return () => clearInterval(cursorInterval);
+  }, []);
+
+  // Type out lines
+  useEffect(() => {
+    if (currentIndex < terminalLines.length) {
+      const delay = terminalLines[currentIndex].includes('████') ? 800 :
+        terminalLines[currentIndex] === '> ' ? 200 :
+          terminalLines[currentIndex].includes('Just kidding') ? 1000 : 80;
+
+      const timeout = setTimeout(() => {
+        setLines(prev => [...prev, terminalLines[currentIndex]]);
+        setCurrentIndex(prev => prev + 1);
+      }, delay);
+
+      return () => clearTimeout(timeout);
+    } else {
+      const completeTimeout = setTimeout(onComplete, 2000);
+      return () => clearTimeout(completeTimeout);
+    }
+  }, [currentIndex, terminalLines, onComplete]);
 
   return (
     <motion.div
-      style={{
-        perspective: 1200,
-        transformStyle: 'preserve-3d',
-      }}
-      className="mb-3"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 z-50 bg-black flex items-center justify-center p-4"
     >
-      <motion.a
-        href={href}
-        target="_blank"
-        rel="noopener noreferrer"
-        onClick={handleClick}
-        className={`relative w-full flex items-center justify-center gap-3 p-4 rounded-lg bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 transition-all duration-200 group ${colorClasses[color as keyof typeof colorClasses]} overflow-hidden`}
-        initial={{ opacity: 0, scale: 0.9, rotateX: -20 }}
-        whileInView={{ opacity: 1, scale: 1, rotateX: 0 }}
-        whileHover={{
-          scale: 1.02,
-          rotateX: 3,
-          rotateY: -2,
-          z: 30,
-          boxShadow: "0 20px 40px rgba(0,0,0,0.2)"
-        }}
-        whileTap={{ scale: 0.98 }}
-        viewport={{ once: true }}
-        style={{
-          transformStyle: 'preserve-3d',
-          boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
-        }}
-      >
-        {/* 3D Depth Layer */}
-        <div
-          className="absolute inset-0 bg-gradient-to-br from-gray-100/50 to-transparent dark:from-gray-700/50 rounded-lg"
-          style={{ transform: 'translateZ(-15px)' }}
-        />
-
-        {/* Icon with 3D effect */}
-        <motion.div
-          className="w-10 h-10 rounded-lg flex items-center justify-center bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 group-hover:bg-white/20 group-hover:text-white transition-colors relative z-10"
-          animate={clicked ? {
-            scale: [1, 1.3, 1],
-            rotate: [0, 15, -15, 0],
-            rotateY: [0, 360],
-          } : {}}
-          transition={{ duration: 0.6 }}
-          style={{
-            transform: 'translateZ(20px)',
-            transformStyle: 'preserve-3d',
-            boxShadow: '0 5px 15px rgba(0,0,0,0.2)',
-          }}
-        >
-          <Icon className="w-5 h-5" />
-        </motion.div>
-
-        {/* Text with depth */}
-        <div
-          className="font-semibold text-gray-900 dark:text-white group-hover:text-white transition-colors relative z-10"
-          style={{ transform: 'translateZ(15px)' }}
-        >
-          {text}
-        </div>
-
-        {/* 3D Shine effect */}
-        <motion.div
-          className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
-          initial={{ x: '-100%' }}
-          whileHover={{ x: '200%' }}
-          transition={{ duration: 0.6 }}
-          style={{ transform: 'translateZ(10px)' }}
-        />
-
-        {/* Click ripple */}
-        <AnimatePresence>
-          {clicked && (
-            <>
-              <motion.div
-                initial={{ scale: 0, opacity: 1 }}
-                animate={{ scale: 2.5, opacity: 0 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.6 }}
-                className="absolute inset-0 border-2 border-blue-500 rounded-lg pointer-events-none"
-                style={{ transform: 'translateZ(25px)' }}
-              />
-              <motion.div
-                initial={{ scale: 0.5, opacity: 1 }}
-                animate={{ scale: 1.5, opacity: 0 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.4 }}
-                className="absolute inset-0 bg-blue-500/30 rounded-lg pointer-events-none blur-md"
-                style={{ transform: 'translateZ(20px)' }}
-              />
-            </>
-          )}
-        </AnimatePresence>
-      </motion.a>
-    </motion.div>
-  );
-};
-
-interface Project {
-  name: string;
-  link: string;
-}
-
-const ProjectCard = ({ project, index }: { project: Project; index: number }) => {
-  const [isFlipped, setIsFlipped] = useState(false);
-  const [isHovered, setIsHovered] = useState(false);
-
-  return (
-    <div
-      style={{
-        perspective: 1500,
-        transformStyle: 'preserve-3d',
-      }}
-      className="relative"
-    >
-      <motion.div
-        onHoverStart={() => setIsHovered(true)}
-        onHoverEnd={() => setIsHovered(false)}
-        onClick={() => setIsFlipped(!isFlipped)}
-        className="relative cursor-pointer"
-        initial={{ opacity: 0, scale: 0.9, rotateY: -180 }}
-        whileInView={{ opacity: 1, scale: 1, rotateY: 0 }}
-        transition={{ delay: index * 0.1, type: "spring", stiffness: 100 }}
-        viewport={{ once: true }}
-        style={{
-          transformStyle: 'preserve-3d',
-        }}
-        animate={{
-          rotateY: isFlipped ? 180 : 0,
-        }}
-        whileHover={{
-          scale: 1.05,
-          rotateX: 5,
-          z: 30,
-        }}
-      >
-        {/* Front Face */}
-        <motion.div
-          className="relative block bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 rounded-xl border-2 border-gray-200 dark:border-gray-700 overflow-hidden group"
-          style={{
-            backfaceVisibility: 'hidden',
-            transformStyle: 'preserve-3d',
-            boxShadow: '0 10px 40px rgba(0,0,0,0.15)',
-          }}
-        >
-          <div className="p-4 aspect-square flex flex-col items-center justify-center text-center relative z-10">
-            <motion.div
-              animate={isHovered ? {
-                rotate: 360,
-                scale: [1, 1.2, 1],
-              } : { rotate: 0 }}
-              transition={{ duration: 0.6 }}
-              className="mb-2"
-              style={{ transform: 'translateZ(20px)' }}
-            >
-              <Code2 className="w-8 h-8 text-blue-600 dark:text-blue-400" />
-            </motion.div>
-            <h3
-              className="font-semibold text-gray-900 dark:text-white capitalize text-sm leading-tight"
-              style={{ transform: 'translateZ(15px)' }}
-            >
-              {project.name}
-            </h3>
-            <motion.div
-              className="mt-2 text-xs text-gray-500 dark:text-gray-400"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: isHovered ? 1 : 0 }}
-              style={{ transform: 'translateZ(10px)' }}
-            >
-              Click to flip
-            </motion.div>
+      <div className="w-full max-w-2xl">
+        {/* Terminal Header */}
+        <div className="bg-gray-800 rounded-t-lg px-4 py-2 flex items-center gap-2">
+          <div className="flex gap-1.5">
+            <div className="w-3 h-3 rounded-full bg-red-500" />
+            <div className="w-3 h-3 rounded-full bg-yellow-500" />
+            <div className="w-3 h-3 rounded-full bg-green-500" />
           </div>
-
-          {/* Gradient overlay */}
-          <motion.div
-            className="absolute inset-0 bg-gradient-to-br from-blue-500/10 via-purple-500/10 to-pink-500/10"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: isHovered ? 1 : 0 }}
-            style={{ transform: 'translateZ(5px)' }}
-          />
-
-          {/* 3D Corner accents */}
-          <div className="absolute top-2 right-2 w-8 h-8 border-t-2 border-r-2 border-blue-400/30 rounded-tr-lg" style={{ transform: 'translateZ(8px)' }} />
-          <div className="absolute bottom-2 left-2 w-8 h-8 border-b-2 border-l-2 border-purple-400/30 rounded-bl-lg" style={{ transform: 'translateZ(8px)' }} />
-        </motion.div>
-
-        {/* Back Face */}
-        <motion.a
-          href={project.link}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="absolute inset-0 bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl border-2 border-blue-400 overflow-hidden flex items-center justify-center p-4 text-center"
-          style={{
-            backfaceVisibility: 'hidden',
-            transform: 'rotateY(180deg)',
-            transformStyle: 'preserve-3d',
-            boxShadow: '0 10px 40px rgba(59, 130, 246, 0.3)',
-          }}
-          whileHover={{ scale: 1.02 }}
-        >
-          <div style={{ transform: 'translateZ(20px)' }}>
-            <Sparkles className="w-8 h-8 text-white mx-auto mb-2" />
-            <div className="text-white font-bold text-sm">View Project</div>
-            <div className="text-white/80 text-xs mt-1">Click to visit</div>
-          </div>
-        </motion.a>
-      </motion.div>
-    </div>
-  );
-};
-
-const InstagramLinkPage = () => {
-  const [viewCount, setViewCount] = useState(0);
-  const [copied, setCopied] = useState(false);
-  const [isDark, setIsDark] = useState(false);
-  const [showShare, setShowShare] = useState(false);
-  const [reactions, setReactions] = useState<Array<{ id: number; emoji: string; x: number; y: number }>>([]);
-  const [likeCount, setLikeCount] = useState(0);
-  const [liveVisitors, setLiveVisitors] = useState(1);
-  const [achievements, setAchievements] = useState<string[]>([]);
-  const [screenshotMode, setScreenshotMode] = useState(false);
-  const [typedText, setTypedText] = useState('');
-  const [currentFact, setCurrentFact] = useState(0);
-  const [colorTheme, setColorTheme] = useState<'default' | 'purple' | 'blue' | 'green' | 'orange'>('default');
-  const [shuffledProjects, setShuffledProjects] = useState<typeof info.projects.bigProjects>([]);
-
-  // New features state
-  const [streak, setStreak] = useState(0);
-  const [greeting, setGreeting] = useState('');
-  const [comboCount, setComboCount] = useState(0);
-  const [comboMultiplier, setComboMultiplier] = useState(1);
-  const [showQR, setShowQR] = useState(false);
-  const [showParticles, setShowParticles] = useState(false);
-  const [easterEggsFound, setEasterEggsFound] = useState<number[]>([]);
-  const [doubleTapHearts, setDoubleTapHearts] = useState<Array<{ id: number; x: number; y: number }>>([]);
-  const [currentAge, setCurrentAge] = useState('0.0000000000');
-  const [dayProgress, setDayProgress] = useState(0);
-  const [yearProgress, setYearProgress] = useState(0);
-
-  // Cinema intro state
-  const [introStage, setIntroStage] = useState(0);
-  const [showContent, setShowContent] = useState(false);
-  const [scrollY, setScrollY] = useState(0);
-  const [scrollProgress, setScrollProgress] = useState(0);
-  const [storyStage, setStoryStage] = useState(0);
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-
-  const lastReactionTime = useRef<number>(0);
-  const comboTimeout = useRef<ReturnType<typeof setTimeout>>();
-  const shakeTimeoutRef = useRef<ReturnType<typeof setTimeout>>();
-  const contentRef = useRef<HTMLDivElement>(null);
-  const rafRef = useRef<number>();
-
-  const funFacts = [
-    "🌍 Globe-trotter currently based in Malta",
-    "💻 Built my first website at age 12",
-    "🎮 Gaming enthusiast & tech collector",
-    "📚 Always learning new technologies",
-    "🎵 Code better with lo-fi beats",
-    "🌙 Night owl & early bird hybrid",
-    "☕ Powered by coffee and curiosity",
-    "🚀 Turning ideas into reality, one line at a time"
-  ];
-
-  useEffect(() => {
-    window.scrollTo(0, 0);
-
-    // Cinema intro sequence
-    const introSequence = [
-      { delay: 0, stage: 0 },      // Black screen
-      { delay: 1000, stage: 1 },   // Studio logo
-      { delay: 3000, stage: 2 },   // Title card
-      { delay: 5500, stage: 3 },   // Name reveal
-      { delay: 7500, stage: 4 },   // Final transition
-    ];
-
-    introSequence.forEach(({ delay, stage }) => {
-      setTimeout(() => setIntroStage(stage), delay);
-    });
-
-    // End intro and show content with dramatic effect
-    setTimeout(() => {
-      setShowContent(true);
-      // Trigger confetti for grand entrance
-      confetti({
-        particleCount: 150,
-        spread: 120,
-        origin: { y: 0.6 },
-        colors: ['#3b82f6', '#8b5cf6', '#ec4899', '#10b981'],
-        startVelocity: 45,
-        gravity: 1.2,
-        ticks: 300
-      });
-    }, 8500);
-
-    // Check dark mode preference
-    const darkMode = document.documentElement.classList.contains('dark');
-    setIsDark(darkMode);
-
-    // Simulate view counter
-    const stored = localStorage.getItem('pageViews');
-    const count = stored ? parseInt(stored) : Math.floor(Math.random() * 500) + 1000;
-    setViewCount(count);
-    localStorage.setItem('pageViews', (count + 1).toString());
-
-    // Check for achievements
-    const visitCount = parseInt(localStorage.getItem('visitCount') || '0') + 1;
-    localStorage.setItem('visitCount', visitCount.toString());
-    checkAchievements(visitCount);
-
-    // Load like count
-    const likes = localStorage.getItem('likeCount');
-    setLikeCount(likes ? parseInt(likes) : Math.floor(Math.random() * 100) + 50);
-
-    // Calculate streak
-    const lastVisit = localStorage.getItem('lastVisit');
-    const today = new Date().toDateString();
-    const yesterday = new Date(Date.now() - 86400000).toDateString();
-
-    if (lastVisit === today) {
-      // Same day, maintain streak
-      const currentStreak = parseInt(localStorage.getItem('streak') || '1');
-      setStreak(currentStreak);
-    } else if (lastVisit === yesterday) {
-      // Consecutive day, increment streak
-      const currentStreak = parseInt(localStorage.getItem('streak') || '1') + 1;
-      setStreak(currentStreak);
-      localStorage.setItem('streak', currentStreak.toString());
-      localStorage.setItem('lastVisit', today);
-
-      if (currentStreak % 7 === 0) {
-        confetti({
-          particleCount: 100,
-          spread: 70,
-          origin: { y: 0.6 }
-        });
-      }
-    } else {
-      // Streak broken, reset
-      setStreak(1);
-      localStorage.setItem('streak', '1');
-      localStorage.setItem('lastVisit', today);
-    }
-
-    // Set time-based greeting
-    const hour = new Date().getHours();
-    if (hour < 12) setGreeting('Good morning');
-    else if (hour < 18) setGreeting('Good afternoon');
-    else setGreeting('Good evening');
-
-    // Load easter eggs
-    const foundEggs = localStorage.getItem('easterEggs');
-    if (foundEggs) setEasterEggsFound(JSON.parse(foundEggs));
-
-    // Calculate age - Birthday: October 15, 2000 at 7:00 AM GMT-3
-    const calculateAge = () => {
-      // Birthday: 2000-10-15 07:00:00 GMT-3 (which is 10:00:00 UTC)
-      const birthDate = new Date('2000-10-15T10:00:00.000Z');
-      const now = new Date();
-      const ageInMilliseconds = now.getTime() - birthDate.getTime();
-      const ageInYears = ageInMilliseconds / (1000 * 60 * 60 * 24 * 365.25);
-      return ageInYears.toFixed(10);
-    };
-
-    // Calculate progress bars
-    const calculateProgress = () => {
-      const now = new Date();
-      const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-      const dayProg = ((now.getTime() - startOfDay.getTime()) / 86400000) * 100;
-
-      const startOfYear = new Date(now.getFullYear(), 0, 1);
-      const yearProg = ((now.getTime() - startOfYear.getTime()) / (365.25 * 86400000)) * 100;
-
-      setDayProgress(dayProg);
-      setYearProgress(yearProg);
-    };
-
-    // Update age every 0.1 seconds
-    setCurrentAge(calculateAge());
-    calculateProgress();
-    const ageInterval = setInterval(() => {
-      setCurrentAge(calculateAge());
-      calculateProgress();
-    }, 100);
-
-    // Simulate live visitors with fluctuation
-    const interval = setInterval(() => {
-      setLiveVisitors(Math.floor(Math.random() * 5) + 1);
-    }, 5000);
-
-    // Enhanced parallax scroll effect with RAF for performance
-    const handleScroll = () => {
-      if (rafRef.current) {
-        cancelAnimationFrame(rafRef.current);
-      }
-
-      rafRef.current = requestAnimationFrame(() => {
-        if (contentRef.current) {
-          const scrollPosition = window.scrollY;
-          const documentHeight = document.documentElement.scrollHeight - window.innerHeight;
-          const progress = documentHeight > 0 ? (scrollPosition / documentHeight) * 100 : 0;
-
-          setScrollY(scrollPosition);
-          setScrollProgress(progress);
-
-          // Enhanced story progression with smoother transitions
-          const viewportHeight = window.innerHeight;
-          const scrollThresholds = [
-            { threshold: viewportHeight * 0.2, stage: 1 },
-            { threshold: viewportHeight * 0.6, stage: 2 },
-            { threshold: viewportHeight * 1.2, stage: 3 },
-          ];
-
-          for (const { threshold, stage } of scrollThresholds) {
-            if (scrollPosition > threshold) {
-              setStoryStage(stage);
-            }
-          }
-        }
-      });
-    };
-
-    // Mouse move handler for parallax effects
-    const handleMouseMove = (e: MouseEvent) => {
-      const x = (e.clientX / window.innerWidth - 0.5) * 2;
-      const y = (e.clientY / window.innerHeight - 0.5) * 2;
-      setMousePosition({ x, y });
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    window.addEventListener('mousemove', handleMouseMove, { passive: true });
-    handleScroll(); // Initialize
-
-    // Typing effect
-    const text = "Full Stack Developer & Creative Technologist";
-    let index = 0;
-    const typingInterval = setInterval(() => {
-      if (index <= text.length) {
-        setTypedText(text.slice(0, index));
-        index++;
-      } else {
-        clearInterval(typingInterval);
-      }
-    }, 50);
-
-    // Shake to shuffle detection
-    const setupShakeListener = async () => {
-      if (typeof DeviceMotionEvent !== 'undefined') {
-        // Check if permission request is available (iOS 13+)
-        if ('requestPermission' in DeviceMotionEvent && typeof (DeviceMotionEvent as unknown as { requestPermission: () => Promise<string> }).requestPermission === 'function') {
-          try {
-            const permission = await (DeviceMotionEvent as unknown as { requestPermission: () => Promise<string> }).requestPermission();
-            if (permission === 'granted') {
-              window.addEventListener('devicemotion', handleShake);
-            }
-          } catch (error) {
-            console.error('Device motion permission error:', error);
-          }
-        } else {
-          window.addEventListener('devicemotion', handleShake);
-        }
-      }
-    };
-    setupShakeListener();
-
-    return () => {
-      clearInterval(interval);
-      clearInterval(ageInterval);
-      clearInterval(typingInterval);
-      window.removeEventListener('devicemotion', handleShake);
-      window.removeEventListener('scroll', handleScroll);
-      window.removeEventListener('mousemove', handleMouseMove);
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const checkAchievements = (visitCount: number) => {
-    const newAchievements: string[] = [];
-    if (visitCount === 1) newAchievements.push('First Visit! 🎉');
-    if (visitCount === 10) newAchievements.push('Regular Visitor! 🔥');
-    if (visitCount === 50) newAchievements.push('Super Fan! ⭐');
-    if (visitCount === 100) newAchievements.push('Legend! 👑');
-
-    if (newAchievements.length > 0) {
-      setAchievements(newAchievements);
-      confetti({
-        particleCount: 100,
-        spread: 70,
-        origin: { y: 0.6 }
-      });
-    }
-  };
-
-  const handleShake = (event: DeviceMotionEvent) => {
-    const acceleration = event.accelerationIncludingGravity;
-    if (acceleration && (Math.abs(acceleration.x || 0) > 15 || Math.abs(acceleration.y || 0) > 15 || Math.abs(acceleration.z || 0) > 15)) {
-      if (shakeTimeoutRef.current) {
-        clearTimeout(shakeTimeoutRef.current);
-      }
-      shakeTimeoutRef.current = setTimeout(() => shuffleProjects(), 500);
-    }
-  };
-
-  const toggleTheme = () => {
-    document.documentElement.classList.toggle('dark');
-    setIsDark(!isDark);
-  };
-
-  const handleCopyLink = async () => {
-    try {
-      await navigator.clipboard.writeText(window.location.href);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    } catch (err) {
-      console.error('Failed to copy:', err);
-    }
-  };
-
-  const handleShare = async () => {
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: 'Emma | leli',
-          text: 'Check out my links!',
-          url: window.location.href,
-        });
-      } catch (err) {
-        console.error('Error sharing:', err);
-      }
-    } else {
-      setShowShare(true);
-      setTimeout(() => setShowShare(false), 2000);
-    }
-  };
-
-  const handleReaction = (emoji: string) => {
-    const id = Date.now();
-    const x = Math.random() * 80 + 10;
-    const y = Math.random() * 50 + 25;
-    setReactions([...reactions, { id, emoji, x, y }]);
-
-    // Increment like count
-    const newCount = likeCount + 1;
-    setLikeCount(newCount);
-    localStorage.setItem('likeCount', newCount.toString());
-
-    // Combo system
-    const now = Date.now();
-    const timeSinceLastReaction = now - lastReactionTime.current;
-
-    if (timeSinceLastReaction < 2000) {
-      // Within combo window
-      const newCombo = comboCount + 1;
-      setComboCount(newCombo);
-
-      let multiplier = 1;
-      if (newCombo >= 5) multiplier = 3;
-      else if (newCombo >= 3) multiplier = 2;
-      else if (newCombo >= 2) multiplier = 1.5;
-
-      setComboMultiplier(multiplier);
-
-      // Clear existing timeout
-      if (comboTimeout.current) clearTimeout(comboTimeout.current);
-
-      // Reset combo after 2 seconds of no activity
-      comboTimeout.current = setTimeout(() => {
-        setComboCount(0);
-        setComboMultiplier(1);
-      }, 2000);
-    } else {
-      setComboCount(1);
-      setComboMultiplier(1);
-    }
-
-    lastReactionTime.current = now;
-
-    // Trigger confetti with combo multiplier
-    confetti({
-      particleCount: Math.floor(50 * comboMultiplier),
-      spread: 60 + (comboMultiplier * 20),
-      origin: { y: 0.7 },
-      colors: ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8']
-    });
-
-    setTimeout(() => {
-      setReactions(prev => prev.filter(r => r.id !== id));
-    }, 3000);
-  };
-
-  const shuffleProjects = () => {
-    const projects = [...(info.projects.bigProjects || [])];
-    const shuffled = projects.sort(() => Math.random() - 0.5).slice(0, 4);
-    setShuffledProjects(shuffled);
-    confetti({
-      particleCount: 30,
-      spread: 50,
-      origin: { y: 0.5 }
-    });
-  };
-
-  const cycleColorTheme = () => {
-    const themes: Array<'default' | 'purple' | 'blue' | 'green' | 'orange'> = ['default', 'purple', 'blue', 'green', 'orange'];
-    const currentIndex = themes.indexOf(colorTheme);
-    const nextTheme = themes[(currentIndex + 1) % themes.length] as 'default' | 'purple' | 'blue' | 'green' | 'orange';
-    setColorTheme(nextTheme);
-  };
-
-  const toggleScreenshotMode = () => {
-    setScreenshotMode(!screenshotMode);
-  };
-
-  const nextFact = () => {
-    setCurrentFact((currentFact + 1) % funFacts.length);
-  };
-
-  const handleDoubleTap = (event: React.MouseEvent | React.TouchEvent) => {
-    const id = Date.now();
-    const rect = (event.currentTarget as HTMLElement).getBoundingClientRect();
-    const x = 'touches' in event
-      ? (event.touches[0]?.clientX ?? 0) - rect.left
-      : event.clientX - rect.left;
-    const y = 'touches' in event
-      ? (event.touches[0]?.clientY ?? 0) - rect.top
-      : event.clientY - rect.top;
-
-    setDoubleTapHearts([...doubleTapHearts, { id, x, y }]);
-
-    setTimeout(() => {
-      setDoubleTapHearts(prev => prev.filter(h => h.id !== id));
-    }, 1000);
-  };
-
-  const handleEasterEgg = (eggId: number) => {
-    if (easterEggsFound.includes(eggId)) return;
-
-    const newFound = [...easterEggsFound, eggId];
-    setEasterEggsFound(newFound);
-    localStorage.setItem('easterEggs', JSON.stringify(newFound));
-
-    confetti({
-      particleCount: 100,
-      spread: 160,
-      origin: { y: 0.6 },
-      colors: ['#FFD700', '#FFA500', '#FF69B4', '#00CED1']
-    });
-
-    if (newFound.length === 5) {
-      // All easter eggs found!
-      setTimeout(() => {
-        confetti({
-          particleCount: 200,
-          spread: 180,
-          origin: { y: 0.5 },
-          startVelocity: 45
-        });
-      }, 500);
-    }
-  };
-
-  const projects = shuffledProjects.length > 0
-    ? shuffledProjects
-    : [...(info.projects.bigProjects || []).slice(0, 4)];
-
-  const highlights = [
-    { icon: Code2, label: "Projects", color: "from-blue-500 to-cyan-500" },
-    { icon: Music, label: "Music", color: "from-purple-500 to-pink-500" },
-    { icon: BookOpen, label: "Articles", color: "from-orange-500 to-red-500" },
-    { icon: Sparkles, label: "About", color: "from-yellow-500 to-orange-500" },
-  ];
-
-  const themeColors = {
-    default: 'bg-gray-50 dark:bg-gray-900',
-    purple: 'bg-gradient-to-br from-purple-50 via-pink-50 to-purple-50 dark:from-purple-950 dark:via-pink-950 dark:to-purple-950',
-    blue: 'bg-gradient-to-br from-blue-50 via-cyan-50 to-blue-50 dark:from-blue-950 dark:via-cyan-950 dark:to-blue-950',
-    green: 'bg-gradient-to-br from-green-50 via-emerald-50 to-green-50 dark:from-green-950 dark:via-emerald-950 dark:to-green-950',
-    orange: 'bg-gradient-to-br from-orange-50 via-yellow-50 to-orange-50 dark:from-orange-950 dark:via-yellow-950 dark:to-orange-950'
-  };
-
-  return (
-    <div className={`min-h-screen ${themeColors[colorTheme]} relative transition-colors duration-700`}>
-      {/* 3D Morphing Blob Background */}
-      {showContent && (
-        <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
-          {[1, 2, 3].map((blob) => (
-            <motion.div
-              key={`blob-${blob}`}
-              className="absolute rounded-full blur-3xl opacity-20"
-              style={{
-                background: blob === 1
-                  ? 'radial-gradient(circle, #3b82f6 0%, transparent 70%)'
-                  : blob === 2
-                    ? 'radial-gradient(circle, #8b5cf6 0%, transparent 70%)'
-                    : 'radial-gradient(circle, #ec4899 0%, transparent 70%)',
-                width: `${300 + blob * 100}px`,
-                height: `${300 + blob * 100}px`,
-                left: blob === 1 ? '10%' : blob === 2 ? '70%' : '40%',
-                top: blob === 1 ? '20%' : blob === 2 ? '60%' : '80%',
-              }}
-              animate={{
-                x: [0, blob * 30, 0, -blob * 20, 0],
-                y: [0, -blob * 40, blob * 30, 0, 0],
-                scale: [1, 1.2, 0.8, 1.1, 1],
-                rotate: [0, 90, 180, 270, 360],
-              }}
-              transition={{
-                duration: 20 + blob * 5,
-                repeat: Infinity,
-                ease: "easeInOut",
-              }}
-            />
-          ))}
+          <span className="text-gray-400 text-sm ml-2 font-mono">visitor_scan.sh</span>
         </div>
-      )}
 
-      {/* CINEMA INTRO OVERLAY */}
-      <AnimatePresence>
-        {!showContent && (
-          <motion.div
-            className="fixed inset-0 z-[9999] bg-black flex items-center justify-center overflow-hidden"
-            exit={{ opacity: 0 }}
-            transition={{ duration: 1 }}
-          >
-            {/* Cinematic Vignette */}
-            <div className="absolute inset-0 bg-gradient-radial from-transparent via-black/50 to-black pointer-events-none" />
-
-            {/* Film Grain Effect */}
-            <motion.div
-              className="absolute inset-0 opacity-10 pointer-events-none"
-              style={{
-                backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 400 400\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noiseFilter\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.9\' numOctaves=\'4\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noiseFilter)\'/%3E%3C/svg%3E")',
-              }}
-              animate={{ opacity: [0.1, 0.15, 0.1] }}
-              transition={{ duration: 0.5, repeat: Infinity }}
-            />
-
-            {/* Stage 0: Black Screen with Light Leak */}
-            {introStage === 0 && (
-              <motion.div
-                initial={{ opacity: 1 }}
-                animate={{ opacity: 1 }}
-                className="absolute inset-0"
-              >
-                <motion.div
-                  className="absolute top-0 left-1/2 w-1 h-full bg-gradient-to-b from-white/20 via-white/5 to-transparent"
-                  initial={{ x: "-50%", scaleY: 0 }}
-                  animate={{ scaleY: 1 }}
-                  transition={{ duration: 1, ease: "easeOut" }}
-                />
-              </motion.div>
-            )}
-
-            {/* Stage 1: Minimal Epic Logo */}
-            {introStage === 1 && (
-              <motion.div
-                initial={{ scale: 0, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 1.5, opacity: 0 }}
-                transition={{ duration: 0.8, ease: "easeOut" }}
-                className="text-center relative"
-              >
-                {/* Orbiting Particles */}
-                {[...Array(16)].map((_, i) => (
-                  <motion.div
-                    key={i}
-                    className="absolute top-1/2 left-1/2 w-3 h-3"
-                    initial={{ x: -6, y: -6, opacity: 0 }}
-                    animate={{
-                      rotate: 360,
-                      opacity: [0, 1, 1, 0],
-                    }}
-                    transition={{
-                      rotate: { duration: 4, ease: "linear", repeat: Infinity },
-                      opacity: { duration: 0.5, times: [0, 0.2, 0.8, 1] },
-                      delay: i * 0.08
-                    }}
-                    style={{
-                      transformOrigin: '6px 6px',
-                    }}
-                  >
-                    <motion.div
-                      className="w-full h-full rounded-full bg-gradient-to-r from-blue-400 to-purple-500"
-                      animate={{
-                        scale: [1, 1.5, 1],
-                      }}
-                      transition={{
-                        duration: 1,
-                        repeat: Infinity,
-                        delay: i * 0.08
-                      }}
-                      style={{
-                        transform: `translate(${Math.cos((i / 16) * Math.PI * 2) * 100}px, ${Math.sin((i / 16) * Math.PI * 2) * 100}px)`
-                      }}
-                    />
-                  </motion.div>
-                ))}
-
-                {/* Main Logo with Enhanced 3D Effect */}
-                <motion.div
-                  animate={{
-                    rotateY: [0, 360],
-                    rotateZ: [0, 0, 0, 360],
-                    scale: [1, 1.2, 1],
-                  }}
-                  transition={{
-                    rotateY: { duration: 2.5, ease: "easeInOut" },
-                    rotateZ: { duration: 8, ease: "linear", repeat: Infinity },
-                    scale: { duration: 2, ease: "easeInOut", repeat: Infinity }
-                  }}
-                  className="relative z-10"
-                  style={{
-                    filter: 'drop-shadow(0 0 40px rgba(59, 130, 246, 1)) drop-shadow(0 0 80px rgba(139, 92, 246, 0.8)) drop-shadow(0 0 120px rgba(236, 72, 153, 0.6))',
-                  }}
-                >
-                  <Code2 className="w-48 h-48 text-white" />
-                </motion.div>
-
-                {/* Energy Rings */}
-                {[1, 2, 3, 4, 5].map((ring) => (
-                  <motion.div
-                    key={ring}
-                    className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border-2"
-                    style={{
-                      borderColor: ring % 2 === 0 ? 'rgba(59, 130, 246, 0.3)' : 'rgba(139, 92, 246, 0.3)'
-                    }}
-                    initial={{ width: 0, height: 0, opacity: 1 }}
-                    animate={{
-                      width: [0, 600],
-                      height: [0, 600],
-                      opacity: [1, 0],
-                    }}
-                    transition={{
-                      duration: 2.5,
-                      repeat: Infinity,
-                      delay: ring * 0.4,
-                      ease: "easeOut"
-                    }}
-                  />
-                ))}
-
-                {/* Particle Explosion */}
-                {[...Array(30)].map((_, i) => (
-                  <motion.div
-                    key={`particle-${i}`}
-                    className="absolute top-1/2 left-1/2 w-1 h-1 rounded-full bg-white"
-                    initial={{ scale: 0, x: 0, y: 0, opacity: 0 }}
-                    animate={{
-                      scale: [0, 1, 0],
-                      x: Math.cos((i / 30) * Math.PI * 2) * 200,
-                      y: Math.sin((i / 30) * Math.PI * 2) * 200,
-                      opacity: [0, 1, 0],
-                    }}
-                    transition={{
-                      duration: 2,
-                      delay: 0.5 + (i * 0.02),
-                      ease: "easeOut",
-                      repeat: Infinity,
-                      repeatDelay: 0.5
-                    }}
-                  />
-                ))}
-              </motion.div>
-            )}            {/* Stage 2: Epic Title Card with Matrix Effect */}
-            {introStage === 2 && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.8 }}
-                className="text-center px-8 relative"
-              >
-                {/* Enhanced Matrix Rain Background */}
-                <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                  {[...Array(30)].map((_, i) => (
-                    <motion.div
-                      key={i}
-                      className="absolute font-mono text-xs"
-                      style={{
-                        left: `${(i / 30) * 100}%`,
-                        color: i % 3 === 0 ? 'rgba(59, 130, 246, 0.4)' : i % 3 === 1 ? 'rgba(139, 92, 246, 0.4)' : 'rgba(236, 72, 153, 0.4)'
-                      }}
-                      initial={{ y: -100, opacity: 0 }}
-                      animate={{
-                        y: typeof window !== 'undefined' ? window.innerHeight + 100 : 1000,
-                        opacity: [0, 1, 1, 0],
-                      }}
-                      transition={{
-                        duration: 2 + Math.random(),
-                        delay: i * 0.08,
-                        ease: "linear",
-                        repeat: Infinity,
-                        repeatDelay: Math.random() * 2
-                      }}
-                    >
-                      {Array.from({ length: 25 }, () => String.fromCharCode(33 + Math.random() * 94)).join('\n')}
-                    </motion.div>
-                  ))}
-                </div>
-
-                {/* Geometric Shapes Flying Through */}
-                {[...Array(8)].map((_, i) => (
-                  <motion.div
-                    key={`shape-${i}`}
-                    className="absolute"
-                    initial={{
-                      x: -100,
-                      y: Math.random() * (typeof window !== 'undefined' ? window.innerHeight : 800),
-                      opacity: 0,
-                      rotate: 0,
-                      scale: 0.5
-                    }}
-                    animate={{
-                      x: typeof window !== 'undefined' ? window.innerWidth + 100 : 1000,
-                      opacity: [0, 0.6, 0],
-                      rotate: 360,
-                      scale: [0.5, 1.5, 0.5]
-                    }}
-                    transition={{
-                      duration: 3,
-                      delay: i * 0.2,
-                      ease: "easeInOut"
-                    }}
-                  >
-                    {i % 3 === 0 ? (
-                      <div className="w-8 h-8 border-2 border-blue-400" />
-                    ) : i % 3 === 1 ? (
-                      <div className="w-8 h-8 rounded-full border-2 border-purple-400" />
-                    ) : (
-                      <div className="w-8 h-8 border-2 border-pink-400 transform rotate-45" />
-                    )}
-                  </motion.div>
-                ))}
-
-                {/* Animated Top Line */}
-                <motion.div
-                  initial={{ width: 0 }}
-                  animate={{ width: "400px" }}
-                  transition={{ duration: 1, ease: "easeInOut" }}
-                  className="h-0.5 bg-gradient-to-r from-transparent via-blue-400 via-purple-500 to-transparent mx-auto mb-12 relative"
-                >
-                  <motion.div
-                    className="absolute top-1/2 left-0 w-full h-4 -translate-y-1/2"
-                    animate={{
-                      boxShadow: [
-                        '0 0 20px rgba(59, 130, 246, 0.5)',
-                        '0 0 40px rgba(139, 92, 246, 0.5)',
-                        '0 0 20px rgba(59, 130, 246, 0.5)',
-                      ]
-                    }}
-                    transition={{ duration: 2, repeat: Infinity }}
-                  />
-                </motion.div>
-
-                {/* Main Text with 3D Effect */}
-                <motion.div className="relative">
-                  <motion.h2
-                    initial={{ opacity: 0, letterSpacing: "1em", scale: 0.5 }}
-                    animate={{
-                      opacity: 1,
-                      letterSpacing: "0.3em",
-                      scale: 1,
-                    }}
-                    transition={{ duration: 1.5, ease: "easeOut" }}
-                    className="text-white text-4xl md:text-6xl font-bold mb-12 uppercase relative z-10"
-                    style={{
-                      textShadow: '0 0 40px rgba(59, 130, 246, 0.8), 0 0 80px rgba(139, 92, 246, 0.6), 2px 2px 0 rgba(236, 72, 153, 0.5)',
-                    }}
-                  >
-                    PRESENTS
-                  </motion.h2>
-
-                  {/* Rotating Hexagon */}
-                  <motion.div
-                    className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none"
-                    animate={{ rotate: 360 }}
-                    transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
-                  >
-                    <svg width="300" height="300" viewBox="0 0 100 100" className="opacity-20">
-                      <motion.polygon
-                        points="50,5 90,25 90,75 50,95 10,75 10,25"
-                        fill="none"
-                        stroke="url(#grad)"
-                        strokeWidth="0.5"
-                        initial={{ pathLength: 0 }}
-                        animate={{ pathLength: 1 }}
-                        transition={{ duration: 2, ease: "easeInOut" }}
-                      />
-                      <defs>
-                        <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
-                          <stop offset="0%" stopColor="#3b82f6" />
-                          <stop offset="50%" stopColor="#8b5cf6" />
-                          <stop offset="100%" stopColor="#ec4899" />
-                        </linearGradient>
-                      </defs>
-                    </svg>
-                  </motion.div>
-                </motion.div>
-
-                {/* Animated Bottom Line */}
-                <motion.div
-                  initial={{ width: 0 }}
-                  animate={{ width: "400px" }}
-                  transition={{ duration: 1, ease: "easeInOut", delay: 0.3 }}
-                  className="h-0.5 bg-gradient-to-r from-transparent via-purple-500 via-pink-400 to-transparent mx-auto relative"
-                >
-                  <motion.div
-                    className="absolute top-1/2 left-0 w-full h-4 -translate-y-1/2"
-                    animate={{
-                      boxShadow: [
-                        '0 0 20px rgba(139, 92, 246, 0.5)',
-                        '0 0 40px rgba(236, 72, 153, 0.5)',
-                        '0 0 20px rgba(139, 92, 246, 0.5)',
-                      ]
-                    }}
-                    transition={{ duration: 2, repeat: Infinity }}
-                  />
-                </motion.div>
-              </motion.div>
-            )}
-
-            {/* Stage 3: Epic Name Reveal */}
-            {introStage === 3 && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0, scale: 1.2 }}
-                transition={{ duration: 0.8 }}
-                className="text-center px-8 relative"
-              >
-                {/* Multi-layer Spotlight effect */}
-                <motion.div
-                  className="absolute inset-0"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: 1 }}
-                >
-                  <motion.div
-                    className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full blur-3xl"
-                    animate={{
-                      background: [
-                        'radial-gradient(circle, rgba(59, 130, 246, 0.2) 0%, transparent 70%)',
-                        'radial-gradient(circle, rgba(139, 92, 246, 0.2) 0%, transparent 70%)',
-                        'radial-gradient(circle, rgba(236, 72, 153, 0.2) 0%, transparent 70%)',
-                        'radial-gradient(circle, rgba(59, 130, 246, 0.2) 0%, transparent 70%)',
-                      ]
-                    }}
-                    transition={{ duration: 4, repeat: Infinity }}
-                  />
-                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-white/5 rounded-full blur-3xl" />
-                </motion.div>
-
-                {/* Holographic Grid Background */}
-                <div className="absolute inset-0 pointer-events-none overflow-hidden">
-                  <motion.div
-                    className="absolute inset-0"
-                    style={{
-                      backgroundImage: 'linear-gradient(rgba(59, 130, 246, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(139, 92, 246, 0.1) 1px, transparent 1px)',
-                      backgroundSize: '50px 50px',
-                    }}
-                    animate={{
-                      opacity: [0.3, 0.6, 0.3],
-                    }}
-                    transition={{ duration: 3, repeat: Infinity }}
-                  />
-                </div>
-
-                <motion.h1
-                  initial={{ opacity: 0, scale: 0.8, y: 50 }}
-                  animate={{ opacity: 1, scale: 1, y: 0 }}
-                  transition={{ duration: 1, ease: "easeOut" }}
-                  className="text-white text-6xl md:text-8xl font-black mb-8 tracking-tight relative z-10"
-                >
-                  <motion.div className="relative inline-block">
-                    <motion.span
-                      initial={{ opacity: 0, x: -100, rotateY: -90 }}
-                      animate={{ opacity: 1, x: 0, rotateY: 0 }}
-                      transition={{ delay: 0.3, duration: 0.8, type: "spring", stiffness: 100 }}
-                      className="block mb-2"
-                      style={{
-                        textShadow: '0 0 40px rgba(59, 130, 246, 1), 0 0 80px rgba(59, 130, 246, 0.8), 4px 4px 0 rgba(0, 0, 0, 0.3)',
-                      }}
-                    >
-                      EMANUEL
-                    </motion.span>
-
-                    {/* Glitch Effect on First Name */}
-                    <motion.span
-                      className="absolute top-0 left-0 block mb-2 text-blue-500 opacity-70"
-                      initial={{ opacity: 0 }}
-                      animate={{
-                        opacity: [0, 0.7, 0],
-                        x: [-2, 2, -2],
-                      }}
-                      transition={{
-                        delay: 0.5,
-                        duration: 0.3,
-                        repeat: 3,
-                        repeatDelay: 0.5
-                      }}
-                    >
-                      EMANUEL
-                    </motion.span>
-                  </motion.div>
-
-                  <motion.div className="relative inline-block">
-                    <motion.span
-                      initial={{ opacity: 0, x: 100, rotateY: 90 }}
-                      animate={{ opacity: 1, x: 0, rotateY: 0 }}
-                      transition={{ delay: 0.6, duration: 0.8, type: "spring", stiffness: 100 }}
-                      className="block bg-gradient-to-r from-blue-400 via-purple-400 via-pink-400 to-orange-400 bg-clip-text text-transparent"
-                      style={{
-                        filter: 'drop-shadow(0 0 30px rgba(139, 92, 246, 0.8)) drop-shadow(0 0 60px rgba(236, 72, 153, 0.6))',
-                      }}
-                    >
-                      CASCONE
-                    </motion.span>
-
-                    {/* Glitch Effect on Last Name */}
-                    <motion.span
-                      className="absolute top-0 left-0 block bg-gradient-to-r from-pink-400 to-purple-400 bg-clip-text text-transparent opacity-60"
-                      initial={{ opacity: 0 }}
-                      animate={{
-                        opacity: [0, 0.6, 0],
-                        x: [2, -2, 2],
-                      }}
-                      transition={{
-                        delay: 0.8,
-                        duration: 0.3,
-                        repeat: 3,
-                        repeatDelay: 0.5
-                      }}
-                    >
-                      CASCONE
-                    </motion.span>
-                  </motion.div>
-                </motion.h1>
-
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 1.2, duration: 0.8 }}
-                  className="relative z-10"
-                >
-                  {/* Animated Social Handle */}
-                  <motion.div
-                    className="inline-flex items-center gap-3 px-6 py-3 bg-white/5 backdrop-blur-xl border border-white/20 rounded-full"
-                    animate={{
-                      boxShadow: [
-                        '0 0 20px rgba(59, 130, 246, 0.3)',
-                        '0 0 40px rgba(139, 92, 246, 0.5)',
-                        '0 0 20px rgba(59, 130, 246, 0.3)',
-                      ]
-                    }}
-                    transition={{ duration: 2, repeat: Infinity }}
-                  >
-                    <motion.div
-                      animate={{ rotate: 360 }}
-                      transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
-                    >
-                      <Github className="w-5 h-5 text-blue-400" />
-                    </motion.div>
-                    <span className="text-white text-xl font-mono tracking-wider">@jecrs687</span>
-                  </motion.div>
-                </motion.div>
-
-                {/* Lens flare effect */}
-                <motion.div
-                  className="absolute top-1/2 left-1/2 w-2 h-2 bg-white rounded-full"
-                  initial={{ scale: 0, opacity: 0 }}
-                  animate={{
-                    scale: [0, 100, 0],
-                    opacity: [0, 0.5, 0],
-                  }}
-                  transition={{ delay: 0.5, duration: 1.5 }}
-                />
-
-                {/* Floating Sparkles & Icons */}
-                {[...Array(20)].map((_, i) => {
-                  const icons = [Sparkles, Zap, TrendingUp, Code2];
-                  const Icon = icons[i % icons.length];
-                  const colors = ['text-blue-400', 'text-purple-400', 'text-pink-400', 'text-cyan-400', 'text-yellow-400'];
-
-                  return (
-                    <motion.div
-                      key={i}
-                      className="absolute"
-                      initial={{
-                        x: Math.cos((i / 20) * Math.PI * 2) * 150,
-                        y: Math.sin((i / 20) * Math.PI * 2) * 150,
-                        opacity: 0,
-                        scale: 0
-                      }}
-                      animate={{
-                        x: Math.cos((i / 20) * Math.PI * 2) * (250 + Math.sin(i) * 100),
-                        y: Math.sin((i / 20) * Math.PI * 2) * (250 + Math.cos(i) * 100),
-                        opacity: [0, 1, 1, 0],
-                        scale: [0, 1.5, 1, 0],
-                        rotate: [0, 360, 720],
-                      }}
-                      transition={{
-                        delay: i * 0.08,
-                        duration: 3,
-                        repeat: Infinity,
-                        repeatDelay: 0.5,
-                        ease: "easeInOut"
-                      }}
-                      style={{
-                        left: '50%',
-                        top: '50%',
-                      }}
-                    >
-                      <Icon className={`w-5 h-5 ${colors[i % colors.length]}`} style={{
-                        filter: 'drop-shadow(0 0 8px currentColor)'
-                      }} />
-                    </motion.div>
-                  );
-                })}
-
-                {/* Energy Burst Lines */}
-                {[...Array(12)].map((_, i) => (
-                  <motion.div
-                    key={`line-${i}`}
-                    className="absolute top-1/2 left-1/2 origin-left h-0.5 bg-gradient-to-r from-blue-400 to-transparent"
-                    initial={{ width: 0, opacity: 0, rotate: (i / 12) * 360 }}
-                    animate={{
-                      width: [0, 200, 0],
-                      opacity: [0, 1, 0],
-                    }}
-                    transition={{
-                      delay: 1.5 + i * 0.05,
-                      duration: 1,
-                      ease: "easeOut"
-                    }}
-                    style={{
-                      transform: `rotate(${(i / 12) * 360}deg)`,
-                    }}
-                  />
-                ))}
-              </motion.div>
-            )}
-
-            {/* Stage 4: Epic Transition Out */}
-            {introStage === 4 && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="absolute inset-0 bg-gradient-to-b from-black via-transparent to-black"
-              >
-                {/* Multiple Camera Flash Effects */}
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: [0, 0.3, 0, 0.6, 0, 1, 0] }}
-                  transition={{ duration: 0.8, times: [0, 0.2, 0.3, 0.5, 0.6, 0.8, 1] }}
-                  className="absolute inset-0 bg-white"
-                />
-
-                {/* Spiral Vortex Effect */}
-                {[...Array(20)].map((_, i) => (
-                  <motion.div
-                    key={`vortex-${i}`}
-                    className="absolute top-1/2 left-1/2 rounded-full border-2 border-blue-400/50"
-                    initial={{
-                      width: 0,
-                      height: 0,
-                      opacity: 1,
-                      rotate: 0
-                    }}
-                    animate={{
-                      width: 2000,
-                      height: 2000,
-                      opacity: 0,
-                      rotate: 360
-                    }}
-                    transition={{
-                      duration: 1,
-                      delay: i * 0.03,
-                      ease: "easeOut"
-                    }}
-                    style={{
-                      marginLeft: '-1000px',
-                      marginTop: '-1000px'
-                    }}
-                  />
-                ))}
-
-                {/* Particle Burst */}
-                {[...Array(100)].map((_, i) => (
-                  <motion.div
-                    key={`burst-${i}`}
-                    className="absolute top-1/2 left-1/2 w-2 h-2 rounded-full"
-                    style={{
-                      background: i % 3 === 0 ? '#3b82f6' : i % 3 === 1 ? '#8b5cf6' : '#ec4899'
-                    }}
-                    initial={{
-                      scale: 0,
-                      x: 0,
-                      y: 0,
-                      opacity: 1
-                    }}
-                    animate={{
-                      scale: [0, 1, 0],
-                      x: Math.cos((i / 100) * Math.PI * 2) * (200 + Math.random() * 300),
-                      y: Math.sin((i / 100) * Math.PI * 2) * (200 + Math.random() * 300),
-                      opacity: [1, 1, 0]
-                    }}
-                    transition={{
-                      duration: 0.8,
-                      delay: i * 0.005,
-                      ease: "easeOut"
-                    }}
-                  />
-                ))}
-
-                <motion.div
-                  initial={{ scaleX: 0 }}
-                  animate={{ scaleX: 1 }}
-                  transition={{ duration: 0.8, ease: "easeInOut", delay: 0.3 }}
-                  className="absolute top-0 left-0 right-0 h-1/2 bg-black origin-left"
-                />
-                <motion.div
-                  initial={{ scaleX: 0 }}
-                  animate={{ scaleX: 1 }}
-                  transition={{ duration: 0.8, ease: "easeInOut", delay: 0.3 }}
-                  className="absolute bottom-0 left-0 right-0 h-1/2 bg-black origin-right"
-                />
-              </motion.div>
-            )}            {/* Cinematic Bars (Top & Bottom) */}
-            <div className="absolute top-0 left-0 right-0 h-16 bg-black pointer-events-none" />
-            <div className="absolute bottom-0 left-0 right-0 h-16 bg-black pointer-events-none" />
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Animated Background Gradient */}
-      {colorTheme !== 'default' && (
-        <motion.div
-          className="fixed inset-0 pointer-events-none opacity-30"
-          animate={{
-            background: [
-              'radial-gradient(circle at 0% 0%, rgba(139, 92, 246, 0.3) 0%, transparent 50%)',
-              'radial-gradient(circle at 100% 100%, rgba(236, 72, 153, 0.3) 0%, transparent 50%)',
-              'radial-gradient(circle at 0% 100%, rgba(59, 130, 246, 0.3) 0%, transparent 50%)',
-              'radial-gradient(circle at 100% 0%, rgba(139, 92, 246, 0.3) 0%, transparent 50%)',
-            ]
-          }}
-          transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
-        />
-      )}
-
-      {/* Floating Reaction Emojis */}
-      <AnimatePresence>
-        {reactions.map((reaction) => (
-          <motion.div
-            key={reaction.id}
-            initial={{ opacity: 1, y: 0, scale: 0 }}
-            animate={{ opacity: 0, y: -200, scale: 1.5 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 3, ease: "easeOut" }}
-            className="fixed text-4xl pointer-events-none z-40"
-            style={{
-              left: `${reaction.x}%`,
-              top: `${reaction.y}%`,
-            }}
-          >
-            {reaction.emoji}
-          </motion.div>
-        ))}
-      </AnimatePresence>
-
-      {/* Screenshot Mode Watermark */}
-      {screenshotMode && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 px-4 py-2 bg-black/80 text-white text-xs rounded-full font-mono"
-        >
-          @jecrs687 • jecrs687.github.io
-        </motion.div>
-      )}
-
-      {/* Floating Action Buttons */}
-      {!screenshotMode && (
-        <div className="fixed top-4 right-4 z-50 flex flex-col gap-2">
-          {/* Theme Toggle */}
-          <motion.button
-            onClick={toggleTheme}
-            className="w-12 h-12 rounded-full bg-white dark:bg-gray-800 shadow-lg flex items-center justify-center text-gray-700 dark:text-gray-300 hover:scale-110 transition-transform border-2 border-gray-200 dark:border-gray-700"
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
-          >
-            <AnimatePresence mode="wait">
-              {isDark ? (
-                <motion.div
-                  key="sun"
-                  initial={{ rotate: -90, opacity: 0 }}
-                  animate={{ rotate: 0, opacity: 1 }}
-                  exit={{ rotate: 90, opacity: 0 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <Sun className="w-5 h-5" />
-                </motion.div>
-              ) : (
-                <motion.div
-                  key="moon"
-                  initial={{ rotate: 90, opacity: 0 }}
-                  animate={{ rotate: 0, opacity: 1 }}
-                  exit={{ rotate: -90, opacity: 0 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <Moon className="w-5 h-5" />
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </motion.button>
-
-          {/* Share Button */}
-          <motion.button
-            onClick={handleShare}
-            className="w-12 h-12 rounded-full bg-white dark:bg-gray-800 shadow-lg flex items-center justify-center text-gray-700 dark:text-gray-300 hover:scale-110 transition-transform border-2 border-gray-200 dark:border-gray-700 relative"
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
-          >
-            <Share2 className="w-5 h-5" />
-            {showShare && (
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0 }}
-                className="absolute -left-24 top-1/2 -translate-y-1/2 bg-gray-900 text-white text-xs px-3 py-1 rounded-full whitespace-nowrap"
-              >
-                Link copied!
-              </motion.div>
-            )}
-          </motion.button>
-
-          {/* Copy Link Button */}
-          <motion.button
-            onClick={handleCopyLink}
-            className="w-12 h-12 rounded-full bg-white dark:bg-gray-800 shadow-lg flex items-center justify-center text-gray-700 dark:text-gray-300 hover:scale-110 transition-transform border-2 border-gray-200 dark:border-gray-700"
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
-          >
-            <AnimatePresence mode="wait">
-              {copied ? (
-                <motion.div
-                  key="check"
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  exit={{ scale: 0 }}
-                >
-                  <Check className="w-5 h-5 text-green-500" />
-                </motion.div>
-              ) : (
-                <motion.div key="copy">
-                  <Copy className="w-5 h-5" />
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </motion.button>
-
-          {/* Color Theme Switcher */}
-          <motion.button
-            onClick={cycleColorTheme}
-            className="w-12 h-12 rounded-full bg-white dark:bg-gray-800 shadow-lg flex items-center justify-center text-gray-700 dark:text-gray-300 hover:scale-110 transition-transform border-2 border-gray-200 dark:border-gray-700"
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
-          >
-            <Palette className="w-5 h-5" />
-          </motion.button>
-
-          {/* Screenshot Mode */}
-          <motion.button
-            onClick={toggleScreenshotMode}
-            className={`w-12 h-12 rounded-full shadow-lg flex items-center justify-center hover:scale-110 transition-transform border-2 ${screenshotMode
-              ? 'bg-blue-500 text-white border-blue-600'
-              : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-700'
-              }`}
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
-          >
-            <Camera className="w-5 h-5" />
-          </motion.button>
-
-          {/* Shuffle Projects */}
-          <motion.button
-            onClick={shuffleProjects}
-            className="w-12 h-12 rounded-full bg-white dark:bg-gray-800 shadow-lg flex items-center justify-center text-gray-700 dark:text-gray-300 hover:scale-110 transition-transform border-2 border-gray-200 dark:border-gray-700"
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
-          >
-            <Shuffle className="w-5 h-5" />
-          </motion.button>
-
-          {/* Particles Toggle */}
-          <motion.button
-            onClick={() => setShowParticles(!showParticles)}
-            className={`w-12 h-12 rounded-full shadow-lg flex items-center justify-center hover:scale-110 transition-transform border-2 ${showParticles
-              ? 'bg-purple-500 text-white border-purple-600'
-              : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-700'
-              }`}
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
-          >
-            <Sparkles className="w-5 h-5" />
-          </motion.button>
-
-          {/* QR Code */}
-          <motion.button
-            onClick={() => setShowQR(!showQR)}
-            className={`w-12 h-12 rounded-full shadow-lg flex items-center justify-center hover:scale-110 transition-transform border-2 ${showQR
-              ? 'bg-green-500 text-white border-green-600'
-              : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-700'
-              }`}
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
-          >
-            <QrCode className="w-5 h-5" />
-          </motion.button>
-        </div>
-      )}
-
-      {/* QR Code Modal */}
-      <AnimatePresence>
-        {showQR && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
-            onClick={() => setShowQR(false)}
-          >
-            <motion.div
-              initial={{ scale: 0.8 }}
-              animate={{ scale: 1 }}
-              exit={{ scale: 0.8 }}
-              className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-2xl"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="flex flex-col items-center gap-4">
-                <h3 className="text-lg font-bold text-gray-900 dark:text-white">Scan to Visit</h3>
-                <div className="bg-white p-4 rounded-xl">
-                  <QRCodeSVG value={window.location.href} size={200} />
-                </div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">@jecrs687</p>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Scroll to Top Button */}
-      <AnimatePresence>
-        {showContent && scrollY > 500 && !screenshotMode && (
-          <motion.button
-            initial={{ opacity: 0, scale: 0, rotate: -180 }}
-            animate={{ opacity: 1, scale: 1, rotate: 0 }}
-            exit={{ opacity: 0, scale: 0, rotate: 180 }}
-            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-            className="fixed bottom-8 right-8 w-14 h-14 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-full shadow-2xl flex items-center justify-center z-50 hover:shadow-blue-500/50 transition-shadow group"
-            whileHover={{ scale: 1.1, rotate: 360 }}
-            whileTap={{ scale: 0.9 }}
-            transition={{ type: "spring", stiffness: 260, damping: 20 }}
-          >
-            <motion.div
-              animate={{ y: [-2, 2, -2] }}
-              transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
-            >
-              ↑
-            </motion.div>
-
-            {/* Ripple Effect */}
-            <motion.div
-              className="absolute inset-0 rounded-full border-2 border-blue-400"
-              animate={{
-                scale: [1, 1.5, 1.5],
-                opacity: [0.5, 0, 0],
-              }}
-              transition={{
-                duration: 2,
-                repeat: Infinity,
-                ease: "easeOut"
-              }}
-            />
-          </motion.button>
-        )}
-      </AnimatePresence>
-
-      {/* Particle Background */}
-      {showParticles && (
-        <div className="fixed inset-0 pointer-events-none z-10">
-          {[...Array(20)].map((_, i) => (
+        {/* Terminal Body */}
+        <div className="bg-gray-900 rounded-b-lg p-4 font-mono text-sm min-h-[400px] max-h-[70vh] overflow-y-auto">
+          {lines.map((line, i) => (
             <motion.div
               key={i}
-              className="absolute w-2 h-2 bg-purple-500/30 rounded-full"
-              animate={{
-                x: [Math.random() * window.innerWidth, Math.random() * window.innerWidth],
-                y: [Math.random() * window.innerHeight, Math.random() * window.innerHeight],
-              }}
-              transition={{
-                duration: Math.random() * 10 + 10,
-                repeat: Infinity,
-                ease: "linear"
-              }}
-              style={{
-                left: Math.random() * 100 + '%',
-                top: Math.random() * 100 + '%',
-              }}
-            />
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              className={`
+                ${line.includes('⚠️') ? 'text-red-400 font-bold' : ''}
+                ${line.includes('🔓') || line.includes('Just kidding') ? 'text-green-400' : ''}
+                ${line.includes('Stay safe') ? 'text-cyan-400' : ''}
+                ${!line.includes('⚠️') && !line.includes('🔓') && !line.includes('Just kidding') && !line.includes('Stay safe') ? 'text-green-500' : ''}
+                leading-relaxed
+              `}
+            >
+              {line}
+            </motion.div>
           ))}
+
+          {/* Blinking cursor */}
+          {currentIndex < terminalLines.length && (
+            <span className={`text-green-500 ${showCursor ? 'opacity-100' : 'opacity-0'}`}>
+              ▋
+            </span>
+          )}
         </div>
-      )}
 
-      {/* Double Tap Hearts */}
-      <AnimatePresence>
-        {doubleTapHearts.map((heart) => (
-          <motion.div
-            key={heart.id}
-            initial={{ opacity: 1, scale: 0, y: 0 }}
-            animate={{ opacity: 0, scale: 2, y: -100 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 1 }}
-            className="fixed text-red-500 pointer-events-none z-40"
-            style={{
-              left: heart.x,
-              top: heart.y,
-            }}
-          >
-            <Heart className="w-8 h-8 fill-current" />
-          </motion.div>
-        ))}
-      </AnimatePresence>
-
-      {/* Combo Counter */}
-      <AnimatePresence>
-        {comboCount > 1 && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.5, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.5 }}
-            className="fixed top-20 left-1/2 -translate-x-1/2 z-50 px-6 py-3 bg-gradient-to-r from-yellow-400 to-orange-500 text-white font-bold rounded-full shadow-lg"
-          >
-            <div className="flex items-center gap-2">
-              <Zap className="w-5 h-5" />
-              <span>{comboCount}x COMBO!</span>
-              {comboMultiplier > 1 && <span className="text-xl">🔥</span>}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Scroll Progress Indicator */}
-      <AnimatePresence>
-        {showContent && scrollY > 100 && (
-          <motion.div
-            initial={{ opacity: 0, x: -10 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -10 }}
-            className="fixed left-4 top-1/2 -translate-y-1/2 z-50 hidden md:block"
-          >
-            <div className="flex flex-col gap-3">
-              {[0, 1, 2, 3].map((stage) => (
-                <motion.div
-                  key={stage}
-                  className={`w-2 h-2 rounded-full transition-all ${storyStage >= stage
-                    ? 'bg-blue-500 dark:bg-blue-400 w-3 h-3'
-                    : 'bg-gray-300 dark:bg-gray-700'
-                    }`}
-                  whileHover={{ scale: 1.5 }}
-                  animate={{
-                    boxShadow: storyStage >= stage
-                      ? ['0 0 0px rgba(59, 130, 246, 0.5)', '0 0 15px rgba(59, 130, 246, 0.8)', '0 0 0px rgba(59, 130, 246, 0.5)']
-                      : 'none'
-                  }}
-                  transition={{ duration: 2, repeat: Infinity }}
-                />
-              ))}
-            </div>
-
-            {/* Progress Bar */}
-            <div className="mt-4 w-1 h-32 bg-gray-200 dark:bg-gray-800 rounded-full overflow-hidden">
-              <motion.div
-                className="w-full bg-gradient-to-b from-blue-500 via-purple-500 to-pink-500"
-                style={{
-                  height: `${scrollProgress}%`,
-                }}
-              />
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* STORYTELLING PARALLAX SECTION */}
-      <AnimatePresence>
-        {showContent && (
-          <motion.div
-            ref={contentRef}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 1.5 }}
-            className="relative"
-          >
-            {/* Story Chapter 1: The Journey Begins - SIMPLIFIED */}
-            <motion.section
-              className="min-h-screen flex items-center justify-center relative overflow-hidden isolate"
-              style={{
-                transform: `translateY(${Math.min(scrollY * 0.3, 200)}px)`,
-              }}
-            >
-              {/* Simple Subtle Background */}
-              <motion.div
-                className="absolute inset-0 bg-gradient-to-b from-blue-50/20 via-transparent to-purple-50/20 dark:from-blue-950/10 dark:via-transparent dark:to-purple-950/10"
-                animate={{
-                  opacity: [0.5, 0.8, 0.5],
-                }}
-                transition={{
-                  duration: 8,
-                  repeat: Infinity,
-                  ease: "easeInOut"
-                }}
-              />
-
-              {/* Animated Background Particles - Multi-layer with Containment */}
-              <div className="absolute inset-0 pointer-events-none overflow-hidden">
-                {/* Layer 1: Far Background */}
-                {[...Array(30)].map((_, i) => {
-                  const baseLeft = Math.random() * 100;
-                  const baseTop = Math.random() * 100;
-                  return (
-                    <motion.div
-                      key={`bg-particle-far-${i}`}
-                      className="absolute w-0.5 h-0.5 bg-blue-400/20 rounded-full blur-sm"
-                      style={{
-                        left: `${baseLeft}%`,
-                        top: `${baseTop}%`,
-                        transform: `translateY(${Math.min(scrollY * 0.05, 50)}px)`,
-                      }}
-                      animate={{
-                        y: [0, -15, 0],
-                        opacity: [0.2, 0.5, 0.2],
-                        scale: [1, 1.3, 1],
-                      }}
-                      transition={{
-                        duration: 4 + Math.random() * 2,
-                        repeat: Infinity,
-                        delay: Math.random() * 2,
-                      }}
-                    />
-                  );
-                })}
-
-                {/* Layer 2: Mid Background */}
-                {[...Array(20)].map((_, i) => {
-                  const baseLeft = Math.random() * 100;
-                  const baseTop = Math.random() * 100;
-                  return (
-                    <motion.div
-                      key={`bg-particle-mid-${i}`}
-                      className="absolute w-1 h-1 bg-purple-400/30 rounded-full"
-                      style={{
-                        left: `${baseLeft}%`,
-                        top: `${baseTop}%`,
-                        transform: `translateY(${Math.min(scrollY * 0.08, 80)}px) translateX(${Math.max(-30, Math.min(30, mousePosition.x * 10))}px)`,
-                      }}
-                      animate={{
-                        y: [0, -20, 0],
-                        opacity: [0.3, 0.8, 0.3],
-                        scale: [1, 1.4, 1],
-                      }}
-                      transition={{
-                        duration: 3 + Math.random() * 2,
-                        repeat: Infinity,
-                        delay: Math.random() * 2,
-                      }}
-                    />
-                  );
-                })}
-
-                {/* Layer 3: Foreground */}
-                {[...Array(15)].map((_, i) => {
-                  const baseLeft = Math.random() * 100;
-                  const baseTop = Math.random() * 100;
-                  return (
-                    <motion.div
-                      key={`bg-particle-near-${i}`}
-                      className="absolute w-1.5 h-1.5 bg-blue-500/40 rounded-full"
-                      style={{
-                        left: `${baseLeft}%`,
-                        top: `${baseTop}%`,
-                        transform: `translateY(${Math.min(scrollY * 0.12, 120)}px) translateX(${Math.max(-50, Math.min(50, mousePosition.x * 15))}px)`,
-                      }}
-                      animate={{
-                        y: [0, -25, 0],
-                        opacity: [0.4, 1, 0.4],
-                        scale: [1, 1.6, 1],
-                      }}
-                      transition={{
-                        duration: 2.5 + Math.random() * 1.5,
-                        repeat: Infinity,
-                        delay: Math.random() * 2,
-                      }}
-                    />
-                  );
-                })}
-              </div>
-
-              <div className="max-w-4xl mx-auto px-6 text-center z-10">
-                <motion.div
-                  initial={{ opacity: 0, y: 30 }}
-                  animate={{ opacity: storyStage >= 0 ? 1 : 0, y: storyStage >= 0 ? 0 : 30 }}
-                  transition={{ duration: 0.8 }}
-                >
-                  {/* Simple Icon */}
-                  <motion.div
-                    className="mb-8"
-                    animate={{
-                      y: [0, -10, 0],
-                    }}
-                    transition={{ 
-                      duration: 3, 
-                      repeat: Infinity,
-                      ease: "easeInOut"
-                    }}
-                  >
-                    <Sparkles className="w-16 h-16 mx-auto text-blue-500" />
-                  </motion.div>
-
-                  {/* Clean Title */}
-                  <h2 className="text-5xl md:text-6xl font-bold text-gray-900 dark:text-white mb-6">
-                    Every Line of Code
-                    <br />
-                    <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                      Tells a Story
-                    </span>
-                  </h2>
-
-                  {/* Simple Description */}
-                  <motion.p
-                    className="text-lg md:text-xl text-gray-600 dark:text-gray-400 leading-relaxed mb-12 max-w-2xl mx-auto"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: storyStage >= 0 ? 1 : 0 }}
-                    transition={{ delay: 0.3 }}
-                  >
-                    From a curious 12-year-old crafting first websites, to building experiences that inspire millions.
-                  </motion.p>
-
-                  {/* Simple Milestone Stats */}
-                  <motion.div
-                    className="flex items-center justify-center gap-8 flex-wrap mb-12"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: storyStage >= 0 ? 1 : 0 }}
-                    transition={{ delay: 0.5 }}
-                  >
-                    {[
-                      { value: "10+", label: "Years Coding" },
-                      { value: "50+", label: "Projects" },
-                      { value: "∞", label: "Ideas" }
-                    ].map((stat, idx) => (
-                      <motion.div
-                        key={stat.label}
-                        className="text-center"
-                        initial={{ opacity: 0, scale: 0.8 }}
-                        animate={{ opacity: storyStage >= 0 ? 1 : 0, scale: storyStage >= 0 ? 1 : 0.8 }}
-                        transition={{ delay: 0.6 + idx * 0.1 }}
-                      >
-                        <div className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-1">
-                          {stat.value}
-                        </div>
-                        <div className="text-sm text-gray-500 dark:text-gray-400">
-                          {stat.label}
-                        </div>
-                      </motion.div>
-                    ))}
-                  </motion.div>
-
-                  {/* Simple Scroll Prompt */}
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: storyStage >= 0 ? 1 : 0 }}
-                    transition={{ delay: 0.8 }}
-                    className="flex items-center justify-center gap-3 text-sm text-gray-500 dark:text-gray-400"
-                  >
-                    <span>Scroll to explore</span>
-                    <motion.div
-                      animate={{ y: [0, 5, 0] }}
-                      transition={{ duration: 1.5, repeat: Infinity }}
-                    >
-                      ↓
-                    </motion.div>
-                  </motion.div>
-                </motion.div>
-              </div>
-
-              {/* Enhanced Floating Code Snippets with Contained Mouse Parallax */}
-              {['</>', '{}', '[]', '( )', '=>', '<|>', '::'].map((symbol, i) => {
-                const baseLeft = 15 + i * 12;
-                const baseTop = 25 + Math.sin(i * 1.5) * 20;
-                return (
-                  <motion.div
-                    key={symbol}
-                    className="absolute text-3xl md:text-4xl font-mono text-blue-400/20 dark:text-blue-400/10 select-none pointer-events-none"
-                    style={{
-                      left: `${baseLeft}%`,
-                      top: `${baseTop}%`,
-                      transform: `
-                        translateY(${Math.min(-scrollY * (0.08 + i * 0.04), 150)}px) 
-                        translateX(${Math.max(-40, Math.min(40, mousePosition.x * (10 + i * 2)))}px)
-                        rotateX(${Math.max(-15, Math.min(15, mousePosition.y * 3))}deg)
-                        rotateY(${Math.max(-15, Math.min(15, mousePosition.x * 3))}deg)
-                      `,
-                      transformStyle: 'preserve-3d',
-                      willChange: 'transform',
-                    }}
-                    animate={{
-                      rotate: [0, 360],
-                      scale: [1, 1.1, 1],
-                    }}
-                    transition={{
-                      rotate: { duration: 15 + i * 3, repeat: Infinity, ease: "linear" },
-                      scale: { duration: 3 + i * 0.5, repeat: Infinity, ease: "easeInOut" }
-                    }}
-                  >
-                    <motion.span
-                      animate={{
-                        textShadow: [
-                          '0 0 10px rgba(59, 130, 246, 0.3)',
-                          '0 0 20px rgba(139, 92, 246, 0.4)',
-                          '0 0 10px rgba(59, 130, 246, 0.3)',
-                        ]
-                      }}
-                      transition={{ duration: 2, repeat: Infinity }}
-                    >
-                      {symbol}
-                    </motion.span>
-                  </motion.div>
-                );
-              })}
-            </motion.section>
-
-            {/* Story Chapter 2: The Craft - Enhanced */}
-            <motion.section
-              className="min-h-screen flex items-center justify-center relative overflow-hidden isolate"
-              style={{
-                transform: `translateY(${Math.min(scrollY * 0.15, 150)}px)`,
-              }}
-            >
-              {/* Animated Background Gradient */}
-              <motion.div
-                className="absolute inset-0 bg-gradient-to-b from-transparent via-blue-50/50 to-transparent dark:via-blue-950/20 pointer-events-none"
-                style={{
-                  transform: `translateY(${Math.min(scrollY * 0.08, 80)}px) scale(${1 + Math.min(scrollProgress * 0.0005, 0.05)})`,
-                }}
-              />
-
-              {/* Floating Geometric Shapes with Containment */}
-              <div className="absolute inset-0 pointer-events-none overflow-hidden">
-                {[...Array(12)].map((_, i) => {
-                  const baseLeft = 10 + i * 7;
-                  const baseTop = 20 + Math.sin(i * 2) * 25;
-                  return (
-                    <motion.div
-                      key={`geo-${i}`}
-                      className="absolute"
-                      style={{
-                        left: `${baseLeft}%`,
-                        top: `${baseTop}%`,
-                        transform: `translateY(${Math.min(-scrollY * (0.06 + i * 0.02), 100)}px) translateX(${Math.max(-30, Math.min(30, mousePosition.x * (8 + i * 2)))}px)`,
-                      }}
-                      animate={{
-                        rotate: [0, 360],
-                        scale: [1, 1.15, 1],
-                      }}
-                      transition={{
-                        rotate: { duration: 20 + i * 5, repeat: Infinity, ease: "linear" },
-                        scale: { duration: 3 + i * 0.5, repeat: Infinity, ease: "easeInOut" }
-                      }}
-                    >
-                      {i % 3 === 0 ? (
-                        <div className="w-6 h-6 border-2 border-blue-300/30 dark:border-blue-600/20 rounded" />
-                      ) : i % 3 === 1 ? (
-                        <div className="w-6 h-6 border-2 border-purple-300/30 dark:border-purple-600/20 rounded-full" />
-                      ) : (
-                        <div className="w-6 h-6 border-2 border-pink-300/30 dark:border-pink-600/20 transform rotate-45" />
-                      )}
-                    </motion.div>
-                  );
-                })}
-              </div>
-
-              <div className="max-w-4xl mx-auto px-6 z-10">
-                <motion.div
-                  initial={{ opacity: 0, x: -100 }}
-                  animate={{ opacity: storyStage >= 1 ? 1 : 0, x: storyStage >= 1 ? 0 : -100 }}
-                  transition={{ duration: 1 }}
-                  className="grid md:grid-cols-3 gap-8"
-                >
-                  {[
-                    { icon: Code2, title: "Innovation", desc: "Pushing boundaries with cutting-edge technology", gradient: "from-blue-500 to-cyan-500" },
-                    { icon: Zap, title: "Performance", desc: "Optimized experiences that feel instant", gradient: "from-purple-500 to-pink-500" },
-                    { icon: Heart, title: "Passion", desc: "Crafted with care and attention to detail", gradient: "from-orange-500 to-red-500" }
-                  ].map((item, i) => (
-                    <motion.div
-                      key={item.title}
-                      initial={{ opacity: 0, y: 50, rotateX: -15 }}
-                      animate={{
-                        opacity: storyStage >= 1 ? 1 : 0,
-                        y: storyStage >= 1 ? 0 : 50,
-                        rotateX: storyStage >= 1 ? 0 : -15
-                      }}
-                      transition={{ delay: i * 0.2, duration: 0.8, type: "spring", stiffness: 100 }}
-                      whileHover={{
-                        scale: 1.05,
-                        rotateY: 5,
-                        z: 50,
-                        transition: { duration: 0.3 }
-                      }}
-                      className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl p-8 rounded-2xl border-2 border-gray-200 dark:border-gray-700 hover:border-transparent transition-all relative overflow-hidden group"
-                      style={{
-                        transform: `translateY(${-scrollY * (0.08 + i * 0.04)}px) translateX(${mousePosition.x * (10 + i * 5)}px)`,
-                        transformStyle: 'preserve-3d',
-                      }}
-                    >
-                      {/* Gradient Overlay */}
-                      <motion.div
-                        className={`absolute inset-0 bg-gradient-to-br ${item.gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-300`}
-                      />
-
-                      {/* Animated Icon */}
-                      <motion.div
-                        animate={{
-                          rotate: [0, 360],
-                        }}
-                        transition={{ duration: 12 + i * 3, repeat: Infinity, ease: "linear" }}
-                        className="mb-6 relative"
-                      >
-                        <motion.div
-                          animate={{
-                            scale: [1, 1.1, 1],
-                          }}
-                          transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-                        >
-                          <item.icon className={`w-14 h-14 mx-auto bg-gradient-to-r ${item.gradient} bg-clip-text text-transparent`} style={{
-                            filter: 'drop-shadow(0 0 20px currentColor)',
-                          }} />
-                        </motion.div>
-                      </motion.div>
-
-                      <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3 group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:bg-clip-text" style={{ backgroundImage: item.gradient }}>{item.title}</h3>
-                      <p className="text-gray-600 dark:text-gray-400 leading-relaxed">{item.desc}</p>
-
-                      {/* Corner Accent */}
-                      <motion.div
-                        className={`absolute top-0 right-0 w-20 h-20 bg-gradient-to-br ${item.gradient} opacity-0 group-hover:opacity-20 blur-2xl transition-opacity`}
-                      />
-                    </motion.div>
-                  ))}
-                </motion.div>
-              </div>
-            </motion.section>
-
-            {/* Story Chapter 3: The Numbers - Enhanced with 3D */}
-            <motion.section
-              className="min-h-[70vh] flex items-center justify-center relative overflow-hidden isolate"
-              style={{
-                transform: `translateY(${Math.min(scrollY * 0.12, 120)}px)`,
-              }}
-            >
-              {/* Radial Gradient Background */}
-              <motion.div
-                className="absolute inset-0"
-                style={{
-                  background: 'radial-gradient(circle at 50% 50%, rgba(59, 130, 246, 0.1), transparent 70%)',
-                  transform: `scale(${1 + scrollProgress * 0.002})`,
-                }}
-              />
-
-              {/* Orbiting Rings */}
-              {[1, 2, 3].map((ring) => (
-                <motion.div
-                  key={`orbit-${ring}`}
-                  className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border border-blue-400/10 pointer-events-none"
-                  style={{
-                    width: `${Math.min(300 + ring * 120, 600)}px`,
-                    height: `${Math.min(300 + ring * 120, 600)}px`,
-                  }}
-                  animate={{
-                    rotate: ring % 2 === 0 ? 360 : -360,
-                  }}
-                  transition={{
-                    duration: 30 + ring * 10,
-                    repeat: Infinity,
-                    ease: "linear"
-                  }}
-                />
-              ))}
-
-              <div className="max-w-6xl mx-auto px-6 z-10">
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: storyStage >= 2 ? 1 : 0, scale: storyStage >= 2 ? 1 : 0.8 }}
-                  transition={{ duration: 1, type: "spring" }}
-                  className="text-center"
-                >
-                  <motion.h2
-                    className="text-3xl md:text-6xl font-bold text-gray-900 dark:text-white mb-4"
-                    animate={{
-                      textShadow: [
-                        '0 0 20px rgba(59, 130, 246, 0.2)',
-                        '0 0 40px rgba(139, 92, 246, 0.3)',
-                        '0 0 20px rgba(59, 130, 246, 0.2)',
-                      ]
-                    }}
-                    transition={{ duration: 3, repeat: Infinity }}
-                  >
-                    Impact in Numbers
-                  </motion.h2>
-                  <p className="text-lg text-gray-600 dark:text-gray-400 mb-16">Metrics that matter</p>
-
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
-                    {[
-                      { value: "10+", label: "Years Coding", icon: Code2, gradient: "from-blue-500 via-blue-600 to-cyan-500" },
-                      { value: "50+", label: "Projects Built", icon: Zap, gradient: "from-purple-500 via-purple-600 to-pink-500" },
-                      { value: "1M+", label: "Lines of Code", icon: TrendingUp, gradient: "from-orange-500 via-red-500 to-pink-500" },
-                      { value: "∞", label: "Ideas", icon: Sparkles, gradient: "from-green-500 via-emerald-500 to-teal-500" }
-                    ].map((stat, i) => (
-                      <motion.div
-                        key={stat.label}
-                        initial={{ opacity: 0, y: 50, rotateX: -20 }}
-                        animate={{
-                          opacity: storyStage >= 2 ? 1 : 0,
-                          y: storyStage >= 2 ? 0 : 50,
-                          rotateX: storyStage >= 2 ? 0 : -20
-                        }}
-                        transition={{ delay: i * 0.15, duration: 0.8, type: "spring", stiffness: 100 }}
-                        whileHover={{
-                          scale: 1.05,
-                          rotateY: 3,
-                          z: 20,
-                          transition: { duration: 0.3 }
-                        }}
-                        className={`bg-gradient-to-br ${stat.gradient} p-8 rounded-3xl text-white relative overflow-hidden group cursor-pointer`}
-                        style={{
-                          transform: `translateY(${Math.max(-80, -scrollY * (0.04 + i * 0.01))}px) translateX(${Math.max(-25, Math.min(25, mousePosition.x * (4 + i)))}px)`,
-                          transformStyle: 'preserve-3d',
-                          boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3)',
-                          willChange: 'transform',
-                        }}
-                      >
-                        {/* Shine Effect */}
-                        <motion.div
-                          className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent"
-                          initial={{ x: '-100%' }}
-                          whileHover={{ x: '200%' }}
-                          transition={{ duration: 0.6 }}
-                        />
-
-                        {/* Animated Icon */}
-                        <motion.div
-                          animate={{
-                            rotate: [0, 360],
-                            scale: [1, 1.1, 1],
-                          }}
-                          transition={{
-                            rotate: { duration: 20, repeat: Infinity, ease: "linear" },
-                            scale: { duration: 2, repeat: Infinity, ease: "easeInOut" }
-                          }}
-                          className="mb-4 relative z-10"
-                        >
-                          <stat.icon className="w-10 h-10 md:w-12 md:h-12 mx-auto drop-shadow-lg" />
-                        </motion.div>
-
-                        {/* Count */}
-                        <motion.div
-                          className="text-4xl md:text-5xl font-black mb-2 relative z-10"
-                          animate={{
-                            scale: [1, 1.05, 1],
-                          }}
-                          transition={{
-                            duration: 2,
-                            repeat: Infinity,
-                            ease: "easeInOut"
-                          }}
-                        >
-                          {stat.value}
-                        </motion.div>
-
-                        {/* Label */}
-                        <div className="text-sm md:text-base font-medium opacity-95 relative z-10">{stat.label}</div>
-
-                        {/* Glow Effect */}
-                        <motion.div
-                          className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity"
-                          style={{
-                            background: `radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.2), transparent 70%)`,
-                          }}
-                        />
-
-                        {/* Particle Effect on Hover */}
-                        {[...Array(5)].map((_, particleIndex) => (
-                          <motion.div
-                            key={`particle-${particleIndex}`}
-                            className="absolute w-1 h-1 bg-white rounded-full opacity-0 group-hover:opacity-100"
-                            style={{
-                              left: '50%',
-                              top: '50%',
-                            }}
-                            animate={{
-                              x: Math.cos((particleIndex / 5) * Math.PI * 2) * 50,
-                              y: Math.sin((particleIndex / 5) * Math.PI * 2) * 50,
-                              opacity: [0, 1, 0],
-                            }}
-                            transition={{
-                              duration: 1,
-                              delay: particleIndex * 0.1,
-                              repeat: Infinity,
-                              repeatDelay: 0.5
-                            }}
-                          />
-                        ))}
-                      </motion.div>
-                    ))}
-                  </div>
-                </motion.div>
-              </div>
-            </motion.section>            {/* Story Chapter 4: The Tech Stack - REDESIGNED */}
-            <motion.section
-              className="min-h-screen flex items-center justify-center relative overflow-hidden isolate"
-              style={{
-                transform: `translateY(${Math.min(scrollY * 0.1, 100)}px)`,
-              }}
-            >
-              {/* Advanced Animated Background */}
-              <div className="absolute inset-0 overflow-hidden">
-                {/* Gradient Mesh Background */}
-                <motion.div
-                  className="absolute inset-0"
-                  style={{
-                    background: 'radial-gradient(circle at 20% 30%, rgba(59, 130, 246, 0.15), transparent 50%), radial-gradient(circle at 80% 70%, rgba(139, 92, 246, 0.15), transparent 50%), radial-gradient(circle at 50% 50%, rgba(236, 72, 153, 0.1), transparent 60%)',
-                  }}
-                  animate={{
-                    scale: [1, 1.1, 1],
-                    rotate: [0, 5, 0],
-                  }}
-                  transition={{
-                    duration: 20,
-                    repeat: Infinity,
-                    ease: "easeInOut"
-                  }}
-                />
-
-                {/* Floating Grid Pattern */}
-                <motion.div
-                  className="absolute inset-0 opacity-5"
-                  style={{
-                    backgroundImage: 'linear-gradient(rgba(59, 130, 246, 0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(59, 130, 246, 0.5) 1px, transparent 1px)',
-                    backgroundSize: '50px 50px',
-                  }}
-                  animate={{
-                    backgroundPosition: ['0px 0px', '50px 50px'],
-                  }}
-                  transition={{
-                    duration: 20,
-                    repeat: Infinity,
-                    ease: "linear"
-                  }}
-                />
-
-                {/* Orbiting Tech Symbols */}
-                {[...Array(8)].map((_, i) => (
-                  <motion.div
-                    key={`tech-orbit-${i}`}
-                    className="absolute"
-                    style={{
-                      left: '50%',
-                      top: '50%',
-                    }}
-                    animate={{
-                      rotate: 360,
-                    }}
-                    transition={{
-                      duration: 40 + i * 5,
-                      repeat: Infinity,
-                      ease: "linear",
-                    }}
-                  >
-                    <motion.div
-                      className="w-3 h-3 rounded-full bg-gradient-to-r from-blue-400 to-purple-400 blur-sm"
-                      style={{
-                        transform: `translateX(${200 + i * 50}px)`,
-                      }}
-                      animate={{
-                        scale: [1, 1.5, 1],
-                        opacity: [0.3, 0.8, 0.3],
-                      }}
-                      transition={{
-                        duration: 2 + i * 0.3,
-                        repeat: Infinity,
-                      }}
-                    />
-                  </motion.div>
-                ))}
-              </div>
-
-              <div className="max-w-7xl mx-auto px-6 z-10 relative">
-                {/* Enhanced Header */}
-                <motion.div
-                  initial={{ opacity: 0, y: 50 }}
-                  animate={{ opacity: storyStage >= 3 ? 1 : 0, y: storyStage >= 3 ? 0 : 50 }}
-                  transition={{ duration: 1 }}
-                  className="text-center mb-20"
-                >
-                  {/* Icon Badge */}
-                  <motion.div
-                    className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-blue-500/10 to-purple-500/10 border border-blue-500/20 mb-6"
-                    animate={{
-                      boxShadow: [
-                        '0 0 0 0 rgba(59, 130, 246, 0)',
-                        '0 0 0 10px rgba(59, 130, 246, 0.1)',
-                        '0 0 0 0 rgba(59, 130, 246, 0)',
-                      ],
-                    }}
-                    transition={{ duration: 2, repeat: Infinity }}
-                  >
-                    <Code2 className="w-5 h-5 text-blue-500" />
-                    <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">Tech Arsenal</span>
-                  </motion.div>
-
-                  {/* Main Title */}
-                  <motion.h2
-                    className="text-4xl md:text-7xl font-black mb-6"
-                    style={{
-                      background: 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 50%, #ec4899 100%)',
-                      WebkitBackgroundClip: 'text',
-                      WebkitTextFillColor: 'transparent',
-                      backgroundClip: 'text',
-                    }}
-                    animate={{
-                      backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'],
-                    }}
-                    transition={{
-                      duration: 5,
-                      repeat: Infinity,
-                      ease: "linear"
-                    }}
-                  >
-                    Master of Technologies
-                  </motion.h2>
-
-                  {/* Subtitle with typing effect */}
-                  <motion.p
-                    className="text-lg md:text-2xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: storyStage >= 3 ? 1 : 0 }}
-                    transition={{ delay: 0.5 }}
-                  >
-                    Crafting digital experiences with cutting-edge tools and frameworks
-                  </motion.p>
-
-                  {/* Tech Stats Line */}
-                  <motion.div
-                    className="flex items-center justify-center gap-8 mt-8 flex-wrap"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: storyStage >= 3 ? 1 : 0, y: storyStage >= 3 ? 0 : 20 }}
-                    transition={{ delay: 0.8 }}
-                  >
-                    {[
-                      { label: "Languages", value: "10+" },
-                      { label: "Frameworks", value: "15+" },
-                      { label: "Years Exp", value: "5+" }
-                    ].map((stat, i) => (
-                      <motion.div
-                        key={stat.label}
-                        className="text-center"
-                        initial={{ scale: 0 }}
-                        animate={{ scale: storyStage >= 3 ? 1 : 0 }}
-                        transition={{ delay: 1 + i * 0.1, type: "spring" }}
-                      >
-                        <div className="text-3xl font-bold bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text text-transparent">
-                          {stat.value}
-                        </div>
-                        <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                          {stat.label}
-                        </div>
-                      </motion.div>
-                    ))}
-                  </motion.div>
-                </motion.div>
-
-                {/* Revolutionary Tech Stack Grid */}
-                <div className="grid md:grid-cols-3 gap-6 lg:gap-8">
-                  {[
-                    {
-                      category: "Frontend",
-                      description: "Pixel-perfect interfaces",
-                      techs: [
-                        { name: "React", level: 95, color: "#61dafb" },
-                        { name: "TypeScript", level: 90, color: "#3178c6" },
-                        { name: "Tailwind", level: 98, color: "#06b6d4" },
-                        { name: "Next.js", level: 88, color: "#000000" },
-                      ],
-                      gradient: "from-blue-500 via-cyan-500 to-blue-600",
-                      bgGradient: "from-blue-500/5 to-cyan-500/5",
-                      icon: Code2,
-                      iconColor: "text-blue-500"
-                    },
-                    {
-                      category: "Backend",
-                      description: "Scalable architectures",
-                      techs: [
-                        { name: "Node.js", level: 92, color: "#339933" },
-                        { name: "Python", level: 85, color: "#3776ab" },
-                        { name: "PostgreSQL", level: 88, color: "#336791" },
-                        { name: "Redis", level: 80, color: "#dc382d" },
-                      ],
-                      gradient: "from-purple-500 via-pink-500 to-purple-600",
-                      bgGradient: "from-purple-500/5 to-pink-500/5",
-                      icon: Zap,
-                      iconColor: "text-purple-500"
-                    },
-                    {
-                      category: "DevOps",
-                      description: "Cloud & automation",
-                      techs: [
-                        { name: "Docker", level: 90, color: "#2496ed" },
-                        { name: "AWS", level: 85, color: "#ff9900" },
-                        { name: "Git", level: 95, color: "#f05032" },
-                        { name: "CI/CD", level: 88, color: "#6366f1" },
-                      ],
-                      gradient: "from-orange-500 via-red-500 to-orange-600",
-                      bgGradient: "from-orange-500/5 to-red-500/5",
-                      icon: TrendingUp,
-                      iconColor: "text-orange-500"
-                    }
-                  ].map((stack, i) => (
-                    <motion.div
-                      key={stack.category}
-                      initial={{ opacity: 0, y: 100, rotateX: -30 }}
-                      animate={{
-                        opacity: storyStage >= 3 ? 1 : 0,
-                        y: storyStage >= 3 ? 0 : 100,
-                        rotateX: storyStage >= 3 ? 0 : -30
-                      }}
-                      transition={{
-                        delay: i * 0.2,
-                        duration: 0.8,
-                        type: "spring",
-                        stiffness: 100
-                      }}
-                      className="group relative"
-                      style={{
-                        perspective: 1500,
-                        transformStyle: 'preserve-3d',
-                      }}
-                    >
-                      <motion.div
-                        whileHover={{
-                          scale: 1.05,
-                          rotateY: 5,
-                          rotateX: 5,
-                          z: 50,
-                        }}
-                        className="relative bg-white/80 dark:bg-gray-900/80 backdrop-blur-2xl rounded-3xl border border-gray-200/50 dark:border-gray-700/50 overflow-hidden"
-                        style={{
-                          transformStyle: 'preserve-3d',
-                          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.15)',
-                        }}
-                      >
-                        {/* Gradient Background Layer */}
-                        <motion.div
-                          className={`absolute inset-0 bg-gradient-to-br ${stack.bgGradient} opacity-0 group-hover:opacity-100 transition-opacity duration-500`}
-                        />
-
-                        {/* Animated Border Glow */}
-                        <motion.div
-                          className={`absolute inset-0 rounded-3xl bg-gradient-to-r ${stack.gradient} opacity-0 group-hover:opacity-20 blur-xl`}
-                          animate={{
-                            scale: [1, 1.1, 1],
-                          }}
-                          transition={{
-                            duration: 2,
-                            repeat: Infinity,
-                          }}
-                        />
-
-                        {/* Content */}
-                        <div className="relative p-8" style={{ transform: 'translateZ(30px)' }}>
-                          {/* Header Section */}
-                          <div className="mb-8">
-                            {/* Floating Icon */}
-                            <motion.div
-                              className="mb-6 relative"
-                              animate={{
-                                y: [0, -10, 0],
-                                rotate: [0, 5, 0, -5, 0],
-                              }}
-                              transition={{
-                                duration: 4,
-                                repeat: Infinity,
-                                ease: "easeInOut"
-                              }}
-                            >
-                              <motion.div
-                                className={`w-20 h-20 mx-auto rounded-2xl bg-gradient-to-br ${stack.gradient} p-1 relative`}
-                                whileHover={{ rotate: 360 }}
-                                transition={{ duration: 0.6 }}
-                              >
-                                <div className="w-full h-full bg-white dark:bg-gray-900 rounded-xl flex items-center justify-center">
-                                  <stack.icon className={`w-10 h-10 ${stack.iconColor}`} />
-                                </div>
-
-                                {/* Orbiting dots */}
-                                {[...Array(3)].map((_, idx) => (
-                                  <motion.div
-                                    key={idx}
-                                    className={`absolute w-2 h-2 rounded-full bg-gradient-to-r ${stack.gradient}`}
-                                    style={{
-                                      top: '50%',
-                                      left: '50%',
-                                    }}
-                                    animate={{
-                                      rotate: 360,
-                                    }}
-                                    transition={{
-                                      duration: 3 + idx,
-                                      repeat: Infinity,
-                                      ease: "linear",
-                                    }}
-                                  >
-                                    <div style={{ transform: `translate(-50%, -50%) translateX(${35 + idx * 5}px)` }} />
-                                  </motion.div>
-                                ))}
-                              </motion.div>
-                            </motion.div>
-
-                            {/* Title & Description */}
-                            <h3 className="text-3xl font-black text-gray-900 dark:text-white mb-2 text-center">
-                              {stack.category}
-                            </h3>
-                            <p className="text-sm text-gray-500 dark:text-gray-400 text-center">
-                              {stack.description}
-                            </p>
-                          </div>
-
-                          {/* Tech Stack with Progress Bars */}
-                          <div className="space-y-4">
-                            {stack.techs.map((tech, techIndex) => (
-                              <motion.div
-                                key={tech.name}
-                                initial={{ opacity: 0, x: -30 }}
-                                animate={{
-                                  opacity: storyStage >= 3 ? 1 : 0,
-                                  x: storyStage >= 3 ? 0 : -30
-                                }}
-                                transition={{
-                                  delay: i * 0.2 + techIndex * 0.1 + 0.5,
-                                  type: "spring"
-                                }}
-                                whileHover={{ x: 5 }}
-                                className="group/tech"
-                              >
-                                {/* Tech Name & Level */}
-                                <div className="flex items-center justify-between mb-2">
-                                  <div className="flex items-center gap-2">
-                                    <motion.div
-                                      className="w-2 h-2 rounded-full"
-                                      style={{ backgroundColor: tech.color }}
-                                      animate={{
-                                        scale: [1, 1.3, 1],
-                                        opacity: [0.7, 1, 0.7],
-                                      }}
-                                      transition={{
-                                        duration: 2,
-                                        repeat: Infinity,
-                                        delay: techIndex * 0.2,
-                                      }}
-                                    />
-                                    <span className="text-sm font-bold text-gray-700 dark:text-gray-300">
-                                      {tech.name}
-                                    </span>
-                                  </div>
-                                  <motion.span
-                                    className="text-xs font-mono font-bold"
-                                    style={{
-                                      background: `linear-gradient(135deg, ${tech.color}, ${tech.color}cc)`,
-                                      WebkitBackgroundClip: 'text',
-                                      WebkitTextFillColor: 'transparent',
-                                    }}
-                                    initial={{ opacity: 0 }}
-                                    whileHover={{ scale: 1.2 }}
-                                  >
-                                    {tech.level}%
-                                  </motion.span>
-                                </div>
-
-                                {/* Animated Progress Bar */}
-                                <div className="relative h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-                                  <motion.div
-                                    className="absolute inset-y-0 left-0 rounded-full"
-                                    style={{
-                                      background: `linear-gradient(90deg, ${tech.color}, ${tech.color}cc)`,
-                                    }}
-                                    initial={{ width: 0 }}
-                                    animate={{
-                                      width: storyStage >= 3 ? `${tech.level}%` : 0
-                                    }}
-                                    transition={{
-                                      delay: i * 0.2 + techIndex * 0.15 + 0.8,
-                                      duration: 1,
-                                      ease: "easeOut"
-                                    }}
-                                  />
-
-                                  {/* Shimmer effect */}
-                                  <motion.div
-                                    className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent"
-                                    animate={{
-                                      x: ['-100%', '200%'],
-                                    }}
-                                    transition={{
-                                      duration: 2,
-                                      repeat: Infinity,
-                                      delay: i * 0.3 + techIndex * 0.2,
-                                      repeatDelay: 3,
-                                    }}
-                                  />
-                                </div>
-                              </motion.div>
-                            ))}
-                          </div>
-
-                          {/* Decorative Corner Elements */}
-                          <div className="absolute top-4 right-4 w-16 h-16 border-t-2 border-r-2 rounded-tr-2xl opacity-10"
-                            style={{ borderColor: stack.techs[0].color }}
-                          />
-                          <div className="absolute bottom-4 left-4 w-16 h-16 border-b-2 border-l-2 rounded-bl-2xl opacity-10"
-                            style={{ borderColor: stack.techs[0].color }}
-                          />
-                        </div>
-
-                        {/* Hover Particles */}
-                        {[...Array(6)].map((_, particleIndex) => (
-                          <motion.div
-                            key={`hover-particle-${particleIndex}`}
-                            className="absolute w-1 h-1 rounded-full opacity-0 group-hover:opacity-100 pointer-events-none"
-                            style={{
-                              background: `linear-gradient(135deg, ${stack.techs[0].color}, ${stack.techs[1].color})`,
-                              left: `${20 + particleIndex * 10}%`,
-                              top: `${10 + Math.sin(particleIndex) * 30}%`,
-                            }}
-                            animate={{
-                              y: [0, -30, 0],
-                              opacity: [0, 1, 0],
-                              scale: [0, 1.5, 0],
-                            }}
-                            transition={{
-                              duration: 2,
-                              repeat: Infinity,
-                              delay: particleIndex * 0.2,
-                            }}
-                          />
-                        ))}
-                      </motion.div>
-
-                      {/* 3D Shadow Layer */}
-                      <div
-                        className={`absolute inset-0 bg-gradient-to-br ${stack.gradient} opacity-20 blur-2xl rounded-3xl`}
-                        style={{
-                          transform: 'translateZ(-30px) scale(0.95)',
-                          zIndex: -1,
-                        }}
-                      />
-                    </motion.div>
-                  ))}
-                </div>
-
-                {/* Tech Achievement Highlights */}
-                <motion.div
-                  className="mt-20 text-center"
-                  initial={{ opacity: 0, y: 50 }}
-                  animate={{ opacity: storyStage >= 3 ? 1 : 0, y: storyStage >= 3 ? 0 : 50 }}
-                  transition={{ delay: 1.5, duration: 0.8 }}
-                >
-                  <motion.div
-                    className="inline-flex items-center gap-3 px-6 py-3 rounded-full bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950/30 dark:to-purple-950/30 border border-blue-200/50 dark:border-blue-800/50"
-                    whileHover={{ scale: 1.05 }}
-                    animate={{
-                      boxShadow: [
-                        '0 0 0 0 rgba(59, 130, 246, 0)',
-                        '0 0 0 15px rgba(59, 130, 246, 0.1)',
-                        '0 0 0 0 rgba(59, 130, 246, 0)',
-                      ],
-                    }}
-                    transition={{
-                      boxShadow: { duration: 2, repeat: Infinity },
-                    }}
-                  >
-                    <Sparkles className="w-5 h-5 text-blue-500" />
-                    <span className="text-sm font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                      Always learning, always building
-                    </span>
-                    <Sparkles className="w-5 h-5 text-purple-500" />
-                  </motion.div>
-
-                  {/* Quick Tech Badges */}
-                  <motion.div
-                    className="flex flex-wrap items-center justify-center gap-3 mt-8 max-w-2xl mx-auto"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: storyStage >= 3 ? 1 : 0 }}
-                    transition={{ delay: 2 }}
-                  >
-                    {[
-                      { icon: "⚡", text: "Performance Optimized" },
-                      { icon: "🎨", text: "Pixel Perfect" },
-                      { icon: "🔒", text: "Security First" },
-                      { icon: "📱", text: "Mobile Ready" },
-                      { icon: "♿", text: "Accessible" },
-                      { icon: "🚀", text: "Fast Delivery" },
-                    ].map((badge, i) => (
-                      <motion.div
-                        key={badge.text}
-                        initial={{ opacity: 0, scale: 0 }}
-                        animate={{
-                          opacity: storyStage >= 3 ? 1 : 0,
-                          scale: storyStage >= 3 ? 1 : 0,
-                        }}
-                        transition={{
-                          delay: 2 + i * 0.1,
-                          type: "spring",
-                          stiffness: 200
-                        }}
-                        whileHover={{
-                          scale: 1.1,
-                          rotate: [0, -5, 5, 0],
-                        }}
-                        className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-shadow cursor-default"
-                      >
-                        <span className="text-base">{badge.icon}</span>
-                        <span className="text-xs font-medium text-gray-700 dark:text-gray-300">
-                          {badge.text}
-                        </span>
-                      </motion.div>
-                    ))}
-                  </motion.div>
-                </motion.div>
-              </div>
-            </motion.section>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: showContent ? 1 : 0 }}
-        transition={{ duration: 1, delay: 0.5 }}
-        className="max-w-lg mx-auto px-4 py-12 relative z-10"
-        style={{
-          perspective: 1500,
-          transformStyle: 'preserve-3d',
-        }}
-      >
-        {/* Profile Section */}
-        <motion.div
-          className="text-center mb-12"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: showContent ? 1 : 0, y: showContent ? 0 : 20 }}
-          transition={{ duration: 0.8, delay: 0.8 }}
-        >
-          {/* Avatar - 3D Tilt Effect */}
-          <motion.div
-            className="w-28 h-28 mx-auto mb-6 relative cursor-pointer select-none"
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            style={{
-              transformStyle: 'preserve-3d',
-              perspective: 1000,
-            }}
-            whileHover={{
-              scale: 1.1,
-              rotateX: mousePosition.y * 5,
-              rotateY: mousePosition.x * 5,
-              z: 50,
-              transition: { duration: 0.3 }
-            }}
-            transition={{ delay: 0.1 }}
-            onDoubleClick={handleDoubleTap}
-            onTouchStart={(e) => {
-              const now = Date.now();
-              const target = e.currentTarget as HTMLElement & { lastTap?: number };
-              const lastTap = target.lastTap || 0;
-              if (now - lastTap < 300) {
-                handleDoubleTap(e);
-              }
-              target.lastTap = now;
-            }}
-          >
-            <img
-              src="/assets/profile.jpg"
-              alt="Emma | leli"
-              className="w-full h-full object-cover rounded-full border-4 border-white dark:border-gray-800 shadow-lg"
-            />
-            <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 border-4 border-white dark:border-gray-900 rounded-full"></div>
-          </motion.div>
-
-          {/* Greeting */}
-          {greeting && (
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="mb-2 text-sm font-medium text-purple-600 dark:text-purple-400"
-            >
-              {greeting}! 👋
-            </motion.div>
-          )}
-
-          {/* Name & Title */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.2 }}
-          >
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-              Emma | leli
-            </h1>
-            <p className="text-gray-600 dark:text-gray-400 mb-1 font-mono">
-              {typedText}
-              <motion.span
-                className="inline-block w-0.5 h-5 bg-gray-600 dark:bg-gray-400 ml-1"
-                animate={{ opacity: [1, 0] }}
-                transition={{ duration: 0.8, repeat: Infinity }}
-              />
-            </p>
-            <p className="text-sm text-gray-500 dark:text-gray-500 font-mono">
-              @jecrs687
-            </p>
-          </motion.div>
-
-          {/* Streak Badge */}
-          {streak > 1 && (
-            <motion.div
-              initial={{ opacity: 0, scale: 0 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="mt-3 inline-flex items-center gap-1 px-3 py-1 bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-300 rounded-full text-sm font-semibold"
-            >
-              <Flame className="w-4 h-4" />
-              {streak} day streak!
-            </motion.div>
-          )}
-
-          {/* Stats Row */}
-          <motion.div
-            className="flex items-center justify-center gap-4 mt-4 text-sm flex-wrap"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.3 }}
-          >
-            <div className="flex items-center gap-1 text-gray-600 dark:text-gray-400">
-              <MapPin className="w-4 h-4" />
-              <span>Malta</span>
-            </div>
-            <motion.div
-              className="flex items-center gap-1 text-gray-600 dark:text-gray-400"
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ delay: 0.5, type: "spring", stiffness: 200 }}
-            >
-              <TrendingUp className="w-4 h-4" />
-              <motion.span
-                key={viewCount}
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
-              >
-                {viewCount.toLocaleString()} views
-              </motion.span>
-            </motion.div>
-            <motion.div
-              className="flex items-center gap-1 text-green-600 dark:text-green-400"
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ delay: 0.7, type: "spring", stiffness: 200 }}
-            >
-              <Users className="w-4 h-4" />
-              <motion.span
-                key={liveVisitors}
-                initial={{ opacity: 0, scale: 0.5 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.3 }}
-              >
-                {liveVisitors} online
-              </motion.span>
-              <motion.div
-                className="w-2 h-2 bg-green-500 rounded-full"
-                animate={{ opacity: [1, 0.3, 1] }}
-                transition={{ duration: 2, repeat: Infinity }}
-              />
-            </motion.div>
-          </motion.div>
-
-          {/* Age Counter */}
-          <motion.div
-            className="mt-4 px-4 py-3 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-xl border border-blue-200 dark:border-blue-800"
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.8 }}
-          >
-            <div className="text-center">
-              <div className="text-xs text-gray-500 dark:text-gray-400 font-semibold mb-1">
-                Current Age
-              </div>
-              <div className="font-mono text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                {currentAge}
-              </div>
-            </div>
-          </motion.div>
-
-          {/* Reaction Bar */}
-          <motion.div
-            className="flex items-center justify-center gap-3 mt-6"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-          >
-            {['❤️', '🔥', '👏', '💯'].map((emoji, index) => (
-              <motion.button
-                key={emoji}
-                onClick={() => handleReaction(emoji)}
-                className="text-2xl hover:scale-125 transition-transform cursor-pointer"
-                whileHover={{ scale: 1.25 }}
-                whileTap={{ scale: 0.9 }}
-                initial={{ opacity: 0, scale: 0 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.5 + index * 0.1 }}
-              >
-                {emoji}
-              </motion.button>
-            ))}
-            <motion.span
-              className="text-sm text-gray-500 dark:text-gray-400 ml-2"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.9 }}
-            >
-              {likeCount > 0 && `${likeCount.toLocaleString()}`}
-            </motion.span>
-          </motion.div>
-
-          {/* Fun Fact Generator */}
-          <motion.div
-            className="mt-6"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.5 }}
-          >
-            <motion.button
-              onClick={nextFact}
-              className="w-full px-4 py-3 bg-gradient-to-r from-purple-100 to-pink-100 dark:from-purple-900/30 dark:to-pink-900/30 rounded-xl border border-purple-200 dark:border-purple-800 text-sm text-gray-700 dark:text-gray-300 font-medium hover:shadow-lg transition-shadow"
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-            >
-              <AnimatePresence mode="wait">
-                <motion.span
-                  key={currentFact}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  transition={{ duration: 0.3 }}
-                  className="block"
-                >
-                  {funFacts[currentFact]}
-                </motion.span>
-              </AnimatePresence>
-              <span className="text-xs text-gray-500 dark:text-gray-400 mt-1 block">Tap for another fact</span>
-            </motion.button>
-          </motion.div>
-
-          {/* Life Progress Bars */}
-          <motion.div
-            className="mt-6 space-y-3"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.6 }}
-          >
-            <div className="text-xs text-gray-600 dark:text-gray-400 font-semibold mb-2">Life Progress</div>
-
-            <div className="space-y-1">
-              <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400">
-                <span>Today</span>
-                <span className="font-mono">{dayProgress.toFixed(7)}%</span>
-              </div>
-              <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-                <motion.div
-                  className="h-full bg-gradient-to-r from-blue-400 to-blue-600"
-                  style={{ width: `${dayProgress}%` }}
-                  initial={{ width: 0 }}
-                  animate={{ width: `${dayProgress}%` }}
-                  transition={{ duration: 0.5 }}
-                />
-              </div>
-            </div>
-
-            <div className="space-y-1">
-              <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400">
-                <span>Year 2025</span>
-                <span className="font-mono">{yearProgress.toFixed(7)}%</span>
-              </div>
-              <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-                <motion.div
-                  className="h-full bg-gradient-to-r from-purple-400 to-purple-600"
-                  style={{ width: `${yearProgress}%` }}
-                  initial={{ width: 0 }}
-                  animate={{ width: `${yearProgress}%` }}
-                  transition={{ duration: 0.5 }}
-                />
-              </div>
-            </div>
-          </motion.div>
-
-          {/* Easter Egg Counter */}
-          {easterEggsFound.length > 0 && (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="mt-4 px-4 py-2 bg-gradient-to-r from-yellow-100 to-orange-100 dark:from-yellow-900/30 dark:to-orange-900/30 rounded-xl"
-            >
-              <div className="flex items-center justify-center gap-2 text-sm font-semibold text-yellow-800 dark:text-yellow-300">
-                <PartyPopper className="w-4 h-4" />
-                <span>Easter Eggs: {easterEggsFound.length}/5</span>
-              </div>
-            </motion.div>
-          )}
-
-          {/* Achievement Badges - 3D Floating Islands */}
-          <AnimatePresence>
-            {achievements.length > 0 && (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.8, y: 20 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.8, y: 20 }}
-                className="mt-4 flex flex-wrap gap-2 justify-center"
-                style={{
-                  perspective: 1000,
-                  transformStyle: 'preserve-3d',
-                }}
-              >
-                {achievements.map((achievement, index) => (
-                  <motion.div
-                    key={achievement}
-                    initial={{ opacity: 0, scale: 0, rotateX: -90 }}
-                    animate={{
-                      opacity: 1,
-                      scale: 1,
-                      rotateX: 0,
-                      y: [0, -8, 0],
-                    }}
-                    transition={{
-                      delay: index * 0.1,
-                      y: {
-                        duration: 2 + index * 0.3,
-                        repeat: Infinity,
-                        ease: "easeInOut"
-                      }
-                    }}
-                    whileHover={{
-                      scale: 1.15,
-                      rotateY: 15,
-                      z: 30,
-                      boxShadow: "0 25px 50px rgba(0,0,0,0.25)"
-                    }}
-                    className="px-3 py-1 bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300 rounded-full text-xs font-semibold flex items-center gap-1 border-2 border-yellow-300 dark:border-yellow-700 cursor-pointer"
-                    style={{
-                      transformStyle: 'preserve-3d',
-                      boxShadow: '0 10px 30px rgba(0,0,0,0.15)',
-                    }}
-                  >
-                    <Trophy className="w-3 h-3" />
-                    {achievement}
-                  </motion.div>
-                ))}
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </motion.div>
-
-        {/* Instagram-style Story Highlights - 3D Carousel */}
-        <motion.div
-          className="mb-8 overflow-x-auto scrollbar-hide"
+        {/* Skip button */}
+        <motion.button
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.35 }}
-          style={{
-            perspective: 1500,
-            transformStyle: 'preserve-3d',
-          }}
+          transition={{ delay: 2 }}
+          onClick={onComplete}
+          className="mt-4 text-gray-500 hover:text-white transition-colors text-sm font-mono"
         >
-          <div className="flex gap-6 justify-start px-2">
-            {highlights.map((highlight, i) => (
-              <motion.div
-                key={highlight.label}
-                className="flex flex-col items-center gap-2 cursor-pointer group relative"
-                initial={{ opacity: 0, scale: 0.8, rotateY: -90 }}
-                animate={{
-                  opacity: 1,
-                  scale: 1,
-                  rotateY: 0,
-                }}
-                transition={{
-                  delay: 0.4 + i * 0.1,
-                  type: "spring",
-                  stiffness: 100
-                }}
-                whileHover={{
-                  scale: 1.15,
-                  rotateY: 15,
-                  z: 50,
-                }}
-                whileTap={{ scale: 0.95 }}
-                style={{
-                  transformStyle: 'preserve-3d',
-                }}
-              >
-                {/* 3D Ring Effect */}
-                <motion.div
-                  className="absolute inset-0 rounded-full"
-                  style={{
-                    background: `linear-gradient(135deg, ${highlight.color.split(' ')[1]}, ${highlight.color.split(' ')[3]})`,
-                    transform: 'translateZ(-20px)',
-                    filter: 'blur(10px)',
-                  }}
-                  initial={{ opacity: 0 }}
-                  whileHover={{ opacity: 0.6 }}
-                />
+          [PRESS TO SKIP]
+        </motion.button>
+      </div>
+    </motion.div>
+  );
+});
 
-                <motion.div
-                  className={`w-16 h-16 rounded-full bg-gradient-to-br ${highlight.color} p-0.5 relative`}
-                  animate={{
-                    boxShadow: [
-                      '0 0 0 0 rgba(59, 130, 246, 0)',
-                      '0 0 0 8px rgba(59, 130, 246, 0.1)',
-                      '0 0 0 0 rgba(59, 130, 246, 0)',
-                    ],
-                  }}
-                  transition={{
-                    duration: 2,
-                    repeat: Infinity,
-                    delay: i * 0.3,
-                  }}
-                  style={{
-                    transformStyle: 'preserve-3d',
-                  }}
-                >
-                  <div
-                    className="w-full h-full rounded-full bg-white dark:bg-gray-800 flex items-center justify-center"
-                    style={{ transform: 'translateZ(10px)' }}
-                  >
-                    <motion.div
-                      animate={{
-                        rotate: [0, 10, -10, 0],
-                        scale: [1, 1.1, 1],
-                      }}
-                      transition={{
-                        duration: 2,
-                        repeat: Infinity,
-                        delay: i * 0.2,
-                      }}
-                    >
-                      <highlight.icon className="w-7 h-7 text-gray-700 dark:text-gray-300" />
-                    </motion.div>
-                  </div>
-                </motion.div>
+HackerTerminal.displayName = 'HackerTerminal';
 
-                <motion.span
-                  className="text-xs text-gray-600 dark:text-gray-400 font-medium"
-                  style={{ transform: 'translateZ(15px)' }}
-                >
-                  {highlight.label}
-                </motion.span>
-              </motion.div>
-            ))}
-          </div>
-        </motion.div>
+// ============================================================================
+// SOCIAL LINK COMPONENT
+// ============================================================================
 
-
-        {/* Currently Listening / Status Badge - 3D Vinyl Effect */}
-        <motion.div
-          className="mb-6 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-xl border border-green-200 dark:border-green-800 p-4 flex items-center gap-3 relative overflow-hidden"
-          initial={{ opacity: 0, x: -20, rotateY: -45 }}
-          animate={{ opacity: 1, x: 0, rotateY: 0 }}
-          transition={{ delay: 0.6, type: "spring" }}
-          whileHover={{
-            scale: 1.02,
-            boxShadow: "0 15px 35px rgba(34, 197, 94, 0.2)"
-          }}
-          style={{
-            perspective: 1000,
-            transformStyle: 'preserve-3d',
-            boxShadow: '0 8px 25px rgba(34, 197, 94, 0.1)',
-          }}
-        >
-          {/* 3D Vinyl Record */}
-          <motion.div
-            animate={{
-              rotate: 360,
-              scale: [1, 1.1, 1],
-            }}
-            transition={{
-              rotate: { duration: 3, repeat: Infinity, ease: "linear" },
-              scale: { duration: 2, repeat: Infinity }
-            }}
-            className="flex-shrink-0 relative"
-            style={{
-              transformStyle: 'preserve-3d',
-              transform: 'translateZ(15px)',
-            }}
-          >
-            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-green-600 to-emerald-600 flex items-center justify-center relative">
-              {/* Vinyl grooves */}
-              <div className="absolute inset-2 rounded-full border-2 border-green-400/30" />
-              <div className="absolute inset-3 rounded-full border border-green-400/20" />
-              <div className="absolute inset-4 rounded-full bg-gray-900 flex items-center justify-center">
-                <Music className="w-4 h-4 text-green-400" />
-              </div>
-            </div>
-          </motion.div>
-          <div className="flex-1 min-w-0">
-            <div className="text-xs text-green-600 dark:text-green-400 font-medium mb-0.5">
-              Currently Vibing to
-            </div>
-            <div className="text-sm font-semibold text-gray-900 dark:text-white truncate">
-              JPop & Coding Beats 🎵
-            </div>
-          </div>
-          <motion.div
-            className="flex gap-0.5"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-          >
-            {[0, 1, 2].map((i) => (
-              <motion.div
-                key={i}
-                className="w-1 bg-green-500 rounded-full"
-                animate={{
-                  height: ["8px", "16px", "8px"],
-                }}
-                transition={{
-                  duration: 0.8,
-                  repeat: Infinity,
-                  delay: i * 0.2,
-                }}
-              />
-            ))}
-          </motion.div>
-        </motion.div>
-
-        {/* Quick Stats Cards - 3D Stacked Layers Effect */}
-        <motion.div
-          className="mb-8 grid grid-cols-3 gap-3"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.65 }}
-          style={{
-            perspective: 1200,
-            transformStyle: 'preserve-3d',
-          }}
-        >
-          {[
-            { value: `${projects.length}+`, label: "Projects", color: "#3b82f6", gradient: "from-blue-500 to-blue-600" },
-            { value: "3+", label: "Languages", color: "#8b5cf6", gradient: "from-purple-500 to-purple-600" },
-            { value: "∞", label: "Ideas", color: "#10b981", gradient: "from-green-500 to-green-600" }
-          ].map((stat, index) => (
-            <motion.div
-              key={stat.label}
-              className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 text-center relative overflow-hidden"
-              initial={{ rotateY: -90, opacity: 0 }}
-              animate={{ rotateY: 0, opacity: 1 }}
-              transition={{
-                delay: 0.65 + index * 0.1,
-                type: "spring",
-                stiffness: 100
-              }}
-              whileHover={{
-                scale: 1.08,
-                rotateY: 5,
-                rotateX: 5,
-                z: 40,
-                borderColor: stat.color,
-                boxShadow: `0 20px 40px ${stat.color}40`,
-              }}
-              style={{
-                transformStyle: 'preserve-3d',
-                boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
-              }}
-            >
-              {/* Gradient overlay on hover */}
-              <motion.div
-                className={`absolute inset-0 bg-gradient-to-br ${stat.gradient} opacity-0`}
-                whileHover={{ opacity: 0.1 }}
-                transition={{ duration: 0.3 }}
-              />
-
-              {/* 3D depth layer */}
-              <div
-                className="absolute inset-0 bg-gradient-to-br from-gray-100/50 to-transparent dark:from-gray-700/50 rounded-xl"
-                style={{ transform: 'translateZ(-10px)' }}
-              />
-
-              <div className="relative" style={{ transform: 'translateZ(20px)' }}>
-                <motion.div
-                  className="text-2xl font-bold mb-1"
-                  style={{
-                    backgroundImage: `linear-gradient(135deg, ${stat.color}, ${stat.color}dd)`,
-                    WebkitBackgroundClip: 'text',
-                    WebkitTextFillColor: 'transparent',
-                    backgroundClip: 'text',
-                  }}
-                  animate={{
-                    scale: [1, 1.05, 1],
-                  }}
-                  transition={{
-                    duration: 2,
-                    repeat: Infinity,
-                    delay: index * 0.3
-                  }}
-                >
-                  {stat.value}
-                </motion.div>
-                <div className="text-xs text-gray-600 dark:text-gray-400 font-medium">
-                  {stat.label}
-                </div>
-              </div>
-            </motion.div>
-          ))}
-        </motion.div>
-
-        {/* Social Links Section */}
-        <motion.div
-          className="mb-8"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.5 }}
-        >
-          <SocialLink
-            href={info.github}
-            icon={Github}
-            text="GitHub"
-            color="black"
-          />
-          <SocialLink
-            href={info.linkedin}
-            icon={Linkedin}
-            text="LinkedIn"
-            color="blue"
-          />
-          <SocialLink
-            href={info.instagram}
-            icon={Instagram}
-            text="Instagram"
-            color="pink"
-          />
-          <SocialLink
-            href={`https://medium.com/@${info.mediumUser}`}
-            icon={BookOpen}
-            text="Medium"
-            color="black"
-          />
-          <SocialLink
-            href={info.facebook}
-            icon={Globe}
-            text="Portfolio"
-            color="gray"
-          />
-        </motion.div>
-
-        {/* Featured Projects with Cool Animation */}
-        <motion.div
-          className="mb-8"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.6 }}
-        >
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
-              <Zap className="w-5 h-5 text-yellow-500" />
-              Latest Projects
-            </h2>
-            <Link
-              to="/projects"
-              className="text-sm text-blue-600 dark:text-blue-400 hover:underline font-medium"
-            >
-              See all
-            </Link>
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            {projects.map((project, index) => (
-              <ProjectCard key={project.name} project={project} index={index} />
-            ))}
-          </div>
-        </motion.div>
-
-        {/* Footer with Fun Interaction - 3D Floating Button */}
-        <motion.div
-          className="text-center pt-6"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.7 }}
-          style={{
-            perspective: 1200,
-            transformStyle: 'preserve-3d',
-          }}
-        >
-          <motion.div
-            animate={{
-              y: [0, -8, 0],
-            }}
-            transition={{
-              duration: 3,
-              repeat: Infinity,
-              ease: "easeInOut"
-            }}
-            whileHover={{
-              scale: 1.08,
-              rotateX: -10,
-              rotateY: 5,
-              z: 40,
-            }}
-            whileTap={{
-              scale: 0.95,
-              rotateX: 5,
-            }}
-            style={{
-              transformStyle: 'preserve-3d',
-            }}
-          >
-            <Link
-              to="/"
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 text-white font-medium hover:from-blue-700 hover:to-purple-700 transition-all shadow-lg hover:shadow-xl relative overflow-hidden"
-              style={{
-                transformStyle: 'preserve-3d',
-                boxShadow: '0 10px 40px rgba(59, 130, 246, 0.3)',
-              }}
-            >
-              {/* 3D depth layers */}
-              <div
-                className="absolute inset-0 bg-gradient-to-r from-blue-700 to-purple-700 rounded-full"
-                style={{ transform: 'translateZ(-5px)' }}
-              />
-              <div
-                className="absolute inset-0 bg-gradient-to-r from-blue-800 to-purple-800 rounded-full"
-                style={{ transform: 'translateZ(-10px)' }}
-              />
-
-              {/* Content layer */}
-              <span className="relative z-10 flex items-center gap-2" style={{ transform: 'translateZ(15px)' }}>
-                <motion.div
-                  animate={{
-                    rotate: [0, 360],
-                    scale: [1, 1.2, 1],
-                  }}
-                  transition={{
-                    duration: 3,
-                    repeat: Infinity,
-                    ease: "easeInOut"
-                  }}
-                >
-                  <Sparkles className="w-4 h-4" />
-                </motion.div>
-                Explore Full Portfolio
-              </span>
-
-              {/* Shimmer effect */}
-              <motion.div
-                className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent"
-                initial={{ x: '-100%' }}
-                animate={{ x: '200%' }}
-                transition={{
-                  duration: 2,
-                  repeat: Infinity,
-                  repeatDelay: 1,
-                }}
-                style={{ transform: 'translateZ(20px)' }}
-              />
-            </Link>
-          </motion.div>
-          <p className="text-xs text-gray-500 dark:text-gray-600 mt-6">
-            Made with passion • © 2025
-          </p>
-
-          {/* Hidden Easter Eggs */}
-          <div className="mt-8 flex justify-center gap-4 opacity-0 hover:opacity-100 transition-opacity">
-            {[1, 2, 3, 4, 5].map((id) => (
-              <motion.button
-                key={id}
-                onClick={() => handleEasterEgg(id)}
-                className={`w-3 h-3 rounded-full ${easterEggsFound.includes(id)
-                  ? 'bg-yellow-400'
-                  : 'bg-gray-300 dark:bg-gray-700'
-                  } hover:scale-150 transition-transform`}
-                whileHover={{ scale: 2 }}
-                whileTap={{ scale: 0.8 }}
-              />
-            ))}
-          </div>
-        </motion.div>
-      </motion.div>
+const SocialLink = memo(({
+  href,
+  icon: Icon,
+  label,
+  color
+}: {
+  href: string;
+  icon: React.ComponentType<{ className?: string }>;
+  label: string;
+  color: string;
+}) => (
+  <motion.a
+    href={href}
+    target="_blank"
+    rel="noopener noreferrer"
+    whileHover={{ scale: 1.05, y: -2 }}
+    whileTap={{ scale: 0.95 }}
+    className={`
+      flex items-center gap-3 px-5 py-3.5 rounded-2xl
+      bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm
+      border border-gray-200/50 dark:border-gray-700/50
+      shadow-sm hover:shadow-lg transition-all duration-300
+      group
+    `}
+  >
+    <div className={`p-2 rounded-xl ${color} transition-transform group-hover:scale-110`}>
+      <Icon className="w-5 h-5 text-white" />
     </div>
+    <span className="font-medium text-gray-800 dark:text-gray-200 flex-1">
+      {label}
+    </span>
+    <ExternalLink className="w-4 h-4 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity" />
+  </motion.a>
+));
+
+SocialLink.displayName = 'SocialLink';
+
+// ============================================================================
+// DATA CARD COMPONENT
+// ============================================================================
+
+const DataCard = memo(({
+  icon: Icon,
+  label,
+  value,
+  delay
+}: {
+  icon: React.ComponentType<{ className?: string }>;
+  label: string;
+  value: string;
+  delay: number;
+}) => (
+  <motion.div
+    initial={{ opacity: 0, scale: 0.8 }}
+    animate={{ opacity: 1, scale: 1 }}
+    transition={{ delay, type: 'spring' }}
+    className="flex items-center gap-2 px-3 py-2 rounded-lg bg-gray-100/80 dark:bg-gray-800/80 text-xs"
+  >
+    <Icon className="w-3.5 h-3.5 text-gray-500" />
+    <span className="text-gray-500">{label}:</span>
+    <span className="font-mono text-gray-700 dark:text-gray-300 truncate">{value}</span>
+  </motion.div>
+));
+
+DataCard.displayName = 'DataCard';
+
+// ============================================================================
+// MAIN COMPONENT
+// ============================================================================
+
+const InstagramLinkPage = () => {
+  const [showTerminal, setShowTerminal] = useState(true);
+  const [visitorData, setVisitorData] = useState<VisitorData | null>(null);
+  const [showDataPanel, setShowDataPanel] = useState(false);
+  const [isDark, setIsDark] = useState(() =>
+    document.documentElement.classList.contains('dark')
+  );
+
+  // Collect visitor data on mount
+  useEffect(() => {
+    setVisitorData(collectVisitorData());
+  }, []);
+
+  // Handle terminal complete
+  const handleTerminalComplete = useCallback(() => {
+    setShowTerminal(false);
+    // Celebration confetti
+    confetti({
+      particleCount: 100,
+      spread: 70,
+      origin: { y: 0.6 },
+      colors: ['#10b981', '#3b82f6', '#8b5cf6'],
+    });
+  }, []);
+
+  // Toggle dark mode
+  const toggleDarkMode = useCallback(() => {
+    setIsDark(prev => {
+      const newValue = !prev;
+      document.documentElement.classList.toggle('dark', newValue);
+      localStorage.setItem('theme', newValue ? 'dark' : 'light');
+      return newValue;
+    });
+  }, []);
+
+  const socialLinks = [
+    { href: info.github, icon: Github, label: 'GitHub', color: 'bg-gray-900 dark:bg-gray-700' },
+    { href: info.linkedin, icon: Linkedin, label: 'LinkedIn', color: 'bg-blue-600' },
+    { href: info.instagram, icon: Instagram, label: 'Instagram', color: 'bg-gradient-to-br from-purple-600 to-pink-500' },
+    { href: `mailto:${info.email}`, icon: Mail, label: 'Email Me', color: 'bg-green-600' },
+  ];
+
+  return (
+    <>
+      {/* Hacker Terminal Intro */}
+      <AnimatePresence>
+        {showTerminal && visitorData && (
+          <HackerTerminal data={visitorData} onComplete={handleTerminalComplete} />
+        )}
+      </AnimatePresence>
+
+      {/* Main Content */}
+      <AnimatePresence>
+        {!showTerminal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5 }}
+            className="min-h-screen bg-gradient-to-br from-gray-50 via-gray-100 to-gray-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 transition-colors duration-500"
+          >
+            {/* Subtle Grid Pattern */}
+            <div
+              className="fixed inset-0 opacity-[0.02] dark:opacity-[0.05] pointer-events-none"
+              style={{
+                backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23000000' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+              }}
+            />
+
+            {/* Top Bar */}
+            <div className="fixed top-4 right-4 z-40 flex gap-2">
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => setShowDataPanel(prev => !prev)}
+                className="p-3 rounded-full bg-white/80 dark:bg-gray-800/80 backdrop-blur-lg shadow-lg border border-gray-200 dark:border-gray-700"
+              >
+                <Eye className="w-5 h-5 text-gray-700 dark:text-gray-300" />
+              </motion.button>
+
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={toggleDarkMode}
+                className="p-3 rounded-full bg-white/80 dark:bg-gray-800/80 backdrop-blur-lg shadow-lg border border-gray-200 dark:border-gray-700"
+              >
+                {isDark ? (
+                  <span className="text-xl">☀️</span>
+                ) : (
+                  <span className="text-xl">🌙</span>
+                )}
+              </motion.button>
+            </div>
+
+            {/* Visitor Data Panel */}
+            <AnimatePresence>
+              {showDataPanel && visitorData && (
+                <motion.div
+                  initial={{ opacity: 0, y: -20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  className="fixed top-20 right-4 z-30 p-4 rounded-2xl bg-white/90 dark:bg-gray-800/90 backdrop-blur-lg shadow-xl border border-gray-200 dark:border-gray-700 max-w-xs"
+                >
+                  <div className="flex items-center gap-2 mb-3">
+                    <Shield className="w-4 h-4 text-green-500" />
+                    <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                      Your Exposed Data
+                    </span>
+                  </div>
+                  <div className="space-y-2">
+                    <DataCard icon={Monitor} label="Browser" value={visitorData.browser} delay={0} />
+                    <DataCard icon={Cpu} label="OS" value={visitorData.os} delay={0.05} />
+                    <DataCard icon={Monitor} label="Screen" value={visitorData.screenSize} delay={0.1} />
+                    <DataCard icon={Clock} label="Timezone" value={visitorData.timezone} delay={0.15} />
+                    <DataCard icon={Globe2} label="Language" value={visitorData.language} delay={0.2} />
+                    <DataCard icon={Wifi} label="Connection" value={visitorData.connectionType} delay={0.25} />
+                  </div>
+                  <p className="mt-3 text-[10px] text-gray-500 dark:text-gray-400">
+                    💡 No data is stored. This is just a demo!
+                  </p>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* Main Content */}
+            <div className="relative z-10 max-w-md mx-auto px-6 py-16 min-h-screen flex flex-col justify-center">
+              {/* Profile Section */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+                className="text-center mb-10"
+              >
+                {/* Avatar */}
+                <motion.div
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ type: 'spring', delay: 0.3 }}
+                  className="relative inline-block mb-6"
+                >
+                  <div className="absolute -inset-1 bg-gradient-to-br from-green-400 via-blue-500 to-purple-600 rounded-full animate-pulse opacity-75 blur-sm" />
+                  <img
+                    src="/assets/profile.jpg"
+                    alt={info.name}
+                    className="relative w-28 h-28 rounded-full object-cover border-4 border-white dark:border-gray-800 shadow-xl"
+                  />
+                  <motion.div
+                    animate={{ scale: [1, 1.2, 1] }}
+                    transition={{ repeat: Infinity, duration: 2 }}
+                    className="absolute -bottom-1 -right-1 w-8 h-8 bg-green-500 rounded-full border-4 border-white dark:border-gray-800 flex items-center justify-center"
+                  >
+                    <Terminal className="w-3.5 h-3.5 text-white" />
+                  </motion.div>
+                </motion.div>
+
+                {/* Name */}
+                <motion.h1
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.4 }}
+                  className="text-2xl font-bold text-gray-900 dark:text-white mb-1"
+                >
+                  {info.name}
+                </motion.h1>
+
+                <motion.p
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.5 }}
+                  className="text-gray-500 dark:text-gray-400 font-medium mb-4"
+                >
+                  {info.nick}
+                </motion.p>
+
+                {/* Fun tagline */}
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.6 }}
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-green-500/10 to-blue-500/10 border border-green-500/20"
+                >
+                  <Skull className="w-4 h-4 text-green-500" />
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Friendly Hacker • Creative Coder
+                  </span>
+                </motion.div>
+              </motion.div>
+
+              {/* Social Links */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.7 }}
+                className="space-y-3 mb-10"
+              >
+                {socialLinks.map((link, index) => (
+                  <motion.div
+                    key={link.label}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.8 + index * 0.1 }}
+                  >
+                    <SocialLink {...link} />
+                  </motion.div>
+                ))}
+              </motion.div>
+
+              {/* Fun Stats */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 1.2 }}
+                className="grid grid-cols-3 gap-4 mb-10"
+              >
+                {[
+                  { emoji: '☕', value: '∞', label: 'Coffees' },
+                  { emoji: '🐛', value: '404', label: 'Bugs Fixed' },
+                  { emoji: '💻', value: '24/7', label: 'Coding' },
+                ].map((stat, i) => (
+                  <motion.div
+                    key={stat.label}
+                    whileHover={{ scale: 1.05, y: -2 }}
+                    className="text-center p-3 rounded-2xl bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm border border-gray-200/50 dark:border-gray-700/50"
+                  >
+                    <div className="text-2xl mb-1">{stat.emoji}</div>
+                    <div className="font-bold text-gray-900 dark:text-white">{stat.value}</div>
+                    <div className="text-xs text-gray-500">{stat.label}</div>
+                  </motion.div>
+                ))}
+              </motion.div>
+
+              {/* CTA Button */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 1.4 }}
+                className="text-center"
+              >
+                <Link
+                  to="/"
+                  className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-gradient-to-r from-green-500 to-blue-600 text-white font-semibold shadow-lg hover:shadow-xl transition-all hover:scale-105"
+                >
+                  <Sparkles className="w-5 h-5" />
+                  Explore Portfolio
+                </Link>
+              </motion.div>
+
+              {/* Footer */}
+              <motion.p
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 1.6 }}
+                className="text-center text-xs text-gray-400 mt-10"
+              >
+                Made with <Heart className="w-3 h-3 inline text-red-500" /> and a bit of chaos
+              </motion.p>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
   );
 };
 

@@ -49,6 +49,21 @@
       ],
       "@/hooks/*": [
         "./src/hooks/*"
+      ],
+      "@/lib": [
+        "./src/lib/index.ts"
+      ],
+      "@/lib/*": [
+        "./src/lib/*"
+      ],
+      "@/stores": [
+        "./src/stores/index.ts"
+      ],
+      "@/stores/*": [
+        "./src/stores/*"
+      ],
+      "@/information.json": [
+        "./src/information.json"
       ]
     }
   },
