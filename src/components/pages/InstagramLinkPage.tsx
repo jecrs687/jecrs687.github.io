@@ -5,7 +5,7 @@
  * websites can collect just by them visiting.
  */
 
-import { useState, useEffect, useCallback, memo } from 'react';
+import { useState, useEffect, useCallback, memo, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -19,12 +19,9 @@ import {
   Monitor,
   Clock,
   Globe2,
-  Battery,
   Cpu,
-  MapPin,
   Eye,
   Shield,
-  Skull,
   Heart,
   Sparkles,
 } from 'lucide-react';
@@ -54,6 +51,13 @@ interface VisitorData {
   localTime: string;
   referrer: string;
   historyLength: number;
+  batteryLevel: string;
+  pixelRatio: string;
+  orientation: string;
+  webGL: string;
+  plugins: number;
+  localStorage: boolean;
+  sessionStorage: boolean;
 }
 
 // ============================================================================
@@ -85,6 +89,20 @@ const getConnectionType = (): string => {
   return nav.connection?.effectiveType?.toUpperCase() || 'Unknown';
 };
 
+const getWebGLInfo = (): string => {
+  try {
+    const canvas = document.createElement('canvas');
+    const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+    if (gl) {
+      const debugInfo = (gl as WebGLRenderingContext).getExtension('WEBGL_debug_renderer_info');
+      if (debugInfo) {
+        return (gl as WebGLRenderingContext).getParameter(debugInfo.UNMASKED_RENDERER_WEBGL) || 'Unknown GPU';
+      }
+    }
+  } catch { /* ignore */ }
+  return 'Unknown GPU';
+};
+
 const collectVisitorData = (): VisitorData => ({
   browser: getBrowserInfo(),
   os: getOSInfo(),
@@ -104,6 +122,13 @@ const collectVisitorData = (): VisitorData => ({
   localTime: new Date().toLocaleTimeString(),
   referrer: document.referrer || 'Direct visit',
   historyLength: window.history.length,
+  batteryLevel: 'Scanning...',
+  pixelRatio: `${window.devicePixelRatio}x`,
+  orientation: screen.orientation?.type || 'Unknown',
+  webGL: getWebGLInfo(),
+  plugins: navigator.plugins?.length || 0,
+  localStorage: !!window.localStorage,
+  sessionStorage: !!window.sessionStorage,
 });
 
 // ============================================================================
@@ -118,34 +143,53 @@ const HackerTerminal = memo(({
   onComplete: () => void;
 }) => {
   const [lines, setLines] = useState<string[]>([]);
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isComplete, setIsComplete] = useState(false);
   const [showCursor, setShowCursor] = useState(true);
 
-  const terminalLines = [
+  // Memoize terminal lines to prevent recreation
+  const terminalLines = useMemo(() => [
     '> INITIALIZING CONNECTION...',
-    '> ACCESSING TARGET DEVICE...',
+    '> BYPASSING FIREWALL...',
+    '> SCANNING DEVICE...',
     '> ████████████████████ 100%',
     '> ',
-    '> ⚠️  TARGET ACQUIRED ⚠️',
+    '> ⚠️  SYSTEM COMPROMISED ⚠️',
     '> ',
-    `> 🖥️  BROWSER: ${data.browser}`,
-    `> 💻 OS: ${data.os}`,
-    `> 📐 SCREEN: ${data.screenSize}`,
-    `> 🌍 TIMEZONE: ${data.timezone}`,
-    `> 🗣️  LANGUAGE: ${data.language}`,
-    `> 🧠 CPU CORES: ${data.hardwareConcurrency}`,
-    `> 💾 RAM: ${data.deviceMemory}`,
-    `> 📡 CONNECTION: ${data.connectionType}`,
-    `> 🔗 REFERRER: ${data.referrer.slice(0, 30)}${data.referrer.length > 30 ? '...' : ''}`,
-    `> 🍪 COOKIES: ${data.cookiesEnabled ? 'ENABLED' : 'DISABLED'}`,
-    `> 👆 TOUCH: ${data.touchSupport ? 'YES' : 'NO'}`,
+    '> 📍 DEVICE FINGERPRINT:',
+    `>    Browser: ${data.browser}`,
+    `>    OS: ${data.os}`,
+    `>    Platform: ${data.platform}`,
     '> ',
-    '> 🔓 ACCESS GRANTED',
+    '> 🖥️  HARDWARE DETECTED:',
+    `>    Screen: ${data.screenSize} @ ${data.pixelRatio}`,
+    `>    Color Depth: ${data.colorDepth}`,
+    `>    CPU Cores: ${data.hardwareConcurrency}`,
+    `>    RAM: ${data.deviceMemory}`,
+    `>    GPU: ${data.webGL.slice(0, 35)}${data.webGL.length > 35 ? '...' : ''}`,
     '> ',
-    '> Just kidding! 😄',
-    '> This is what ANY website can see.',
-    '> Stay safe online! 🛡️',
-  ];
+    '> 🌐 NETWORK INFO:',
+    `>    Timezone: ${data.timezone}`,
+    `>    Language: ${data.language}`,
+    `>    Connection: ${data.connectionType}`,
+    `>    Online: ${data.online ? 'YES' : 'NO'}`,
+    '> ',
+    '> 🔍 BROWSER DATA:',
+    `>    Cookies: ${data.cookiesEnabled ? 'ENABLED ✓' : 'DISABLED ✗'}`,
+    `>    LocalStorage: ${data.localStorage ? 'AVAILABLE ✓' : 'BLOCKED ✗'}`,
+    `>    Do Not Track: ${data.doNotTrack ? 'ON' : 'OFF (you\'re being tracked!)'}`,
+    `>    Plugins: ${data.plugins} installed`,
+    `>    History Length: ${data.historyLength} pages`,
+    '> ',
+    `> 🔗 REFERRER: ${data.referrer.slice(0, 40)}${data.referrer.length > 40 ? '...' : ''}`,
+    `> ⏰ LOCAL TIME: ${data.localTime}`,
+    '> ',
+    '> ✅ DATA EXTRACTION COMPLETE',
+    '> ',
+    '> ...just kidding! 😄',
+    '> ',
+    '> This is what websites see about you.',
+    '> No data was stored. Stay safe! 🛡️',
+  ], [data]);
 
   // Blinking cursor effect
   useEffect(() => {
@@ -155,24 +199,35 @@ const HackerTerminal = memo(({
     return () => clearInterval(cursorInterval);
   }, []);
 
-  // Type out lines
+  // Type out lines sequentially
   useEffect(() => {
-    if (currentIndex < terminalLines.length) {
-      const delay = terminalLines[currentIndex].includes('████') ? 800 :
-        terminalLines[currentIndex] === '> ' ? 200 :
-          terminalLines[currentIndex].includes('Just kidding') ? 1000 : 80;
+    if (isComplete) return;
 
-      const timeout = setTimeout(() => {
-        setLines(prev => [...prev, terminalLines[currentIndex]]);
-        setCurrentIndex(prev => prev + 1);
-      }, delay);
+    let currentIdx = 0;
+    const addNextLine = () => {
+      if (currentIdx < terminalLines.length) {
+        const line = terminalLines[currentIdx];
+        setLines(prev => [...prev, line]);
+        currentIdx++;
+        
+        // Calculate delay for next line
+        const nextLine = terminalLines[currentIdx];
+        const delay = !nextLine ? 2000 :
+          nextLine.includes('████') ? 800 :
+          nextLine === '> ' ? 200 :
+          nextLine.includes('Just kidding') ? 1000 : 100;
+        
+        setTimeout(addNextLine, delay);
+      } else {
+        setIsComplete(true);
+        setTimeout(onComplete, 2000);
+      }
+    };
 
-      return () => clearTimeout(timeout);
-    } else {
-      const completeTimeout = setTimeout(onComplete, 2000);
-      return () => clearTimeout(completeTimeout);
-    }
-  }, [currentIndex, terminalLines, onComplete]);
+    // Start after initial delay
+    const startTimeout = setTimeout(addNextLine, 300);
+    return () => clearTimeout(startTimeout);
+  }, [terminalLines, onComplete, isComplete]);
 
   return (
     <motion.div
@@ -212,7 +267,7 @@ const HackerTerminal = memo(({
           ))}
 
           {/* Blinking cursor */}
-          {currentIndex < terminalLines.length && (
+          {!isComplete && (
             <span className={`text-green-500 ${showCursor ? 'opacity-100' : 'opacity-0'}`}>
               ▋
             </span>
@@ -488,11 +543,11 @@ const InstagramLinkPage = () => {
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: 0.6 }}
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-green-500/10 to-blue-500/10 border border-green-500/20"
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-purple-500/10 to-pink-500/10 border border-purple-500/20"
                 >
-                  <Skull className="w-4 h-4 text-green-500" />
+                  <Terminal className="w-4 h-4 text-purple-500" />
                   <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                    Friendly Hacker • Creative Coder
+                    Digital Nomad • Code Wizard ✨
                   </span>
                 </motion.div>
               </motion.div>
@@ -527,7 +582,7 @@ const InstagramLinkPage = () => {
                   { emoji: '☕', value: '∞', label: 'Coffees' },
                   { emoji: '🐛', value: '404', label: 'Bugs Fixed' },
                   { emoji: '💻', value: '24/7', label: 'Coding' },
-                ].map((stat, i) => (
+                ].map((stat) => (
                   <motion.div
                     key={stat.label}
                     whileHover={{ scale: 1.05, y: -2 }}
