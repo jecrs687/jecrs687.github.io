@@ -1579,7 +1579,7 @@ async function buildWorld3D(stage) {
   const root = new THREE.Group(); stage.add(root);
   for (const [i, sc] of SCENES.entries()) {
     await new Promise(r => setTimeout(r, 0));
-    window.filmLoad && window.filmLoad(.65 + .25 * (i + 1) / N);
+    window.filmLoad && window.filmLoad(.65 + .2 * (i + 1) / N, `Building ${sc.slug.split(" · ").pop()}`);
     const g = new THREE.Group(); g.position.x = stageX(i); root.add(g);
     const night = sc.night, depth = sc.sea ? 26 : 140, zc = sc.sea ? 7 : -50;
     put(g, new THREE.PlaneGeometry(L3 + .2 + (i === 0 || i === N - 1 ? L3 : 0), depth).rotateX(-Math.PI / 2), new THREE.MeshStandardMaterial({ color: sc.ground, roughness: sc.env === "tokyo" ? .35 : .9, metalness: sc.env === "tokyo" ? .25 : 0 }), 0, 0, zc, false);
@@ -1847,4 +1847,25 @@ function frame(now) {
 
 addEventListener("resize", () => { resize(); resizeActor(); });
 resize(); resizeActor(); renderFact(SCENES[0].fact); line.innerHTML = SCENES[0].line; slug.textContent = "Reel 1 · " + SCENES[0].slug;
-buildWorld3D(stage3).then(() => requestAnimationFrame(frame));
+// behind the loader: build the world, then roll the whole film once so every shader is compiled and every
+// texture and shadow map is on the GPU before the first scroll
+async function rehearse() {
+  W3.groups.forEach(g => (g.visible = true));
+  Object.values(PROPS.all).forEach(o => { o.visible = true; o.scale.setScalar(o.userData.base); });
+  placeCamera(cam, shotAt(0, 0), 0, EMMA.height);
+  gl.compile(stage3, cam);
+  for (let i = 0; i < N; i++) {
+    await new Promise(r => setTimeout(r, 0));
+    const X = stageX(i), SP = SCENE_POSE[i];
+    RIG.position.set(X, 0, 0);
+    W3.groups.forEach((g, k) => (g.visible = Math.abs(k - i) <= 1));
+    for (const [k, o] of Object.entries(PROPS.all)) o.visible = (SP.props || []).includes(k) || k === "claude";
+    key.target.position.set(X, .6, 0); key.position.set(X - 4, 8, 6);
+    const w = W3.walls.find(w => w.i === i); if (w) { paintWall(w.env, w.c2, 0); w.tex.needsUpdate = true; }
+    for (const hu of [-1, 0, 1]) { placeCamera(cam, shotAt(i, hu), X, EMMA.height); updateWorld3D(hu, i); gl.render(stage3, cam); }
+    window.filmLoad && window.filmLoad(.85 + .13 * (i + 1) / N, `Rehearsing scene ${i + 1} of ${N}`);
+  }
+  for (const [k, o] of Object.entries(PROPS.all)) { o.visible = false; PROPS.amt[k] = 0; }
+  RIG.position.set(0, 0, 0);
+}
+buildWorld3D(stage3).then(rehearse).then(() => requestAnimationFrame(frame));
