@@ -20,7 +20,7 @@ const Navbar = () => {
   // Update current scene based on route
   useEffect(() => {
     const path = location.pathname;
-    if (path === '/') setCurrentScene('home');
+    if (path === '/home') setCurrentScene('home');
     if (path === '/repositories') setCurrentScene('cyber');
     if (path === '/skills') setCurrentScene('dojo');
     if (path === '/articles') setCurrentScene('library');
@@ -28,7 +28,7 @@ const Navbar = () => {
   }, [location.pathname, setCurrentScene]);
   
   const navItems = [
-    { path: '/', name: 'Home', icon: FaHome, scene: 'home', description: 'Welcome screen' },
+    { path: '/home', name: 'Home', icon: FaHome, scene: 'home', description: 'Welcome screen' },
     { path: '/repositories', name: 'Code', icon: FaCode, scene: 'cyber', description: 'My GitHub projects' },
     { path: '/skills', name: 'Skills', icon: FaLightbulb, scene: 'dojo', description: 'My tech expertise' },
     { path: '/articles', name: 'Articles', icon: FaBook, scene: 'library', description: 'My blog posts' },

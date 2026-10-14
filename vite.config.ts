@@ -24,6 +24,10 @@ export default defineConfig({
     target: 'esnext',
     minify: 'terser',
     rollupOptions: {
+      input: {
+        film: path.resolve(__dirname, 'index.html'),
+        app: path.resolve(__dirname, 'app.html'),
+      },
       output: {
         manualChunks: {
           'react-vendor': ['react', 'react-dom', 'react-router-dom'],

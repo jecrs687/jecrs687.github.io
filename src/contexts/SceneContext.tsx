@@ -24,7 +24,7 @@ export const SceneProvider = ({ children }: { children: ReactNode }) => {
     const path = location.pathname;
     let newScene: SceneType = 'home';
 
-    if (path === '/') {
+    if (path === '/home') {
       newScene = 'home';
     } else if (path === '/repositories') {
       newScene = 'cyber';

@@ -97,7 +97,7 @@ class ErrorBoundary extends Component<Props, State> {
                                 Try Again
                             </button>
                             <button
-                                onClick={() => (window.location.href = '/')}
+                                onClick={() => (window.location.href = '/app.html')}
                                 className="flex-1 px-4 py-2 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-900 dark:text-white rounded-lg font-medium transition-colors"
                             >
                                 Go Home

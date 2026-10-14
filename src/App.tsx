@@ -70,7 +70,7 @@ const AnimatedRoutes = () => {
         loadData();
     }, []);
 
-    if (isMobile && location.pathname === '/') {
+    if (isMobile && location.pathname === '/home') {
         return <Navigate to="/instagram" replace />;
     }
 
@@ -78,8 +78,9 @@ const AnimatedRoutes = () => {
         <AnimatePresence mode="wait">
             <Suspense fallback={<LoadingScreen />}>
                 <Routes location={location} key={location.pathname}>
+                    <Route path="/" element={<Navigate to="/home" replace />} />
                     <Route
-                        path="/"
+                        path="/home"
                         element={
                             <AnimatedPage className="scene-wrapper scene-home">
                                 <Home />
