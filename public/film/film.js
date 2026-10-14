@@ -1575,15 +1575,17 @@ const BUILD = {
   },
 };
 
-function buildWorld3D(stage) {
+async function buildWorld3D(stage) {
   const root = new THREE.Group(); stage.add(root);
-  SCENES.forEach((sc, i) => {
+  for (const [i, sc] of SCENES.entries()) {
+    await new Promise(r => setTimeout(r, 0));
+    window.filmLoad && window.filmLoad(.65 + .25 * (i + 1) / N);
     const g = new THREE.Group(); g.position.x = stageX(i); root.add(g);
     const night = sc.night, depth = sc.sea ? 26 : 140, zc = sc.sea ? 7 : -50;
     put(g, new THREE.PlaneGeometry(L3 + .2 + (i === 0 || i === N - 1 ? L3 : 0), depth).rotateX(-Math.PI / 2), new THREE.MeshStandardMaterial({ color: sc.ground, roughness: sc.env === "tokyo" ? .35 : .9, metalness: sc.env === "tokyo" ? .25 : 0 }), 0, 0, zc, false);
     BUILD[sc.env](g, { i, sc, night });
     W3.groups.push(g);
-  });
+  }
   return root;
 }
 let wallTick = 0;
@@ -1663,12 +1665,12 @@ key.castShadow = true; key.shadow.mapSize.set(LOW ? 1024 : 2048, LOW ? 1024 : 20
 const fill = new THREE.DirectionalLight(0xc8d6ff, .55);
 const rim = new THREE.DirectionalLight(0xffffff, 1.4);
 stage3.add(hemi, key, key.target, fill, rim);
+window.filmLoad && window.filmLoad(.65);
 const EMMA = buildEmma();
 const RIG = new THREE.Group(); stage3.add(RIG);
 RIG.add(EMMA.root);
 const PROPS = buildProps(EMMA);
 RIG.add(PROPS.world);
-buildWorld3D(stage3);
 stage3.fog = new THREE.Fog(0xffffff, 22, 130);
 EMMA.root.traverse(o => { if (o.isMesh && (o.material.transparent || o.material.isMeshBasicMaterial)) o.castShadow = false; });
 
@@ -1708,7 +1710,7 @@ function resizeActor() {
   gl.setPixelRatio(DPR); gl.setSize(W, H, false);
   if (glP) { const pc = glP.domElement; glP.setPixelRatio(DPR); glP.setSize(pc.clientWidth, pc.clientHeight, false); }
 }
-let rawS = 0, endAt = 0;
+let rawS = 0, endAt = 0, booted = false;
 const ENTER_AFTER = 6, countEl = document.getElementById("count");
 function enterSite() { location.href = "/app.html"; }
 function rawProgress() { const max = track.offsetHeight - innerHeight; return max > 0 ? clamp(scrollY / max, 0, 1) : 0; }
@@ -1815,6 +1817,7 @@ function frame(now) {
   placeCamera(cam, SHOT, X, EMMA.height);
   updateWorld3D(t, si);
   gl.render(stage3, cam);
+  if (!booted) { booted = true; window.filmReady && window.filmReady(); }
 
   // reaction cam: always finds his face, wherever he is turned (desktop only)
   if (glP) {
@@ -1844,4 +1847,4 @@ function frame(now) {
 
 addEventListener("resize", () => { resize(); resizeActor(); });
 resize(); resizeActor(); renderFact(SCENES[0].fact); line.innerHTML = SCENES[0].line; slug.textContent = "Reel 1 · " + SCENES[0].slug;
-requestAnimationFrame(frame);
+buildWorld3D(stage3).then(() => requestAnimationFrame(frame));

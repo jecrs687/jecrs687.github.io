@@ -18,8 +18,86 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Zen+Kaku+Gothic+New:wght@400;700&family=IBM+Plex+Mono:wght@500&display=swap" />
   <link rel="stylesheet" href="/film/film.css" />
+  <style>
+    /* the loader: a film-reel countdown leader, inline so it paints before anything else downloads */
+    #loader { position: fixed; inset: 0; z-index: 100; display: grid; place-items: center; background: #07070c; color: #f4efe6; overflow: hidden; font-family: "IBM Plex Mono", ui-monospace, Menlo, monospace; transition: clip-path 1s cubic-bezier(.7,0,.2,1), opacity .4s .9s; clip-path: circle(150% at 50% 50%); }
+    #loader.out { clip-path: circle(0% at 50% 50%); opacity: 0; pointer-events: none; }
+    #loader .ld-frame { position: absolute; inset: 0; animation: flicker .12s steps(2) infinite; background: radial-gradient(ellipse at center, rgba(255,240,210,.08), transparent 60%), radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,.65)); }
+    #loader .ld-grain { position: absolute; inset: -50%; opacity: .13; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); animation: grain .5s steps(4) infinite; }
+    #loader .ld-holes { position: absolute; top: -40px; bottom: -40px; width: 30px; background: repeating-linear-gradient(to bottom, transparent 0 14px, #1c1b24 14px 34px, transparent 34px 40px); animation: roll .5s linear infinite; }
+    #loader .ld-holes.l { left: max(10px, env(safe-area-inset-left, 0px)); } #loader .ld-holes.r { right: max(10px, env(safe-area-inset-right, 0px)); }
+    #loader .ld-holes::after { content: ""; position: absolute; inset: 0 6px; background: repeating-linear-gradient(to bottom, transparent 0 16px, #f4efe6 16px 30px, transparent 30px 40px); opacity: .1; border-radius: 4px; }
+    #loader .ld-leader { position: relative; width: min(62vmin, 360px); aspect-ratio: 1; border-radius: 50%; display: grid; place-items: center; }
+    #loader .ld-leader::before { content: ""; position: absolute; inset: 0; border-radius: 50%; background: conic-gradient(from 0deg, rgba(255,200,97,.55) var(--sweep, 0deg), rgba(255,255,255,.04) var(--sweep, 0deg)); box-shadow: 0 0 0 2px rgba(244,239,230,.75), 0 0 0 12px rgba(7,7,12,1), 0 0 0 14px rgba(244,239,230,.35); }
+    #loader .ld-leader::after { content: ""; position: absolute; inset: 14%; border-radius: 50%; border: 2px solid rgba(244,239,230,.75); }
+    #loader .ld-cross { position: absolute; inset: -18%; background: linear-gradient(rgba(244,239,230,.55), rgba(244,239,230,.55)) center / 2px 100% no-repeat, linear-gradient(rgba(244,239,230,.55), rgba(244,239,230,.55)) center / 100% 2px no-repeat; }
+    #loader .ld-num { position: relative; font-family: "Dela Gothic One", "Arial Black", sans-serif; font-size: min(30vmin, 170px); line-height: 1; text-shadow: 0 0 30px rgba(255,200,97,.35); font-variant-numeric: tabular-nums; }
+    #loader .ld-meta { position: absolute; left: 0; right: 0; bottom: max(28px, 7vh); display: grid; justify-items: center; gap: 10px; padding-left: max(24px, env(safe-area-inset-left, 0px)); padding-right: max(24px, env(safe-area-inset-right, 0px)); }
+    #loader .ld-title { font-family: "Dela Gothic One", "Arial Black", sans-serif; font-size: clamp(22px, 4vw, 34px); letter-spacing: .04em; }
+    #loader .ld-title b { color: #ffc861; font-weight: 400; }
+    #loader .ld-bar { width: min(340px, 70vw); height: 4px; border-radius: 4px; background: rgba(244,239,230,.15); overflow: hidden; }
+    #loader .ld-bar i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, #ff8fa3, #ffc861); border-radius: 4px; transition: width .25s; }
+    #loader .ld-status { font-size: 11px; letter-spacing: .2em; text-transform: uppercase; color: #a9a3b8; font-variant-numeric: tabular-nums; }
+    #loader .ld-status a { color: #ffc861; }
+    #loader .ld-tag { position: absolute; top: max(22px, 4vh); left: 0; right: 0; text-align: center; font-size: 10px; letter-spacing: .3em; text-transform: uppercase; color: #a9a3b8; }
+    #loader.flash .ld-frame { background: #fff6e0; animation: none; }
+    @keyframes flicker { 50% { opacity: .82; } }
+    @keyframes grain { 0% { transform: translate(0,0) } 25% { transform: translate(-6%,4%) } 50% { transform: translate(5%,-3%) } 75% { transform: translate(-3%,-6%) } }
+    @keyframes roll { to { transform: translateY(40px); } }
+    @media (prefers-reduced-motion: reduce) { #loader .ld-frame, #loader .ld-grain, #loader .ld-holes { animation: none; } }
+  </style>
 </head>
 <body>
+<div id="loader" role="status" aria-live="polite">
+  <div class="ld-grain" aria-hidden="true"></div>
+  <div class="ld-holes l" aria-hidden="true"></div><div class="ld-holes r" aria-hidden="true"></div>
+  <div class="ld-frame" aria-hidden="true"></div>
+  <div class="ld-tag">Reel 1 · Emanuel Cascone · @jecrs687</div>
+  <div class="ld-leader" aria-hidden="true"><div class="ld-cross"></div><div class="ld-num" id="ldNum">10</div></div>
+  <div class="ld-meta">
+    <div class="ld-title"><b>EMMA</b> · a scroll picture</div>
+    <div class="ld-bar"><i id="ldBar"></i></div>
+    <div class="ld-status" id="ldStatus">Threading the reel… 0%</div>
+  </div>
+</div>
+<script>
+  // Loader: a countdown leader that keeps sweeping while the film loads. Progress follows the real steps
+  // (three.js, the film code, fonts, building the 3D world, the first rendered frame); then it counts out and irises open.
+  (function () {
+    var el = document.getElementById("loader"), num = document.getElementById("ldNum"), bar = document.getElementById("ldBar"), st = document.getElementById("ldStatus");
+    var shown = 0, target = .06, t0 = performance.now(), done = false, failed = false, BEAT = 520, rel = 0;
+    var words = [[0, "Threading the reel"], [.3, "Loading the 3D engine"], [.55, "Unpacking scenes"], [.8, "Lighting the set"], [.95, "Rolling"]];
+    window.filmLoad = function (p) { target = Math.max(target, p); };
+    window.filmFail = function () { failed = true; st.innerHTML = 'The film could not load. <a href="/app.html">Open the website →</a>'; };
+    window.filmReady = function () { target = 1; done = true; };
+    if (document.fonts) document.fonts.ready.then(function () { filmLoad(.2); });
+    function tick(now) {
+      if (failed) return;
+      var el2 = Math.max(0, now - t0), cap = done ? 1 : Math.min(target, .97);
+      shown += (cap - shown) * .08 + (done ? .004 : 0); if (shown > 1) shown = 1;
+      // countdown from 10: one sweep per number while the film loads behind it. It waits on 2 until
+      // everything is ready, then counts to 1 and opens.
+      var beats = el2 / BEAT, n = 10 - Math.floor(beats), sweep = beats % 1, ready = done && shown > .985;
+      if (n < 2) {
+        if (!ready) n = 2;                                   // hold on 2, still sweeping, until the film is ready
+        else { rel = rel || el2; n = 1; sweep = Math.min(1, (el2 - rel) / BEAT); }
+      }
+      el.style.setProperty("--sweep", (sweep * 360).toFixed(1) + "deg");
+      num.textContent = n;
+      bar.style.width = (shown * 100).toFixed(1) + "%";
+      var w = words[0][1]; for (var i = 0; i < words.length; i++) if (shown >= words[i][0]) w = words[i][1];
+      st.textContent = w + "… " + Math.round(shown * 100) + "%";
+      if (n === 1 && sweep >= 1) {
+        el.classList.add("ld-flash");
+        setTimeout(function () { el.classList.remove("ld-flash"); el.classList.add("out"); }, 140);
+        setTimeout(function () { el.remove(); }, 1500);
+        return;
+      }
+      requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  })();
+</script>
 
 <div class="track" id="track">
   <div class="stage" id="stage">
@@ -49,7 +127,7 @@
   </div>
 </div>
 <noscript><p style="color:#fff;padding:24px">This film needs JavaScript. <a href="/app.html" style="color:#ffc861">Open the website →</a></p></noscript>
-<script src="https://cdn.jsdelivr.net/npm/three@0.149.0/build/three.min.js"></script>
-<script src="/film/film.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.149.0/build/three.min.js" onload="filmLoad(.5)" onerror="filmFail()"></script>
+<script src="/film/film.js" onerror="filmFail()"></script>
 </body>
 </html>
