@@ -1211,7 +1211,11 @@ function currentShot() {
 const camTarget = new THREE.Vector3();
 function placeCamera(cam, sh, X, EH) {
   const barT = document.querySelector(".bar.top").offsetHeight, barB = document.querySelector(".bar.bottom").offsetHeight;
-  const topF = (barT + 10) / H, botF = 1 - (barB + 14) / H, avail = botF - topF;
+  // on an upright phone: a wider lens, Emma centred, and kept below the fact card
+  const tall = H > W;
+  if (tall) sh = { ...sh, fov: sh.fov * 1.5, d: sh.d * .8, cx: .5 + (sh.cx - .5) * .25, cy: Math.max(sh.cy, .6) };
+  const factB = tall && !factEl.hidden && factEl.style.opacity !== "0" ? factEl.offsetTop + factEl.offsetHeight : 0;
+  const topF = (Math.max(barT, factB) + 10) / H, botF = 1 - (barB + 14) / H, avail = botF - topF;
   cam.fov = sh.fov; cam.aspect = W / H;
   let d = sh.d; const tanH = Math.tan(sh.fov * Math.PI / 360);
   const span = EH * 1.15 * Math.cos(Math.min(1, Math.abs(sh.el)) * .6);

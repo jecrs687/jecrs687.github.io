@@ -29,14 +29,6 @@ html { overflow-anchor: none; }
 .fact .chips a { border: 1px solid rgba(255,200,97,.5); color: var(--gold); }
 .fact .chips a:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
 @media (max-width: 560px) { .fact { top: calc(var(--bar) + 8px); padding: 9px 11px; } .fact .bar-row { grid-template-columns: 74px 1fr 26px; font-size: 11.5px; } }
-.rotate { display: none; position: fixed; inset: 0; z-index: 50; background: var(--ink); color: var(--paper); place-content: center; justify-items: center; gap: 14px; text-align: center; padding-left: max(24px, env(safe-area-inset-left, 0px)); padding-right: max(24px, env(safe-area-inset-right, 0px)); }
-.rotate .phone { width: 58px; height: 100px; border: 3px solid var(--gold); border-radius: 12px; position: relative; animation: turn 2.4s ease-in-out infinite; }
-.rotate .phone::after { content: ""; position: absolute; left: 50%; bottom: 6px; width: 14px; height: 3px; margin-left: -7px; border-radius: 2px; background: var(--gold); }
-.rotate .phone::before { content: "↻"; position: absolute; right: -34px; top: -10px; color: var(--rose); font-size: 26px; }
-.rotate p { margin: 8px 0 0; font-family: var(--display); font-size: 24px; line-height: 1.15; text-wrap: balance; }
-.rotate small { font-size: 14px; color: var(--dim); max-width: 28ch; }
-@keyframes turn { 0%, 20% { transform: rotate(0); } 50%, 80% { transform: rotate(-90deg); } 100% { transform: rotate(0); } }
-@media (orientation: portrait) and (max-width: 900px) { .rotate { display: grid; } html, body { overflow: hidden; } }
 @media (max-height: 520px) and (orientation: landscape) {
   :root { --bar: 40px; }
   .bar.top { font-size: 9.5px; letter-spacing: .08em; }
@@ -100,3 +92,18 @@ canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block
 .endcard .count { font-family: var(--mono); font-size: 12px; color: var(--dim); min-height: 1em; }
 .low .sub .portrait { display: none; }
 @media (max-height: 520px) and (orientation: landscape) { .skip { padding: 3px 8px; font-size: 9px; } .endcard a.enter { font-size: 13px; padding: 6px 12px; margin-top: 4px; } .endcard .count { font-size: 10px; } }
+/* phones held upright: a taller subtitle bar, a compact top bar, the fact card across the top */
+@media (orientation: portrait) and (max-width: 760px) {
+  :root { --bar: 54px; }
+  .bar.top { font-size: 9.5px; letter-spacing: .06em; gap: 10px; }
+  .bar.top .tc { display: none; }
+  .skip { padding: 4px 9px; font-size: 9.5px; }
+  .bar.bottom { height: auto; min-height: 92px; padding-block: 12px 22px; }
+  .sub { max-width: none; }
+  .sub p { font-size: 14px; line-height: 1.4; }
+  .fact { right: max(16px, env(safe-area-inset-right, 0px)); width: auto; top: calc(var(--bar) + 10px); }
+  .fact .bar-row { grid-template-columns: 96px 1fr 28px; }
+  .titlecard h1 { font-size: 22vw; }
+  .endcard { top: calc(var(--bar) + 14px); }
+  .endcard a.enter { font-size: 15px; }
+}
