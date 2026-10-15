@@ -1,88 +1,16 @@
 // phones and low-memory devices get a lighter film
 const LOW = matchMedia("(pointer: coarse)").matches || Math.min(screen.width, screen.height) < 600 || (navigator.deviceMemory || 8) <= 4;
 if (LOW) document.documentElement.classList.add("low");
-// ---------- Emma in 3D: Kinoloom "diorama" lookdev, v2 — a finely faceted low-poly chibi ----------
-// Built like the Kinoloom rigs: parametric three.js parts on a joint hierarchy, seeded vertex jitter so facets catch
-// the key light, poses as pure functions of time. v2 adds: one sculpted head (no seams), features snapped to the face
-// by raycast, textured eyes, ribbon hair locks with sheen, folded tee and jeans, drawstring, stacked cuffs, real sneakers.
 THREE.ColorManagement.legacyMode = false;
 const TAU = Math.PI * 2;
 const smooth = (a, b, t) => { const u = clamp((t - a) / (b - a), 0, 1); return u * u * (3 - 2 * u); };
 function mulberry32(a) { return () => { a |= 0; a = (a + 0x6d2b79f5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
 const V3 = (x, y, z) => new THREE.Vector3(x, y, z);
 
-const COL = {
-  skin: 0xc68b65, noseTip: 0xcf8a6c, ear: 0xc97f68, lip: 0x7c4234, brow: 0x2a1d18,
-  hair: 0x171513, hairMid: 0x26231f, hairHi: 0x5d5853,
-  shirt: 0x2c3562, rib: 0x252c54,
-  jeans: 0x1e1e22, jeansFade: 0x3c3d44, cuff: 0x5b5d65, cuffHi: 0x6d6f77, cord: 0xe6e2da,
-  shoe: 0x45484f, shoeHi: 0x55585f, sole: 0xe9e6df, lace: 0xdedbd4,
-  frame: 0x1a1311, sclera: 0xfbf8f2, ink: 0x15100f, mouth: 0x4e1b1e, tongue: 0xd8767a, teeth: 0xfdfbf6,
-};
-
 // ---- textures ----
 function canvasTex(w, h, draw, srgb = true) { const c = document.createElement("canvas"); c.width = w; c.height = h; draw(c.getContext("2d"), w, h); const t = new THREE.CanvasTexture(c); if (srgb) t.encoding = THREE.sRGBEncoding; t.anisotropy = 4; return t; }
-// navy tee with a soft, shaded capybara screen print, laid out for a lathe whose front is at u = 0.5
-function shirtTexture() {
-  return canvasTex(1024, 512, (x, W, H) => {
-    const r = mulberry32(3);
-    x.fillStyle = "#263052"; x.fillRect(0, 0, W, H);
-    for (let i = 0; i < 3200; i++) { x.fillStyle = r() < .5 ? "rgba(255,255,255,.03)" : "rgba(0,0,20,.05)"; x.fillRect(r() * W, r() * H, 2, 2); }
-    x.save(); x.translate(W / 2 + 4, H * .47); x.scale(1.5, 1.85);   // lathe stretches u and v differently
-    const E = (cx, cy, rx, ry, a = 0) => { const p = new Path2D(); p.ellipse(cx, cy, rx, ry, a, 0, TAU); return p; };
-    const grad = (y0, y1, a, b) => { const g = x.createLinearGradient(0, y0, 0, y1); g.addColorStop(0, a); g.addColorStop(1, b); return g; };
-    for (const [lx, ly] of [[-24, 26], [-8, 28], [30, 26], [44, 24]]) { x.fillStyle = "#7d5134"; const p = new Path2D(); p.roundRect(lx - 7, ly - 6, 14, 20, 7); x.fill(p); }
-    x.fillStyle = grad(-30, 34, "#865836", "#b58258"); x.fill(E(14, 2, 50, 30, -.06));            // barrel body: darker back, warm belly
-    const head = new Path2D(); head.moveTo(-4, -24); head.bezierCurveTo(-26, -36, -56, -30, -64, -12); head.bezierCurveTo(-70, 4, -60, 20, -42, 20); head.bezierCurveTo(-24, 22, -8, 14, -4, 4); head.closePath();
-    x.fillStyle = grad(-34, 22, "#8c5c39", "#a9774f"); x.fill(head);
-    x.fillStyle = "rgba(205,160,118,.55)"; x.fill(E(-56, 4, 11, 12));                               // blunt snout
-    x.fillStyle = "#5e3b25"; x.fill(E(-12, -27, 7, 5.5, -.4));                                       // ear
-    x.fillStyle = "#2a1a12"; x.fill(E(-38, -10, 3.2, 3.6)); x.fill(E(-61, -2, 2.6, 3.4, .2));       // eye, nostril
-    x.strokeStyle = "rgba(60,36,24,.6)"; x.lineWidth = 2; x.beginPath(); x.moveTo(-60, 11); x.quadraticCurveTo(-55, 14, -50, 12); x.stroke();
-    x.strokeStyle = "rgba(70,44,26,.35)";
-    for (let i = 0; i < 16; i++) { const px = -30 + r() * 80, py = -20 + r() * 30; x.beginPath(); x.moveTo(px, py); x.lineTo(px + 6, py + 4); x.stroke(); }
-    x.restore();
-    for (let i = 0; i < 900; i++) { x.fillStyle = "rgba(38,48,82,.35)"; x.fillRect(W / 2 - 110 + r() * 220, H * .47 - 90 + r() * 160, 1.6, 1.6); } // screen-print wear
-  });
-}
-function plainTee() { // same jersey grain, no print — for the sleeves
-  return canvasTex(256, 128, (x, W, H) => { const r = mulberry32(5); x.fillStyle = "#263052"; x.fillRect(0, 0, W, H); for (let i = 0; i < 500; i++) { x.fillStyle = r() < .5 ? "rgba(255,255,255,.03)" : "rgba(0,0,20,.05)"; x.fillRect(r() * W, r() * H, 2, 2); } });
-}
-function irisTexture() {
-  return canvasTex(256, 256, (x, W) => {
-    const c = W / 2;
-    x.fillStyle = "#fbf8f2"; x.fillRect(0, 0, W, W);
-    const g = x.createRadialGradient(c, c + 14, 8, c, c, 118);
-    g.addColorStop(0, "#c1895a"); g.addColorStop(.55, "#8b5a36"); g.addColorStop(.86, "#5a3820"); g.addColorStop(1, "#2a1a10");
-    x.fillStyle = g; x.beginPath(); x.arc(c, c, 118, 0, TAU); x.fill();
-    x.strokeStyle = "rgba(255,225,180,.22)"; x.lineWidth = 3;
-    for (let a = 0; a < TAU; a += .2) { x.beginPath(); x.moveTo(c + Math.cos(a) * 50, c + Math.sin(a) * 50); x.lineTo(c + Math.cos(a) * 100, c + Math.sin(a) * 100); x.stroke(); }
-    x.fillStyle = "rgba(30,15,8,.35)"; x.beginPath(); x.arc(c, c - 40, 112, Math.PI * 1.05, Math.PI * 1.95); x.fill();   // lid shadow
-    x.fillStyle = "#120c09"; x.beginPath(); x.arc(c, c + 4, 46, 0, TAU); x.fill();
-  });
-}
 function softDot(color) {
   return canvasTex(128, 128, (x, W) => { const g = x.createRadialGradient(64, 64, 0, 64, 64, 64); g.addColorStop(0, color); g.addColorStop(1, "rgba(0,0,0,0)"); x.fillStyle = g; x.fillRect(0, 0, W, W); });
-}
-
-// ---- materials: diorama shading (physical, flat-shaded facets, low specular) ----
-const MATS = {};
-function M(role) {
-  if (MATS[role]) return MATS[role];
-  const c = COL[role];
-  let m;
-  if (role === "skin" || role === "noseTip" || role === "ear") m = new THREE.MeshPhysicalMaterial({ color: c, roughness: .58, specularIntensity: .25, sheen: .6, sheenRoughness: .5, sheenColor: new THREE.Color(0xff9a7a), flatShading: true });
-  else if (role === "hair") m = new THREE.MeshPhysicalMaterial({ color: 0xffffff, vertexColors: true, roughness: .58, specularIntensity: .28, flatShading: true, side: THREE.DoubleSide });
-  else if (role === "jeans") m = new THREE.MeshPhysicalMaterial({ color: 0xffffff, vertexColors: true, roughness: .86, specularIntensity: .15, flatShading: true });
-  else if (role === "shirt") m = new THREE.MeshPhysicalMaterial({ color: 0xffffff, map: shirtTexture(), roughness: .82, specularIntensity: .12, flatShading: true, side: THREE.DoubleSide });
-  else if (role === "sleeve") m = new THREE.MeshPhysicalMaterial({ color: 0xffffff, map: plainTee(), roughness: .82, specularIntensity: .12, flatShading: true, side: THREE.DoubleSide });
-  else if (role === "frame") m = new THREE.MeshPhysicalMaterial({ color: c, roughness: .38, clearcoat: .9, clearcoatRoughness: .3, specularIntensity: .6 });
-  else if (role === "lens") m = new THREE.MeshPhysicalMaterial({ color: 0xf4efe6, transparent: true, opacity: .12, roughness: 0, clearcoat: 1, depthWrite: false });
-  else if (role === "iris") m = new THREE.MeshPhysicalMaterial({ map: irisTexture(), roughness: .18, clearcoat: 1, clearcoatRoughness: .08 });
-  else if (role === "blush") m = new THREE.MeshBasicMaterial({ map: softDot("rgba(232,120,104,1)"), transparent: true, opacity: .55, depthWrite: false });
-  else if (["sclera", "ink", "teeth", "mouth", "tongue"].includes(role)) m = new THREE.MeshPhysicalMaterial({ color: c, roughness: .25, clearcoat: .8, clearcoatRoughness: .15 });
-  else m = new THREE.MeshPhysicalMaterial({ color: c, roughness: role === "cuff" || role === "cord" ? .8 : .5, specularIntensity: .2, flatShading: true });
-  return (MATS[role] = m);
 }
 
 // ---- geometry helpers ----
@@ -100,305 +28,125 @@ function jitter(geo, amount, seed = SEED++) {
 function deform(geo, fn) { const p = geo.attributes.position, v = new THREE.Vector3(); for (let i = 0; i < p.count; i++) { v.fromBufferAttribute(p, i); fn(v); p.setXYZ(i, v.x, v.y, v.z); } geo.computeVertexNormals(); return geo; }
 function mk(geo, m, x = 0, y = 0, z = 0) { const o = new THREE.Mesh(geo, m); o.position.set(x, y, z); o.castShadow = o.receiveShadow = true; return o; }
 const G = (parent, x = 0, y = 0, z = 0) => { const g = new THREE.Group(); g.position.set(x, y, z); parent.add(g); return g; };
-// a tapered capsule hanging from its pivot (y = 0) down to y = -len, as one lathe: no seams at the joints
-function capsuleLathe(r0, r1, len, seg = 14, cap = 5) {
-  const pts = [];
-  for (let i = 0; i <= cap; i++) { const a = -Math.PI / 2 + (i / cap) * Math.PI / 2; pts.push(new THREE.Vector2(Math.max(1e-4, Math.cos(a) * r1), -len + Math.sin(a) * r1)); }
-  for (let i = 1; i <= cap; i++) { const a = (i / cap) * Math.PI / 2; pts.push(new THREE.Vector2(Math.max(1e-4, Math.cos(a) * r0), Math.sin(a) * r0)); }
-  return new THREE.LatheGeometry(pts, seg);
-}
-const limb = (r0, r1, len, seg = 14) => jitter(capsuleLathe(r0, r1, len, seg), (r0 + r1) * .03);
-function lathe(prof, seg = 24, zScale = 1, phiStart = 0) { const g = new THREE.LatheGeometry(prof.map(([r, y]) => new THREE.Vector2(r, y)), seg, phiStart); g.scale(1, 1, zScale); return g; }
-function tube(points, r, m, seg = 16) { return mk(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(points), seg, r, 6, false), m); }
 function ring(R, tb, m, seg = 32, arc = TAU) { const o = new THREE.Mesh(new THREE.TorusGeometry(R, tb, 8, seg, arc), m); o.castShadow = true; return o; }
 function bar(a, b, r, m, seg = 8) {
   const d = new THREE.Vector3().subVectors(b, a), g = new THREE.CylinderGeometry(r, r, 1, seg); g.translate(0, .5, 0);
   const o = new THREE.Mesh(g, m); o.position.copy(a); o.quaternion.setFromUnitVectors(V3(0, 1, 0), d.clone().normalize()); o.scale.set(1, d.length(), 1); o.castShadow = true; return o;
 }
-// jeans get a stone-wash fade on the front of each part, painted into vertex colours (in the part's local frame)
-function denim(geo, fadeY = null) {
-  geo = geo.index ? geo.toNonIndexed() : geo;
-  const p = geo.attributes.position, cols = [], base = new THREE.Color(COL.jeans), fade = new THREE.Color(COL.jeansFade), c = new THREE.Color();
-  let maxR = 1e-6; for (let i = 0; i < p.count; i++) maxR = Math.max(maxR, Math.hypot(p.getX(i), p.getZ(i)));
-  for (let i = 0; i < p.count; i++) {
-    const f = Math.pow(clamp(p.getZ(i) / maxR * .5 + .5, 0, 1), 2.2) * (fadeY ? fadeY(p.getY(i)) : 1);
-    c.copy(base).lerp(fade, clamp(f, 0, 1) * .75); cols.push(c.r, c.g, c.b);
-  }
-  geo.setAttribute("color", new THREE.Float32BufferAttribute(cols, 3)); return geo;
+// ---- binary packs exported from Blender: [u32 header length][JSON header][typed arrays] ----
+function readPack(buf) { const n = new DataView(buf).getUint32(0, true); return { head: JSON.parse(new TextDecoder().decode(new Uint8Array(buf, 4, n))), base: 4 + n }; }
+const typed = (buf, base, [off, len], T) => new T(buf, base + off, len);
+function dequant(buf, base, e) {   // int16 positions over the part's bounding box -> float32
+  const q = typed(buf, base, e.pos, Int16Array), out = new Float32Array(q.length);
+  for (let i = 0; i < q.length; i++) { const k = i % 3; out[i] = e.min[k] + (q[i] + 32768) / 65535 * (e.max[k] - e.min[k]); }
+  return out;
 }
+const SRGB_LUT = Float32Array.from({ length: 256 }, (_, i) => { const c = i / 255; return c <= .04045 ? c / 12.92 : ((c + .055) / 1.055) ** 2.4; });
+const linearColors = u8 => Float32Array.from(u8, c => SRGB_LUT[c]);
+const fetchBin = url => fetch(url).then(r => { if (!r.ok) throw new Error(url + " " + r.status); return r.arrayBuffer(); });
 
-// ---- hair: ribbon locks (tapered blades with a little thickness), merged into one mesh with a sheen stripe ----
-class HairBuilder {
-  constructor() { this.pos = []; this.col = []; this.cRoot = new THREE.Color(0x0b0a09); this.cMid = new THREE.Color(COL.hairMid); this.cHi = new THREE.Color(COL.hairHi); }
-  blade(P0, P1, P2, N, w, t, hi = .6) {
-    const segs = 8, rings = [], cols = [];
-    for (let s = 0; s <= segs; s++) {
-      const u = s / segs, iu = 1 - u;
-      const C = P0.clone().multiplyScalar(iu * iu).addScaledVector(P1, 2 * iu * u).addScaledVector(P2, u * u);
-      const T = P1.clone().sub(P0).multiplyScalar(2 * iu).addScaledVector(P2.clone().sub(P1), 2 * u).normalize();
-      const S = T.clone().cross(N).normalize(), Nn = S.clone().cross(T).normalize();
-      const wf = w * Math.pow(iu, .8) * (u < .2 ? .7 + 1.5 * u : 1), tf = t * (1 - u * .85);
-      rings.push([C.clone().addScaledVector(S, -wf / 2), C.clone().addScaledVector(S, -wf * .12).addScaledVector(Nn, tf), C.clone().addScaledVector(S, wf / 2), C.clone().addScaledVector(Nn, -tf * .35)]);
-      const base = this.cRoot.clone().lerp(this.cMid, smooth(0, .55, u));
-      const sheen = Math.exp(-(((u - .55) / .22) ** 2)) * hi;
-      cols.push([base, base.clone().lerp(this.cHi, sheen), base, base.clone().multiplyScalar(.8)]);
-    }
-    for (let s = 0; s < segs; s++) for (let k = 0; k < 4; k++) {
-      const k2 = (k + 1) % 4, a = rings[s][k], b = rings[s][k2], c1 = rings[s + 1][k], d = rings[s + 1][k2];
-      const ca = cols[s][k], cb = cols[s][k2], cc = cols[s + 1][k], cd = cols[s + 1][k2];
-      for (const [v, cv] of [[a, ca], [c1, cc], [b, cb], [b, cb], [c1, cc], [d, cd]]) { this.pos.push(v.x, v.y, v.z); this.col.push(cv.r, cv.g, cv.b); }
-    }
-  }
-  mesh() {
-    const g = new THREE.BufferGeometry();
-    g.setAttribute("position", new THREE.Float32BufferAttribute(this.pos, 3));
-    g.setAttribute("color", new THREE.Float32BufferAttribute(this.col, 3));
-    g.computeVertexNormals(); return mk(g, M("hair"));
-  }
-}
-
-// ---- the build: units ~ metres, ~1.24 tall to the top of the hair ----
-const HX = .2, HY = .205, HZ = .19;
-function buildEmma() {
-  SEED = 1;
-  const root = new THREE.Group(), body = G(root);
-  const hips = G(body, 0, .43, 0);
-
-  // pelvis + waistband + drawstring peeking out under the tee
-  hips.add(mk(denim(jitter(lathe([[1e-4, -.085], [.142, -.085], [.158, -.03], [.154, .04], [1e-4, .04]], 22, .76), .003)), M("jeans")));
-  const wb = ring(.153, .011, new THREE.MeshPhysicalMaterial({ color: COL.jeans, roughness: .85, flatShading: true }), 30); wb.rotation.x = Math.PI / 2; wb.scale.set(1, .76, 1); wb.position.y = -.012; hips.add(wb);
-  for (const s of [-1, 1]) {
-    hips.add(tube([V3(s * .008, -.014, .119), V3(s * .016, -.04, .124), V3(s * .012, -.07, .122), V3(s * .02, -.088, .12)], .0042, M("cord"), 12));
-    hips.add(mk(new THREE.CylinderGeometry(.0055, .0055, .014, 8), M("cord"), s * .02, -.095, .12));
-  }
-
-  // legs: loose black jeans with a front fade, folds stacked above wide rolled cuffs, dark grey sneakers
-  const legs = {};
-  for (const [k, s] of [["L", -1], ["R", 1]]) {
-    const thigh = G(hips, s * .078, -.012, 0);
-    thigh.add(mk(denim(jitter(capsuleLathe(.082, .078, .18, 16), .004), y => .6 + .6 * Math.exp(-(((y + .1) / .06) ** 2))), M("jeans")));
-    const knee = G(thigh, 0, -.18, 0);
-    const shinG = deform(jitter(capsuleLathe(.078, .082, .172, 16), .004), v => {
-      const a = Math.atan2(v.x, v.z);
-      const f = smooth(-.08, -.15, v.y) * .055 * Math.sin(v.y * 95 + a * 1.5);       // bunching above the cuff
-      const kf = Math.exp(-((v.y / .03) ** 2)) * .03 * Math.sin(a * 3);               // knee creases
-      v.x *= 1 + f + kf; v.z *= 1 + f + kf;
-    });
-    knee.add(mk(denim(shinG, y => .5 + .7 * Math.exp(-(((y + .02) / .05) ** 2))), M("jeans")));
-    knee.add(mk(jitter(new THREE.CylinderGeometry(.094, .097, .05, 22, 1, true), .003), M("cuff"), 0, -.15, 0));
-    const fold = ring(.094, .011, M("cuffHi"), 26); fold.rotation.x = Math.PI / 2; fold.position.y = -.126; knee.add(fold);
-    const fold2 = ring(.096, .008, M("cuff"), 26); fold2.rotation.x = Math.PI / 2; fold2.position.y = -.174; knee.add(fold2);
-    const foot = G(knee, 0, -.175, 0);
-    // sneaker: rounded upper with a flat bottom and toe spring, rubber sole and toe cap, laces, tongue, heel tab
-    foot.add(mk(deform(jitter(new THREE.IcosahedronGeometry(1, 3), .015), v => { if (v.y < 0) v.y *= .35; if (v.z > .4) v.y += (v.z - .4) * .12; v.multiply(V3(.063, .052, .112)); }), M("shoe"), 0, -.036, .03));
-    foot.add(mk(deform(new THREE.CylinderGeometry(1, 1, 1, 26), v => v.multiply(V3(.067, .02, .12))), M("sole"), 0, -.06, .03));
-    foot.add(mk(deform(new THREE.IcosahedronGeometry(1, 2), v => { if (v.y > .2) v.y = .2; v.multiply(V3(.054, .03, .05)); }), M("sole"), 0, -.048, .1));
-    for (let i = 0; i < 4; i++) foot.add(mk(new THREE.BoxGeometry(.044 - i * .004, .006, .008), M("lace"), 0, .012 - i * .007, .035 + i * .018));
-    const tongue = mk(new THREE.BoxGeometry(.032, .012, .04), M("shoeHi"), 0, .016, .02); tongue.rotation.x = -.5; foot.add(tongue);
-    foot.add(mk(new THREE.BoxGeometry(.026, .03, .01), M("shoeHi"), 0, -.012, -.08));
-    legs[k] = { thigh, knee, foot, s };
-  }
-
-  // torso: a loose navy tee with folds toward the hem, print on the front, ribbed crew collar
-  const chest = G(hips, 0, .03, 0);
-  const teeG = deform(jitter(lathe([[1e-4, -.04], [.162, -.04], [.168, -.005], [.166, .06], [.158, .13], [.152, .18], [.144, .216], [.12, .246], [.07, .263], [1e-4, .269]], 30, .8, Math.PI), .0025), v => {
-    const a = Math.atan2(v.x, v.z), low = smooth(.09, -.04, v.y);
-    const f = 1 + low * (.028 * Math.sin(a * 7 + 1.3) + .014 * Math.sin(a * 13));
-    v.x *= f; v.z *= f;
-  });
-  const tee = mk(teeG, M("shirt")); chest.add(tee);
-  const collar = ring(.06, .012, M("rib"), 30); collar.rotation.x = Math.PI / 2; collar.scale.set(1, .85, 1); collar.position.set(0, .258, .006); chest.add(collar);
-
-  // arms: flared short sleeves with folds, soft capsule arms, hands with jointed fingers
-  const arms = {};
-  for (const [k, s] of [["L", -1], ["R", 1]]) {
-    const shoulder = G(chest, s * .152, .215, 0);
-    shoulder.add(mk(deform(jitter(lathe([[1e-4, .05], [.05, .042], [.07, .01], [.073, -.05], [.083, -.108], [.077, -.114]], 22), .002), v => {
-      const a = Math.atan2(v.x, v.z), f = 1 + smooth(-.03, -.11, v.y) * .05 * Math.sin(a * 5 + s);
-      v.x *= f; v.z *= f;
-    }), M("sleeve")));
-    shoulder.add(mk(limb(.05, .048, .115).translate(0, -.015, 0), M("skin")));
-    const elbow = G(shoulder, 0, -.13, 0);
-    elbow.add(mk(limb(.048, .04, .12), M("skin")));
-    const hand = G(elbow, 0, -.122, 0);
-    hand.add(mk(deform(jitter(new THREE.IcosahedronGeometry(1, 2), .03), v => v.multiply(V3(.024, .042, .04))), M("skin"), 0, -.03, 0));
-    const fingers = [];
-    for (let i = 0; i < 4; i++) {
-      const z = -.026 + i * .0175, len = [.022, .026, .025, .02][i];
-      const base = G(hand, s * .003, -.064, z); base.add(mk(limb(.0105, .0098, len, 8), M("skin")));
-      const tip = G(base, 0, -len, 0); tip.add(mk(limb(.0098, .0088, len * .8, 8), M("skin")));
-      fingers.push({ base, tip });
-    }
-    const thumb = G(hand, -s * .006, -.024, .036); thumb.add(mk(limb(.0125, .011, .026, 8), M("skin")));
-    const thumbTip = G(thumb, 0, -.026, 0); thumbTip.add(mk(limb(.011, .0098, .02, 8), M("skin")));
-    thumb.rotation.x = .9;
-    arms[k] = { shoulder, elbow, hand, fingers, thumb, s };
-  }
-
-  // head: one sculpted skull — full cheeks, soft narrow chin, round back — finely faceted
-  const neck = G(chest, 0, .255, 0);
-  neck.add(mk(limb(.05, .054, .06).translate(0, .05, 0), M("skin")));
-  const head = G(neck, 0, .02, 0); head.scale.setScalar(1.1);
-  const F = G(head, 0, .2, 0);
-  const skullG = deform(jitter(new THREE.IcosahedronGeometry(1, 4), .012), v => {
-    const cheek = Math.exp(-(((v.y + .38) / .26) ** 2)) * Math.max(0, v.z + .2);
-    v.x *= 1 + .05 * cheek; v.z *= 1 + .05 * cheek;
-    if (v.y < -.42) { const k = (-v.y - .42) / .58; v.x *= 1 - .36 * k * k; v.z = v.z * (1 - .1 * k) + .05 * k; }
-    if (v.z < 0) v.z *= 1.06;
-    v.multiply(V3(HX, HY, HZ));
-  });
-  F.add(mk(skullG, M("skin")));
-  // snap features onto the sculpted face with a raycast
-  const probe = new THREE.Mesh(skullG, new THREE.MeshBasicMaterial({ side: THREE.DoubleSide })); probe.updateMatrixWorld(true);
-  const ray = new THREE.Raycaster();
-  const surfZ = (x, y) => { ray.set(V3(x, y, 1), V3(0, 0, -1)); const h = ray.intersectObject(probe)[0]; return h ? h.point.z : .15; };
-
-  // nose: a small button with a warm tip
-  const nz = surfZ(0, -.068);
-  F.add(mk(deform(new THREE.IcosahedronGeometry(1, 2), v => v.multiply(V3(.018, .015, .017))), M("skin"), 0, -.068, nz + .002));
-  F.add(mk(deform(new THREE.IcosahedronGeometry(1, 2), v => v.multiply(V3(.01, .008, .008))), M("noseTip"), 0, -.071, nz + .013));
-  // ears: big and round, a warm inner bowl, turned slightly forward
-  for (const s of [-1, 1]) {
-    const ear = G(F, s * .196, -.035, -.004); ear.rotation.y = s * .35;
-    ear.add(mk(deform(jitter(new THREE.IcosahedronGeometry(1, 2), .04), v => v.multiply(V3(.022, .05, .036))), M("skin")));
-    ear.add(mk(deform(new THREE.IcosahedronGeometry(1, 2), v => v.multiply(V3(.01, .032, .022))), M("ear"), s * .012, -.002, .004));
-  }
-  // cheek blush, soft-edged
-  for (const s of [-1, 1]) {
-    const bx = s * .105, by = -.09, bl = new THREE.Mesh(new THREE.PlaneGeometry(.075, .045), M("blush"));
-    bl.position.set(bx, by, surfZ(bx, by) + .003); bl.lookAt(V3(bx * 3.2, by * .6, 1)); F.add(bl);
-  }
-  // eyes: sclera, a painted iris (ring, streaks, pupil, two highlights), a skin lid that blinks, a heavy upper lash
-  const eyes = [];
-  for (const s of [-1, 1]) {
-    const r = .037, ex = s * .072, ey = -.028, e = G(F, ex, ey, surfZ(ex, ey) - r * .55);
-    e.scale.set(1, 1.1, 1);
-    e.add(mk(new THREE.SphereGeometry(r, 32, 18), M("sclera")));
-    const iris = new THREE.Mesh(new THREE.CircleGeometry(r * .78, 32), M("iris")); iris.position.z = r * 1.006; e.add(iris);
-    const lid = mk(new THREE.SphereGeometry(r * 1.07, 32, 14, 0, TAU, 0, Math.PI * .5), M("skin")); e.add(lid);
-    const lash = new THREE.Mesh(new THREE.TorusGeometry(r * 1.06, r * .11, 8, 28, Math.PI), M("ink")); lash.rotation.x = Math.PI / 2; lid.add(lash);
-    const glint = new THREE.Mesh(new THREE.SphereGeometry(r * .16, 12, 8), new THREE.MeshBasicMaterial({ color: 0xffffff })); glint.position.set(r * .3, r * .3, r * 1.02); e.add(glint);
-    const glint2 = glint.clone(); glint2.scale.setScalar(.45); glint2.position.set(-r * .3, -r * .32, r * 1.015); e.add(glint2);
-    const happy = new THREE.Mesh(new THREE.TorusGeometry(r * .64, r * .11, 8, 22, Math.PI), M("ink")); happy.position.set(0, -r * .25, r * 1.02); happy.visible = false; e.add(happy);
-    e.userData = { lid, happy, eyeParts: [iris, glint, glint2] };
-    eyes.push(e);
-  }
-  // brows: thick, softly arched, dark brown — visible above the glasses
-  const brows = [-1, 1].map(s => {
-    const b = tube([[.032, .062], [.068, .074], [.104, .066]].map(([x, y]) => V3(s * x, y, surfZ(s * x, y) + .006)), .0072, M("brow"), 10);
-    F.add(b); return b;
-  });
-  // mouth: a gentle closed smile line, plus an open mouth with teeth and tongue for grins and talking
-  const mz = surfZ(0, -.122);
-  const smile = tube([V3(-.03, -.115, surfZ(-.03, -.115) + .002), V3(-.012, -.124, mz + .002), V3(.012, -.124, mz + .002), V3(.03, -.115, surfZ(.03, -.115) + .002)], .0034, M("lip"), 14);
-  F.add(smile);
-  const MO = G(F, 0, -.126, mz - .006);
-  const open = mk(new THREE.SphereGeometry(.028, 20, 12), M("mouth")); open.scale.set(1.2, .9, .5); MO.add(open);
-  const teeth = mk(new THREE.BoxGeometry(.036, .008, .01), M("teeth"), 0, .012, .008); MO.add(teeth);
-  const tongue = mk(new THREE.SphereGeometry(.018, 14, 8), M("tongue"), 0, -.012, .004); tongue.scale.set(1.3, .6, .6); MO.add(tongue);
-  const mouth = { MO, smile, open, teeth, tongue };
-
-  // glasses: thick dark acetate frames — flat fronts with bevelled edges, round with a slightly squared top, a thick
-  // keyhole bridge, hinge blocks, flat arms back over the ears, nose pads and a soft glare on each lens
-  const frame = M("frame"), frameEdge = new THREE.MeshPhysicalMaterial({ color: 0x3b2a22, roughness: .35, clearcoat: .9, clearcoatRoughness: .25 });
-  const superE = (a, b, n, steps = 64) => { const pts = []; for (let i = 0; i < steps; i++) { const t = (i / steps) * TAU, c = Math.cos(t), s2 = Math.sin(t); pts.push(new THREE.Vector2(a * Math.sign(c) * Math.abs(c) ** (2 / n), (s2 > 0 ? b * 1.0 : b * .96) * Math.sign(s2) * Math.abs(s2) ** (2 / (s2 > 0 ? n + .5 : n)))); } return pts; };
-  const LA = .053, LB = .05, FW = .0105, GY = -.026;
-  const rimShape = new THREE.Shape(superE(LA + FW, LB + FW, 2.1)); rimShape.holes.push(new THREE.Path(superE(LA, LB, 2.1)));
-  const rimGeo = new THREE.ExtrudeGeometry(rimShape, { depth: .009, bevelEnabled: true, bevelThickness: .0028, bevelSize: .0022, bevelSegments: 2, curveSegments: 64 });
-  rimGeo.translate(0, 0, -.0045);
-  const glareTex = canvasTex(128, 128, (x, W) => {
-    x.clearRect(0, 0, W, W); x.save(); x.translate(64, 64); x.rotate(-.7);
-    x.fillStyle = "rgba(255,255,255,.55)"; x.fillRect(-60, -26, 120, 14); x.fillStyle = "rgba(255,255,255,.3)"; x.fillRect(-60, -6, 120, 6); x.restore();
-  });
-  const glare = new THREE.MeshBasicMaterial({ map: glareTex, transparent: true, opacity: .35, depthWrite: false });
-  const lensFront = {};
-  for (const s of [-1, 1]) {
-    const gx = s * .077, gz = surfZ(gx, GY) + .028;
-    const lensG = G(F, gx, GY, gz); lensG.rotation.y = s * .12; lensFront[s] = lensG;
-    const rim = new THREE.Mesh(rimGeo, [frame, frameEdge]); rim.castShadow = true; lensG.add(rim);
-    const lensShape = new THREE.Shape(superE(LA + .001, LB + .001, 2.1));
-    const lens = new THREE.Mesh(new THREE.ShapeGeometry(lensShape, 48), M("lens")); lens.position.z = -.002; lensG.add(lens);
-    const gl = new THREE.Mesh(new THREE.ShapeGeometry(lensShape, 48), glare); gl.position.z = .001; lensG.add(gl);
-    // hinge block on the outer top corner, then a flat arm back over the ear and down behind it
-    const hx = s * (LA + FW + .004);
-    lensG.add(mk(new THREE.BoxGeometry(.012, .016, .014), frame, hx, LB * .45, -.006));
-    const hingeW = new THREE.Vector3(hx, LB * .45, -.012).applyMatrix4(new THREE.Matrix4().compose(lensG.position, lensG.quaternion, new THREE.Vector3(1, 1, 1)));
-    const temple = V3(s * .19, GY + .028, .06), earTop = V3(s * .2, GY + .026, -.01), behind = V3(s * .204, GY - .016, -.05);
-    for (const [a, b] of [[hingeW, temple], [temple, earTop], [earTop, behind]]) {
-      const d = new THREE.Vector3().subVectors(b, a), arm = mk(new THREE.BoxGeometry(.0058, .0105, 1), frame);
-      arm.position.copy(a).addScaledVector(d, .5); arm.lookAt(b); arm.scale.z = d.length(); F.add(arm);
-    }
-    // nose pad
-    F.add(mk(new THREE.SphereGeometry(.007, 10, 8), M("lens"), s * .022, GY - .022, gz - .02));
-  }
-  // thick keyhole bridge joining the two fronts
-  const bx = .077 - LA - FW * .3, bz = surfZ(0, GY) + .026;
-  const bridgeCurve = new THREE.CatmullRomCurve3([V3(-bx, GY + .018, bz - .004), V3(0, GY + .024, bz + .002), V3(bx, GY + .018, bz - .004)]);
-  F.add(mk(new THREE.TubeGeometry(bridgeCurve, 16, .0068, 8, false), frame));
-
-  // hair: a dark scalp base following the hairline, then three layers of chunky faceted clumps — a big under-volume,
-  // a messy outer layer whose tips flick outward, cowlicks on the crown — plus a chunky side-swept fringe,
-  // spiky flicks over the ears, a layered back and nape
-  const HAIRLINE = [[0, .55], [.75, .52], [1.15, .32], [1.45, .22], [1.75, .2], [2.2, -.62], [Math.PI, -.86]];
-  const hairline = phi => { const a = Math.abs(Math.atan2(Math.sin(phi), Math.cos(phi))); for (let i = 1; i < HAIRLINE.length; i++) if (a <= HAIRLINE[i][0]) return lerp(HAIRLINE[i - 1][1], HAIRLINE[i][1], (a - HAIRLINE[i - 1][0]) / (HAIRLINE[i][0] - HAIRLINE[i - 1][0])); return -.5; };
-  const capG = deform(jitter(new THREE.IcosahedronGeometry(1, 4), .01), v => {
-    const el = Math.asin(clamp(v.y, -1, 1)), phi = Math.atan2(v.x, v.z);
-    v.multiplyScalar(el < hairline(phi) ? .9 : 1.05);
-    if (v.z < 0) v.z *= 1.06;
-    v.multiply(V3(HX, HY, HZ)); v.y += .006;
-  });
-  F.add(mk(capG, new THREE.MeshPhysicalMaterial({ color: COL.hair, roughness: .6, specularIntensity: .25, flatShading: true })));
-  const HB = new HairBuilder(), r = mulberry32(77);
-  const sp = (phi, el, lift = 1) => V3(HX * Math.cos(el) * Math.sin(phi) * lift, HY * Math.sin(el) * lift + .008, HZ * Math.cos(el) * Math.cos(phi) * lift * (Math.cos(phi) < 0 ? 1.06 : 1));
-  const lockAt = (rp, re, tp, te, w, t, lift = 1.12, arch = .08, hi = .7, flick = 0) => {
-    const P0 = sp(rp, re, .97), P2 = sp(tp, te, lift), P1 = sp((rp + tp) / 2 + (r() - .5) * .22, (re + te) / 2, lift + arch);
-    if (flick) P2.addScaledVector(P2.clone().normalize(), flick * .022);   // tip kicks out, away from the head
-    HB.blade(P0, P1, P2, P0.clone().normalize(), w, t, hi);
+// ---------- Emma in 3D: the painted, faceted model sculpted in Blender, skinned to a small skeleton ----------
+// emma.bin carries the joints and three skinned parts: the body (one painted texture), the glasses (same texture) and the
+// hair (hand-painted vertex colours). Bones rest unrotated — only the shoulders and hips turn to lie along the model's
+// A-pose — so the pose functions below drive them with plain Euler angles, as pure functions of time.
+const EMMA = { root: new THREE.Group(), rig: null, height: 1.22 };
+// skin is shaded smooth and soft (with a touch of warm glow, so its shadows stay gentle); clothes, shoes and everything else keep their flat-cut facets. The body is one
+// painted mesh, so the split happens per pixel: warm, skin-coloured texels use the smooth normal, the rest the face normal.
+function softSkin(m) {
+  m.onBeforeCompile = sh => {
+    sh.fragmentShader = sh.fragmentShader.replace("#include <normal_fragment_begin>", `#include <normal_fragment_begin>
+      float skinK = smoothstep(.05, .14, diffuseColor.r - diffuseColor.b) * smoothstep(.06, .16, diffuseColor.r);
+      vec3 faceN = normalize(cross(dFdx(vViewPosition), dFdy(vViewPosition)));
+      normal = normalize(mix(faceN, normal, skinK)); geometryNormal = normal;`)
+      .replace("#include <emissivemap_fragment>", `#include <emissivemap_fragment>
+      totalEmissiveRadiance += diffuseColor.rgb * vec3(.2, .13, .1) * skinK;   // a little warm light through the skin`);
   };
-  const front = rp => Math.cos(rp) > .35;
-  for (let i = 0; i < 74; i++) {                      // 1. big under-volume: wide flat clumps all over the scalp
-    const rp = (r() - .5) * TAU, re = .4 + r() * .9;
-    if (front(rp) && re < .75) continue;
-    lockAt(rp, re, rp + (r() - .5) * .4, re - (front(rp) ? .3 : .45) - r() * .2, .15 + r() * .05, .05, (front(rp) ? 1.17 : 1.22) + r() * .07, .1, .55);
+  return m;
+}
+// smooth normals across UV seams: average every vertex normal with the others at the same position
+function weldNormals(g) {
+  const p = g.attributes.position, n = g.attributes.normal, acc = new Map(), key = i => `${p.getX(i).toFixed(4)},${p.getY(i).toFixed(4)},${p.getZ(i).toFixed(4)}`;
+  for (let i = 0; i < p.count; i++) { const k = key(i), a = acc.get(k) || [0, 0, 0]; a[0] += n.getX(i); a[1] += n.getY(i); a[2] += n.getZ(i); acc.set(k, a); }
+  for (let i = 0; i < p.count; i++) { const a = acc.get(key(i)), l = Math.hypot(...a) || 1; n.setXYZ(i, a[0] / l, a[1] / l, a[2] / l); }
+}
+async function loadEmma(E) {
+  const [buf, map] = await Promise.all([fetchBin("/film/emma.bin"), new THREE.TextureLoader().loadAsync(LOW ? "/film/emma_1k.jpg" : "/film/emma.jpg")]);
+  map.encoding = THREE.sRGBEncoding; map.anisotropy = 4;
+  const { head: H, base } = readPack(buf), B = {}, skel = new THREE.Group();
+  for (const b of H.bones) B[b.name] = new THREE.Bone();
+  skel.add(B.body);
+  for (const b of H.bones) {
+    if (!b.parent) continue;
+    const o = B[b.name], wp = V3(...b.pos);
+    B[b.parent].add(o); skel.updateMatrixWorld(true);
+    o.position.copy(B[b.parent].worldToLocal(wp.clone()));
+    const child = H.bones.find(c => c.parent === b.name);
+    if (/^(shoulder|thigh)/.test(b.name)) { const d = V3(...child.pos).sub(wp); o.rotation.z = Math.atan2(d.x, -d.y); }
   }
-  for (let i = 0; i < 64; i++) {                      // 2. messy outer layer: spiky clumps whose tips flick out
-    const rp = (r() - .5) * TAU, re = .55 + r() * .7;
-    if (front(rp) && re < .85) continue;
-    lockAt(rp, re, rp + (r() - .5) * .5, re - .28 - r() * .3, .12 + r() * .04, .042, 1.19 + r() * .07, .06, .8, .2 + r() * .6);
+  skel.updateMatrixWorld(true);
+  const skeleton = new THREE.Skeleton(H.bones.map(b => B[b.name]));
+  const mats = {
+    body: softSkin(new THREE.MeshStandardMaterial({ map, roughness: .9 })),
+    glasses: new THREE.MeshStandardMaterial({ map, roughness: .4 }),
+    hair: new THREE.MeshStandardMaterial({ vertexColors: true, roughness: .8, flatShading: true, side: THREE.DoubleSide }),
+  };
+  for (const [name, e] of Object.entries(H.parts)) {
+    const g = new THREE.BufferGeometry();
+    g.setAttribute("position", new THREE.BufferAttribute(dequant(buf, base, e), 3));
+    if (e.uv) g.setAttribute("uv", new THREE.BufferAttribute(typed(buf, base, e.uv, Uint16Array), 2, true));
+    if (e.col) g.setAttribute("color", new THREE.BufferAttribute(linearColors(typed(buf, base, e.col, Uint8Array)), 3));
+    if (e.nrm) g.setAttribute("normal", new THREE.BufferAttribute(typed(buf, base, e.nrm, Int8Array), 3, true));
+    g.setAttribute("skinIndex", new THREE.BufferAttribute(typed(buf, base, e.si, Uint8Array), 4));
+    g.setAttribute("skinWeight", new THREE.BufferAttribute(typed(buf, base, e.sw, Uint8Array), 4, true));
+    g.setIndex(new THREE.BufferAttribute(typed(buf, base, e.idx, e.idx32 ? Uint32Array : Uint16Array), 1));
+    if (!e.nrm) g.computeVertexNormals();
+    if (name === "body") weldNormals(g);
+    const m = new THREE.SkinnedMesh(g, mats[name]);
+    m.castShadow = m.receiveShadow = true; m.frustumCulled = false;
+    skel.add(m); m.bind(skeleton);
   }
-  for (let i = 0; i < 4; i++) {                       // 3. a few small cowlicks at the crown, falling back
-    const rp = Math.PI * .85 + (r() - .5) * 1.2, re = 1.15 + r() * .15;
-    lockAt(rp, re, rp + (r() - .5) * .6, re - .3, .1, .036, 1.24 + r() * .05, .05, .9, .6);
-  }
-  for (let i = 0; i < 9; i++) {                       // 4. chunky fringe swept to one side, pointed tips at the brows
-    const rp = -.95 + i * .22 + (r() - .5) * .06;
-    const te = .22 + r() * .06 + Math.abs(rp) * .14 - (i === 5 ? .05 : 0);
-    lockAt(rp, .88 - Math.abs(rp) * .15, rp - .3 + (r() - .5) * .1, te, (Math.abs(rp) < .5 ? .19 : .16) + r() * .03, .044, 1.1, .13, .6, i % 3 === 0 ? .3 : 0);
-  }
-  for (const s of [-1, 1]) for (let j = 0; j < 7; j++) { // 5. spiky flicks over the ears
-    const rp = s * (1.1 + j * .14);
-    lockAt(rp, .48 + r() * .2, rp + s * (.26 + r() * .12), .0 + r() * .14, .12, .04, 1.23 + r() * .07, .04, .7, .5 + r() * .5);
-  }
-  for (let i = 0; i < 48; i++) {                      // 6. layered back, full and rounded
-    const rp = Math.PI + (r() - .5) * 2.6;
-    lockAt(rp, .05 + r() * .7, rp + (r() - .5) * .35, -.4 - r() * .26, .15, .048, 1.19 + r() * .07, .09, .65, r() < .4 ? .8 : 0);
-  }
-  for (const s of [-1, 1]) for (let j = 0; j < 9; j++) { // fuller sides: clumps falling over the tops of the ears
-    const rp = s * (1.25 + j * .12 + r() * .05);
-    lockAt(rp, .45 + r() * .3, rp + s * .1, -.02 - r() * .12, .13, .044, 1.16 + r() * .06, .07, .6, .3);
-  }
-  for (let i = 0; i < 14; i++) {                      // 7. nape, pointed ends down to the neck
-    const rp = Math.PI + (i / 13 - .5) * 2.0;
-    lockAt(rp, -.2, rp + (r() - .5) * .25, -.76 - r() * .1, .11, .034, 1.06, .03, .5, .4);
-  }
-  for (const s of [-1, 1]) lockAt(s * 1.38, .4, s * 1.42, -.05, .06, .022, 1.03, .02, .3); // short sideburns
-  const hairG = HB.mesh(); F.add(hairG);
+  const F = new THREE.Object3D(); F.position.copy(B.head.worldToLocal(V3(...H.face))); B.head.add(F);   // the face, for the reaction cam
+  const none = () => new THREE.Object3D();
+  const arm = (k, s) => ({ shoulder: B["shoulder." + k], elbow: B["elbow." + k], hand: B["hand." + k], fingers: [], thumb: none(), s });
+  const leg = (k, s) => ({ thigh: B["thigh." + k], knee: B["knee." + k], foot: B["foot." + k], s });
+  B.body.userData.base = 0;
+  E.rig = { body: B.body, hips: B.hips, chest: B.chest, tee: none(), neck: B.neck, head: B.head, F, arms: { L: arm("L", -1), R: arm("R", 1) }, legs: { L: leg("L", -1), R: leg("R", 1) } };
+  E.height = H.height;
+  E.root.add(skel);
+}
 
-  // stand the soles on y = 0
-  root.updateMatrixWorld(true);
-  const box = new THREE.Box3().setFromObject(root);
-  body.position.y = body.userData.base = -box.min.y;
-  return { root, rig: { body, hips, chest, tee, neck, head, F, eyes, brows, mouth, arms, legs, hairG }, height: box.max.y - box.min.y };
+// ---------- the prop kit: faceted, hand-painted low-poly models built in Blender (props.bin) ----------
+// each model is one geometry with two groups: lit faces and glowing faces (lamps, screens, windows)
+const KIT = {};
+const KIT_MATS = [new THREE.MeshStandardMaterial({ vertexColors: true, flatShading: true, roughness: .85 }), new THREE.MeshBasicMaterial({ vertexColors: true, toneMapped: false })];
+async function loadKit() {
+  const buf = await fetchBin("/film/props.bin"), { head, base } = readPack(buf);
+  for (const [name, e] of Object.entries(head)) {
+    const g = new THREE.BufferGeometry();
+    g.setAttribute("position", new THREE.BufferAttribute(dequant(buf, base, e), 3));
+    g.setAttribute("color", new THREE.BufferAttribute(linearColors(typed(buf, base, e.col, Uint8Array)), 3));
+    const lit = e.idx ? typed(buf, base, e.idx, Uint16Array) : [], hot = e.gidx ? typed(buf, base, e.gidx, Uint16Array) : [];
+    const idx = new Uint16Array(lit.length + hot.length); idx.set(lit); idx.set(hot, lit.length);
+    g.setIndex(new THREE.BufferAttribute(idx, 1));
+    g.addGroup(0, lit.length, 0); if (hot.length) g.addGroup(lit.length, hot.length, 1);
+    g.computeVertexNormals(); g.computeBoundingBox(); g.computeBoundingSphere();
+    KIT[name] = g;
+  }
+}
+// place a kit model: kit(group, "palm_a", x, z, { ry, s, y, cast })
+function kit(g, name, x = 0, z = 0, { ry = 0, s = 1, y = 0, cast } = {}) {
+  const geo = KIT[name];
+  if (!geo) { console.warn("kit: no model", name); return G(g, x, y, z); }
+  const o = new THREE.Mesh(geo, KIT_MATS);
+  o.position.set(x, y, z); o.rotation.y = ry; if (Array.isArray(s)) o.scale.set(...s); else o.scale.setScalar(s);
+  o.castShadow = cast ?? (z > -7 && Math.abs(x) < 9); o.receiveShadow = true; g.add(o); return o;
+}
+// many copies of one small model in one draw call: list of [x, z, ry, s]
+function kitMany(g, name, list, cast = false) {
+  const geo = KIT[name]; if (!geo || !list.length) return null;
+  const im = new THREE.InstancedMesh(geo, KIT_MATS, list.length), m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), e = new THREE.Euler();
+  list.forEach(([x, z, ry = 0, s = 1, y = 0], i) => im.setMatrixAt(i, m4.compose(V3(x, y, z), q.setFromEuler(e.set(0, ry, 0)), V3(s, s, s))));
+  im.castShadow = cast; im.receiveShadow = true; im.frustumCulled = false; g.add(im); return im;
 }
 
 // ---- poses: pure functions of time + scroll state ----
@@ -478,6 +226,7 @@ function applyPose(C, P) {
     const L = rig.legs[k], q = P.legs[k];
     L.thigh.rotation.set(q.hx, q.hy, q.hz); L.knee.rotation.x = q.kx; L.foot.rotation.x = -(q.hx + q.kx) * .6;
   }
+  if (!rig.eyes) return;               // the painted model keeps its face; only rigs with face parts animate it
   const b = clamp(P.blink, 0, 1), happy = P.eyes === "happy";
   for (const e of rig.eyes) {
     const u = e.userData;
@@ -1331,21 +1080,6 @@ function building(g, x, z, w, h, d, wall, night, glowCol = 0xffcf8a) {
   B3(g, w + .2, .25, d + .2, wall, x, h, z);
   return o;
 }
-function palm(g, x, z, h, lean = .1) {
-  const trunk = G(g, x, 0, z); trunk.rotation.z = lean;
-  for (let k = 0; k < 6; k++) C3(trunk, .13 - k * .01, .15 - k * .01, h / 6 + .02, "#7a5a3a", 0, k * h / 6, 0, 7);
-  const top = G(trunk, 0, h, 0);
-  for (let k = 0; k < 8; k++) { const f = S3(top, .5, "#3f7a3a", Math.cos(k / 8 * TAU) * .7, -.15, Math.sin(k / 8 * TAU) * .7, 1.6, .12, .35); f.rotation.y = -k / 8 * TAU; f.rotation.z = -.35; }
-  S3(top, .18, "#6a4a2a", 0, -.1, 0);
-}
-function roundTree(g, x, z, h, col = "#3f6a3a") {
-  C3(g, .12, .18, h * .5, "#5a3e2a", x, 0, z, 7);
-  S3(g, h * .32, col, x, h * .62, z, 1, .9, 1); S3(g, h * .24, col, x - h * .2, h * .52, z + .1, 1, .9, 1); S3(g, h * .22, col, x + h * .22, h * .55, z - .1, 1, .9, 1);
-}
-function lampPost(g, x, z, h, col, night, glowSize = 1.4) {
-  C3(g, .05, .07, h, "#2a2d36", x, 0, z, 8); B3(g, .28, .14, .28, "#2a2d36", x, h, z);
-  bulb(g, x, h - .04, z, col, .1); if (night > .15) glow3(g, x, h, z, col, glowSize, .5 + night * .4);
-}
 function ridge3(g, z, hgt, col, seed, width = L3 + 12) {
   const r = mulberry32(seed), s = new THREE.Shape(); s.moveTo(-width / 2, 0);
   const ph = r() * 10; for (let k = 0; k <= 40; k++) { const x = -width / 2 + k / 40 * width; s.lineTo(x, hgt * (.55 + .3 * Math.sin(x * .25 + ph) + .15 * Math.sin(x * .7 + ph * 2))); }
@@ -1356,15 +1090,6 @@ function seaPlane(g, night) {
   put(g, new THREE.PlaneGeometry(L3 + 2, 150).rotateX(-Math.PI / 2), new THREE.MeshStandardMaterial({ color: night > .5 ? 0x18234a : 0x2f4f8a, roughness: .25, metalness: .3 }), 0, .02, -81, false);
 }
 function person(g, x, z, col) { const p = G(g, x, 0, z); C3(p, .12, .14, .55, col, 0, .45, 0, 8); S3(p, .12, "#e0b08a", 0, 1.12, 0); C3(p, .05, .05, .45, "#2a2d36", -.06, 0, 0, 6); C3(p, .05, .05, .45, "#2a2d36", .06, 0, 0, 6); return p; }
-function car(g, col) { const c = new THREE.Group(); g.add(c); B3(c, 1.9, .5, .9, col, 0, .18, 0); B3(c, 1.1, .4, .82, col, -.1, .68, 0); B3(c, 1.0, .3, .84, mat3(0xbfdcff, { basic: true }), -.1, .72, 0); for (const [dx, dz] of [[-.6, .45], [.6, .45], [-.6, -.45], [.6, -.45]]) { const w = put(c, new THREE.CylinderGeometry(.18, .18, .12, 12).rotateX(Math.PI / 2), "#1a1a1e", dx, .18, dz); } bulb(c, .96, .4, .3, 0xfff2c0, .06); bulb(c, .96, .4, -.3, 0xfff2c0, .06); return c; }
-function bike(g, x, z, col = "#2f6fb0", ry = 0) { const b = G(g, x, 0, z); b.rotation.y = ry; for (const dx of [-.42, .42]) { const w = put(b, new THREE.TorusGeometry(.3, .025, 6, 20), "#222", dx, .32, 0); } put(b, new THREE.CylinderGeometry(.02, .02, .8, 6).rotateZ(Math.PI / 2), col, 0, .52, 0); put(b, new THREE.CylinderGeometry(.02, .02, .5, 6).rotateZ(.6), col, -.2, .42, 0); B3(b, .2, .04, .08, "#222", -.15, .72, 0); return b; }
-function crate(g, x, z, s = .6, col = "#a87a4a") { B3(g, s, s, s, col, x, 0, z); B3(g, s + .02, .06, s + .02, "#8a5f3a", x, s * .5, z); }
-function cone3(g, x, z) { K3(g, .18, .55, "#f28a2a", x, 0, z, 10); C3(g, .13, .15, .08, "#ffffff", x, .22, z, 10); B3(g, .38, .04, .38, "#f28a2a", x, 0, z); }
-function pot(g, x, z, s = 1) { C3(g, .2 * s, .15 * s, .35 * s, "#c46a3f", x, 0, z, 10); for (let k = 0; k < 7; k++) { const l = S3(g, .09 * s, "#4f8a4a", x + Math.cos(k) * .1 * s, .55 * s + (k % 3) * .08 * s, z + Math.sin(k) * .1 * s, .7, 2.2, .5); l.rotation.set(Math.cos(k * 2) * .5, k, Math.sin(k) * .5); } }
-function floorLamp(g, x, z, col = 0xffd9a0, on = true) { C3(g, .15, .18, .04, "#2b2838", x, 0, z); C3(g, .02, .02, 1.6, "#2b2838", x, 0, z, 6); put(g, new THREE.CylinderGeometry(.16, .26, .3, 12, 1, true), mat3("#f2dcb0", { side: THREE.DoubleSide }), x, 1.6, z); if (on) { bulb(g, x, 1.52, z, col, .06); glow3(g, x, 1.5, z, col, 1.6, .55); } }
-function armchair(g, x, z, col, ry = 0) { const a = G(g, x, 0, z); a.rotation.y = ry; B3(a, .9, .4, .8, col, 0, .1, 0); B3(a, .9, .6, .2, col, 0, .4, -.3); for (const s of [-.4, .4]) B3(a, .14, .35, .8, col, s, .4, 0); for (const [dx, dz] of [[-.38, -.32], [.38, -.32], [-.38, .32], [.38, .32]]) C3(a, .03, .03, .1, "#3a2a1a", dx, 0, dz, 6); }
-function table(g, x, z, w = .8, h = .55, col = "#3a2a20") { B3(g, w, .05, w * .7, col, x, h, z); for (const [dx, dz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) B3(g, .05, h, .05, col, x + dx * (w / 2 - .05), 0, z + dz * (w * .35 - .05)); }
-function rug(g, x, z, rx, rz, col) { const r = put(g, new THREE.CylinderGeometry(1, 1, .015, 32), col, x, .008, z, false); r.scale.set(rx, 1, rz); }
 
 // interiors: the old painted walls become real 3D sets — a back wall, side returns, a floor — with furniture in front
 const WALLTOP = { airport: "#eef1f4", studio: "#efe2cc", ailab: "#232a44", lounge: "#1f3a36", karaoke: "#1c1236", tvroom: "#2a2550", books: "#3b2a22" };
@@ -1393,87 +1118,127 @@ function room(g, env, i) {
   B3(g, WALL_M, .12, .06, mat3(new THREE.Color(WALLTOP[env]).multiplyScalar(.7).getHex()), 0, 0, -2.76);   // skirting board
 }
 
+// scatter helper: n random [x, z, ry, s] spots in a box, skipping Emma's path (|x| < keep near z > -2)
+function spots(seed, n, x0, x1, z0, z1, s0 = .8, s1 = 1.2, keep = 1.6) {
+  const r = mulberry32(seed), out = [];
+  while (out.length < n) { const x = lerp(x0, x1, r()), z = lerp(z0, z1, r()); if (Math.abs(x) < keep && z > -2.2) continue; out.push([x, z, r() * TAU, lerp(s0, s1, r())]); }
+  return out;
+}
+// rooftop clutter for the nearer buildings: tanks, AC boxes, antennas, dishes
+function roofTop(g, x, h, z, w, d, r) {
+  const opts = ["rooftop_tank", "ac_unit", "antenna", "satellite_dish", "chimney"];
+  for (let k = 0, n = 1 + Math.floor(r() * 2.5); k < n; k++) kit(g, opts[Math.floor(r() * opts.length)], x + (r() - .5) * (w - 1), z + (r() - .5) * (d - 1), { y: h + .25, ry: r() * TAU, s: .9 + r() * .3, cast: false });
+}
+// a little pulse for speakers and lanterns
+const pulse = (o, c, k = .05, f = 8) => upd(c.i, t => o.scale.setScalar(o.userData.s0 * (1 + k * Math.max(0, Math.sin(t * f)))));
+const kitP = (g, n, x, z, o) => { const m = kit(g, n, x, z, o); m.userData.s0 = m.scale.x; return m; };
+
 // ---------- the fifteen scenes ----------
 const BUILD = {
   hills(g, c) {
     ridge3(g, -60, 14, "#7a5a86", 1); ridge3(g, -40, 9, "#5c6a6a", 2);
-    [[-6.5, -5, 4.2], [-3, -9, 5], [4.5, -7.5, 4.6], [7.5, -12, 5.4], [-8, -14, 5], [9.5, -4.5, 3.8], [1, -15, 5.2]].forEach(([x, z, h], k) => palm(g, x, z, h, (k % 2 ? -1 : 1) * .12));
-    [[-4.2, -3.6, "#f2a6c8"], [6.2, -3.2, "#f7d038"], [2.4, -11, "#f2a6c8"], [-9, -8, "#f7d038"]].forEach(([x, z, col]) => { C3(g, .1, .16, 1.8, "#5a3e2a", x, 0, z, 7); for (const [dx, dy, r] of [[0, 2.2, .8], [-.6, 1.9, .55], [.6, 1.95, .6], [0, 2.7, .5]]) S3(g, r, col, x + dx, dy, z, 1, .85, 1); });
-    const house = G(g, 4.8, 0, -8.5); B3(house, 3.2, 2.2, 2.4, "#f2e6d0", 0, 0, 0); const roof = put(house, new THREE.ConeGeometry(2.5, 1.4, 4), "#c4553a", 0, 2.9, 0); roof.rotation.y = Math.PI / 4; roof.scale.set(1.05, 1, .8);
-    B3(house, .5, .5, .05, "#3a6a9a", -.8, 1, 1.21); B3(house, .5, .5, .05, "#3a6a9a", .8, 1, 1.21); B3(house, .6, 1.1, .05, "#8a5a3a", 0, 0, 1.21);
-    for (let k = 0; k < 9; k++) { B3(g, .08, .8, .08, "#8a6a4a", -8 + k * .7, 0, -2.6); } B3(g, 5.7, .06, .05, "#8a6a4a", -5.2, .55, -2.6); B3(g, 5.7, .06, .05, "#8a6a4a", -5.2, .3, -2.6);
-    const r = mulberry32(3); for (let k = 0; k < 40; k++) { const x = (r() - .5) * 16, z = -1.5 - r() * 10; if (Math.abs(x) < 1.5 && z > -2) continue; K3(g, .08, .3, "#5f9a45", x, 0, z, 5); if (k % 3 === 0) bulb(g, x + .1, .32, z, ["#ffd27a", "#ff8fb0", "#ffffff"][k % 3], .05); }
-    S3(g, .5, "#5a7a3a", -2.4, .3, -1.8, 1.3, .7, 1); S3(g, .4, "#4a6a30", -1.8, .25, -2.1, 1.2, .7, 1); S3(g, .45, "#8a8a92", 3, .2, -1.6, 1.3, .6, 1);
-    C3(g, .04, .04, 1.2, "#6a4a2a", 2.2, 0, 1.6, 6); plane(g, textTex("BRASIL ☀", { w: 512, h: 160, bg: "#efe6d0", fg: "#3a2a1a", size: 72 }), .9, .28, 2.2, 1.1, 1.63);
+    [[-6.5, -5, 1], [-3, -9, 1.1], [4.5, -7.5, 1.05], [7.5, -12, 1.2], [-8, -14, 1.1], [9.5, -4.5, .85], [1, -15, 1.15], [-10, -6, .9]].forEach(([x, z, s], k) => kit(g, k % 2 ? "palm_b" : "palm_a", x, z, { s, ry: k * 1.3 }));
+    [[-4.2, -3.6, "tree_ipe_pink", 1], [6.2, -3.2, "tree_ipe_yellow", 1], [2.4, -11, "tree_ipe_pink", 1.1], [-9, -8, "tree_ipe_yellow", 1.1], [-1.5, -17, "tree_oak", 1.3], [8.5, -18, "tree_oak", 1.2], [-6, -19, "tree_small", 1.4]].forEach(([x, z, n, s], k) => kit(g, n, x, z, { ry: k * .9, s }));
+    kit(g, "farmhouse", 4.8, -8.5, { ry: -.2, s: 1.1 });
+    kit(g, "mailbox_rural", 2.6, -6.4, { ry: -.3 }); kit(g, "bird_house", -6.2, -3.3, { ry: .4 });
+    for (let k = 0; k < 4; k++) kit(g, "fence_wood", -8.6 + k * 2, -2.6, { ry: k % 2 ? .04 : -.03 });
+    kit(g, "bush_a", -2.4, -1.9, { s: 1.1 }); kit(g, "bush_flower", -1.6, -2.3); kit(g, "butterfly_bush", 1.6, -2.4); kit(g, "rock_a", 3.1, -1.7, { s: .6, ry: 1 }); kit(g, "rocks_small", 4, -1.2, { ry: 2 });
+    kit(g, "stump", -3.6, -1.4, { ry: .5 }); kit(g, "bush_a", 5.4, -2.2, { s: .8 }); kit(g, "rock_b", -5.2, -1.1, { ry: 3 });
+    kitMany(g, "grass_tuft", spots(3, 50, -8, 8, -12, 1.8));
+    kitMany(g, "flowers_yellow", spots(4, 14, -8, 8, -9, 1.5)); kitMany(g, "flowers_pink", spots(5, 14, -8, 8, -9, 1.5)); kitMany(g, "fern", spots(6, 8, -8, 8, -6, -1.8));
+    kit(g, "sign_post", 3.7, -1.4, { ry: -.5, s: .85 }); C3(g, .04, .04, 1.2, "#6a4a2a", 2.2, 0, 1.6, 6); plane(g, textTex("BRASIL ☀", { w: 512, h: 160, bg: "#efe6d0", fg: "#3a2a1a", size: 72 }), .9, .28, 2.2, 1.1, 1.63);
   },
   airport(g, c) {
     room(g, "airport", c.i);
-    for (const row of [-1.7]) for (let k = 0; k < 4; k++) { B3(g, .5, .08, .5, "#2f6fb0", -3.6 + k * .55, .42, row); B3(g, .5, .5, .08, "#2f6fb0", -3.6 + k * .55, .46, row - .24); C3(g, .03, .03, .42, "#777", -3.6 + k * .55, 0, row, 6); }
-    const tr = G(g, 2.6, 0, -1.3); B3(tr, 1.0, .06, .55, "#7a8494", 0, .2, 0); B3(tr, .06, 1.0, .55, "#7a8494", .5, .2, 0); for (const [dx, dz] of [[-.4, -.25], [-.4, .25], [.4, -.25], [.4, .25]]) S3(tr, .06, "#222", dx, .08, dz); B3(tr, .55, .45, .45, "#3a6ab0", -.15, .26, 0); B3(tr, .4, .35, .4, "#e0a34a", -.2, .71, 0);
+    kit(g, "airport_seats", -3.4, -1.9); kit(g, "airport_seats", -3.4, -.9, { ry: Math.PI });
+    kit(g, "luggage_cart", 2.6, -1.3, { ry: -.4 }); kit(g, "suitcase_b", -1.9, -1.7, { ry: .5 }); kit(g, "suitcase_a", -1.5, -1.9, { ry: -.3, s: .9 });
+    kit(g, "checkin_desk", 1.4, -2.3); kit(g, "rope_barrier", 3.4, -1.9, { ry: .1 });
     C3(g, .04, .04, 1.9, "#2a2d33", 4.2, 0, -.9, 8); plane(g, textTex("GATE 7 →", { w: 512, h: 160, bg: "#ffcf3a", fg: "#16181d", size: 80 }), .9, .28, 4.2, 1.95, -.88);
-    pot(g, -4.4, -2.2, 1.6); pot(g, 1.2, -2.3, 1.3);
+    kit(g, "plant_indoor_palm", -4.4, -2.3); kit(g, "plant_indoor_palm", 4.4, -2.3, { s: .85, ry: 2 });
     for (const x of [-4.6, 4.6]) C3(g, .2, .2, 4, "#d6dbe2", x, 0, -2.4, 16);
+    kit(g, "vending_machine", -2.3, -2.4, { s: .9 });
   },
   city(g, c) {
     ridge3(g, -70, 10, "#8fb6d6", 4);
     const r = mulberry32(5), cols = ["#6a7a98", "#8a90a8", "#5a6a88", "#9aa3b8", "#7a7090"];
-    for (const [z, hmin, hmax] of [[-10, 5, 11], [-16, 8, 18], [-26, 12, 26]]) for (let x = -L3 / 2 - 2; x < L3 / 2 + 2;) { const w = 2 + r() * 3; building(g, x + w / 2, z, w, hmin + r() * (hmax - hmin), 3 + r() * 2, cols[Math.floor(r() * 5)], c.night); x += w + .3 + r() * .8; }
+    for (const [z, hmin, hmax] of [[-10, 5, 11], [-16, 8, 18], [-26, 12, 26]]) for (let x = -L3 / 2 - 2; x < L3 / 2 + 2;) {
+      const w = 2 + r() * 3, h = hmin + r() * (hmax - hmin), d = 3 + r() * 2;
+      building(g, x + w / 2, z, w, h, d, cols[Math.floor(r() * 5)], c.night); if (z > -20) roofTop(g, x + w / 2, h, z, w, d, r);
+      x += w + .3 + r() * .8;
+    }
     put(g, new THREE.PlaneGeometry(L3 + 2, 3.6).rotateX(-Math.PI / 2), "#3a3c44", 0, .015, -3.1, false);
     for (let k = -8; k < 8; k += 1.6) B3(g, .8, .005, .1, "#e8e8e8", k, .02, -3.1);
     B3(g, L3 + 2, .08, 2.6, "#a9abb3", 0, 0, .1); B3(g, L3 + 2, .12, .15, "#8a8c94", 0, 0, -1.2);
-    for (const x of [-3, 4]) { C3(g, .05, .05, 2.6, "#2a2d36", x, 0, -1.2, 8); B3(g, .25, .7, .2, "#2a2d36", x, 2.4, -1.2); const ls = ["#e0484a", "#f2c14e", "#5fe08d"].map((col, k) => bulb(g, x, 2.95 - k * .2, -1.08, 0x333333, .06)); upd(c.i, t => { const ph = Math.floor((t / 3 + x) % 3); ls.forEach((b, k) => b.material = mat3(k === ph ? ["#e0484a", "#f2c14e", "#5fe08d"][k] : "#3a3d46", { basic: true })); }); }
-    lampPost(g, -6, -1.1, 3.2, 0xfff0d0, c.night); lampPost(g, 7, -1.1, 3.2, 0xfff0d0, c.night);
-    const cars = [["#d9433a", -2.6, 1], ["#2f6fb0", -3.7, -1], ["#f2c14e", -2.6, 1.3]].map(([col, z, dir], k) => { const cr = car(g, col); cr.position.z = z; cr.rotation.y = dir > 0 ? 0 : Math.PI; return { cr, dir, k }; });
-    upd(c.i, t => cars.forEach(({ cr, dir, k }) => { cr.position.x = ((t * 3.2 * dir + k * 7) % 20 + 20) % 20 - 10; }));
+    B3(g, L3 + 2, .08, 1.8, "#a9abb3", 0, 0, -5.8);                                    // far sidewalk
+    for (const x of [-3, 4]) {
+      kit(g, "traffic_light", x, -1.25, { s: 1 });
+      const ls = [0, 1, 2].map(k => bulb(g, x, 2.43 - k * .3, -.87, 0x333333, .085));
+      upd(c.i, t => { const ph = Math.floor((t / 3 + x) % 3); ls.forEach((b, k) => b.material = mat3(k === ph ? ["#e0484a", "#f2c14e", "#5fe08d"][k] : "#3a3d46", { basic: true })); });
+    }
+    for (const x of [-6.5, 7]) { kit(g, "lamp_modern", x, -1.3); if (c.night > .15) glow3(g, x, 3.5, -1, 0xfff0d0, 1.4, .6); }
+    const cars = [["car_sedan", -2.6, 1], ["bus", -3.7, -1], ["taxi", -2.6, 1.3], ["car_hatch", -3.7, -.8]].map(([n, z, dir], k) => { const cr = kit(g, n, 0, z, { ry: dir > 0 ? 0 : Math.PI }); return { cr, dir, k }; });
+    upd(c.i, t => cars.forEach(({ cr, dir, k }) => { cr.position.x = ((t * 3.2 * dir + k * 7) % 22 + 22) % 22 - 11; }));
     const ppl = [["#7a4a7a", -.7], ["#3a6a4a", -.85], ["#c46a3f", -.6]].map(([col, z], k) => ({ p: person(g, 0, z, col), k }));
     upd(c.i, t => ppl.forEach(({ p, k }) => { const dir = k % 2 ? 1 : -1; p.position.x = ((t * .8 * dir + k * 5 + 3) % 16 + 16) % 16 - 8; p.rotation.y = dir > 0 ? Math.PI / 2 : -Math.PI / 2; p.position.y = Math.abs(Math.sin(t * 6 + k)) * .04; }));
-    C3(g, .1, .12, .45, "#d9433a", 1.6, 0, .9, 10); S3(g, .1, "#e04a40", 1.6, .48, .9); bike(g, -1.8, .8, "#2f6fb0", .2); C3(g, .2, .18, .6, "#3a6a4a", 3.2, 0, .9, 10);
+    kit(g, "hydrant", 1.6, .9); kit(g, "bicycle", -1.8, .8, { ry: .2 }); kit(g, "trash_bin", 3.2, .9); kit(g, "bus_stop", -5.2, -.6); kit(g, "bench_city", 5.6, -.7);
+    kit(g, "planter", 2.4, -.8); kit(g, "news_box", -2.5, -.8); kit(g, "mailbox_city", 6.6, .9); kit(g, "bollard", 1, -.95); kit(g, "bollard", -1, -.95);
+    kit(g, "cafe_set", -5.5, -5.6, { ry: .3 }); kit(g, "kiosk", 4.5, -5.6, { ry: -.1 }); kit(g, "tree_small", -1.5, -5.6, { s: 1.1 }); kit(g, "tree_small", 1.8, -5.6, { s: .95, ry: 2 });
+    const plane3 = kit(g, "airplane", 0, -60, { y: 20, s: 1, cast: false });
+    upd(c.i, t => { plane3.position.x = ((t * 6) % 90) - 45; plane3.position.y = 20 + Math.sin(t * .2) * 1.5; });
   },
   studio(g, c) {
     room(g, "studio", c.i);
-    rug(g, 0, .4, 1.6, 1.1, "#c46a5a"); rug(g, 0, .4, 1.2, .8, "#e0905a");
-    const ch = G(g, -1.4, 0, -.6); ch.rotation.y = .6; B3(ch, .5, .08, .5, "#2b2f3a", 0, .45, 0); B3(ch, .5, .6, .08, "#2b2f3a", 0, .5, -.22); C3(ch, .03, .03, .45, "#555", 0, 0, 0, 6); for (let k = 0; k < 5; k++) { const a = k / 5 * TAU; B3(ch, .3, .03, .04, "#333", Math.cos(a) * .15, .02, Math.sin(a) * .15).rotation.y = -a; }
-    const cat = G(g, 1.9, 0, -.4); C3(cat, .35, .38, .1, "#7a5a9a", 0, 0, 0, 16); S3(cat, .2, "#f2a03a", 0, .2, 0, 1.3, .7, 1); S3(cat, .11, "#f2a03a", .2, .27, .05); K3(cat, .04, .08, "#f2a03a", .17, .36, .05, 4); K3(cat, .04, .08, "#f2a03a", .25, .36, .05, 4);
-    upd(c.i, t => cat.children[1].scale.y = .7 + .04 * Math.sin(t * 2));
-    floorLamp(g, 3.6, -1.6); pot(g, -3.8, -2, 1.4);
-    for (let k = 0; k < 3; k++) B3(g, .5 - k * .06, .3, .4, ["#c99a3c", "#a87a4a", "#8a6a4a"][k], -2.8, k * .3, -2.2);
+    kit(g, "rug_round", 0, .4, { s: [1.5, 1, 1.1] });
+    kit(g, "office_chair", -1.4, -.6, { ry: .6 });
+    kit(g, "cat_bed", 1.9, -.4, { ry: -.4 });
+    kit(g, "floor_lamp", 3.6, -1.6); if (c.night > .1) glow3(g, 3.6, 1.5, -1.6, 0xffd9a0, 1.6, .5);
+    kit(g, "plant_monstera", -3.8, -2, { s: 1.2 }); kit(g, "bookshelf_low", -2.6, -2.45); kit(g, "plant_hanging", 2.6, -2.5, { y: 1.5 });
+    kit(g, "beanbag", 2.9, -1.4, { ry: -.5 }); kit(g, "record_player", 4.1, -2.3, { ry: -.2 }); kit(g, "plant_cactus", -1.9, -2.3, { s: .8 });
   },
   ailab(g, c) {
     room(g, "ailab", c.i);
-    const m = G(g, -2.4, 0, -1.4); m.rotation.y = .4; table(m, 0, 0, 1.4, .75, "#2b2f3a"); B3(m, .9, .55, .05, "#0f1220", 0, .85, -.1); C3(m, .03, .03, .1, "#555", 0, .75, -.1, 6);
+    const m = G(g, -2.4, 0, -1.4); m.rotation.y = .4; kit(m, "desk", 0, 0); kit(m, "office_chair", 0, .7, { ry: Math.PI + .2 });
+    B3(m, .9, .55, .05, "#0f1220", 0, .85, -.12); C3(m, .03, .03, .1, "#555", 0, .75, -.12, 6);
     const scr = document.createElement("canvas"); scr.width = 256; scr.height = 160; const sTex = new THREE.CanvasTexture(scr); sTex.encoding = THREE.sRGBEncoding;
-    plane(m, sTex, .84, .5, 0, 1.125, -.07, { transparent: false });
+    plane(m, sTex, .84, .5, 0, 1.125, -.09, { transparent: false });
     upd(c.i, t => { const x = scr.getContext("2d"); x.fillStyle = "#0b0e18"; x.fillRect(0, 0, 256, 160); x.font = "13px 'IBM Plex Mono', monospace"; for (let k = 0; k < 8; k++) { x.fillStyle = ["#c792ea", "#c3e88d", "#89ddff", "#f78c6c"][k % 4]; x.fillText("".padEnd(4 + ((k * 7 + Math.floor(t * 4)) % 20), "▇").slice(0, 18), 12, 20 + k * 17); } sTex.needsUpdate = true; });
     const st = G(g, 2.4, 0, -1.6); B3(st, .5, 1.5, .2, "#d97757", 0, 0, 0); plane(st, textTex("✳", { w: 128, h: 128, fg: "#fff", size: 96 }), .4, .4, 0, 1.0, .11); plane(st, textTex("Claude", { w: 256, h: 64, fg: "#fff", size: 36, font: "'IBM Plex Mono', monospace" }), .44, .11, 0, .55, .11);
     for (let k = 0; k < 3; k++) wire(g, new THREE.Vector3(-2.2 + k * .2, .02, -1.2), new THREE.Vector3(1.5 + k * .3, .02, -2.6), -.15, 0x5a6aa0, .02);
-    pot(g, 3.8, -2.1, 1.4);
+    kit(g, "server_rack", 3.6, -2.3); kit(g, "server_rack", 4.3, -2.3); kit(g, "whiteboard", .4, -2.3, { ry: .1 });
+    kit(g, "plant_snake", -4.2, -2.2); kit(g, "coffee_machine", -3.9, -.6, { ry: Math.PI / 2 }); kit(g, "bar_stool", 1.4, -1.6);
   },
   workshop(g, c) {
     ridge3(g, -60, 12, "#c89a9a", 6);
-    const r = mulberry32(8); for (const [z, hmin, hmax] of [[-12, 6, 12], [-20, 9, 18]]) for (let x = -L3 / 2 - 2; x < L3 / 2 + 2;) { const w = 2.2 + r() * 2.6; building(g, x + w / 2, z, w, hmin + r() * (hmax - hmin), 3, ["#7a5a6a", "#8a6a6a", "#6a4d5e"][Math.floor(r() * 3)], .35, 0xffc070); x += w + .4 + r(); }
+    const r = mulberry32(8); for (const [z, hmin, hmax] of [[-12, 6, 12], [-20, 9, 18]]) for (let x = -L3 / 2 - 2; x < L3 / 2 + 2;) { const w = 2.2 + r() * 2.6, h = hmin + r() * (hmax - hmin); building(g, x + w / 2, z, w, h, 3, ["#7a5a6a", "#8a6a6a", "#6a4d5e"][Math.floor(r() * 3)], .35, 0xffc070); if (z > -15) roofTop(g, x + w / 2, h, z, w, 3, r); x += w + .4 + r(); }
     [["Tesify", -3.6], ["Meetnow", 0], ["NovelBr", 3.6]].forEach(([name, x], k) => {
       const z = -4.2, y = 1.2 + (k % 2) * .4; C3(g, .06, .06, y, "#4a3a3a", x - .7, 0, z, 8); C3(g, .06, .06, y, "#4a3a3a", x + .7, 0, z, 8);
       B3(g, 2.3, 1.05, .12, "#2a1c33", x, y, z); plane(g, textTex(name, { w: 512, h: 220, fg: "#ffc861", size: 84, border: "#ffc861" }), 2.1, .9, x, y + .52, z + .07);
       const bs = []; for (let q = 0; q < 12; q++) bs.push(bulb(g, x - 1.05 + q * .19, y + 1.1, z + .07, 0xffe9a8, .035));
       upd(c.i, t => bs.forEach((b, q) => b.material = mat3(Math.sin(t * 5 + q) > 0 ? 0xffe9a8 : 0x6a5030, { basic: true })));
     });
-    const cr = G(g, 7.5, 0, -10); for (let k = 0; k < 10; k++) B3(cr, .5, 1.1, .5, "#d9a63a", 0, k * 1.1, 0); B3(cr, 7, .35, .35, "#d9a63a", -2.5, 11, 0); B3(cr, .8, .8, .6, "#8a6a3a", 0, 11, 0);
-    const hook = G(cr, -4, 11, 0); const cable = C3(hook, .015, .015, 4, "#222", 0, -4, 0, 4); B3(hook, .7, .4, .4, "#ffc861", 0, -4.4, 0);
-    upd(c.i, t => { hook.rotation.z = Math.sin(t * .6) * .08; hook.position.x = -4 + Math.sin(t * .25) * 1.5; });
-    crate(g, -5.2, -1.6); crate(g, -4.6, -1.9, .5); crate(g, -5, -1.7, .4); cone3(g, 2.2, -1.2); cone3(g, 2.8, -1.4); cone3(g, 3.3, -1.1); B3(g, .6, .3, .3, "#d9433a", 5.2, 0, -1.2);
-    lampPost(g, -7, -1.4, 3.2, 0xffd9a0, .35);
+    kit(g, "crane", 9, -10, { ry: 0, cast: false });
+    const hook = G(g, 4, 11.4, -10); C3(hook, .015, .015, 4, "#222", 0, -4, 0, 4); B3(hook, .7, .4, .4, "#ffc861", 0, -4.4, 0);
+    upd(c.i, t => { hook.rotation.z = Math.sin(t * .6) * .08; hook.position.x = 4 + Math.sin(t * .25) * 1.5; });
+    kit(g, "crate_stack", -5.2, -1.7, { ry: .2 }); kit(g, "pallet", -4.1, -1.9, { ry: -.3 }); kit(g, "crate", -4.2, -1.9, { y: .15, ry: .5, s: .8 }); kit(g, "barrel", -6.3, -1.5); kit(g, "barrel", -6.7, -2.1, { ry: 1 });
+    for (const [x, z] of [[2.2, -1.2], [2.8, -1.4], [3.3, -1.1]]) kit(g, "cone", x, z, { ry: x });
+    kit(g, "barrier", 4.6, -1.5, { ry: -.2 }); kit(g, "workbench", -1.6, -2.5); kit(g, "toolbox", -.9, -1.9, { ry: .4 }); kit(g, "ladder", 1.2, -2.6, { ry: .3 });
+    kit(g, "forklift", 6.2, -2.4, { ry: -.6 });
+    kit(g, "lamp_classic", -7, -1.4); if (c.night > .15) glow3(g, -7, 3.2, -1.4, 0xffd9a0, 1.4, .5);
   },
   park(g, c) {
     ridge3(g, -60, 12, "#6b4a78", 9); ridge3(g, -40, 7, "#4a5a48", 10);
-    [[-7, -6, 3.2], [-3, -10, 3.8], [1.5, -12, 4.2], [8, -8, 3.6], [-9.5, -12, 4], [5, -14, 4.4], [-5.5, -15, 3.8], [9.5, -15, 4.6]].forEach(([x, z, h]) => roundTree(g, x, z, h, "#3f6a3a"));
-    const gz = G(g, 5.2, 0, -5); C3(gz, 2, 2.1, .3, "#e8dcc4", 0, 0, 0, 6); for (let k = 0; k < 6; k++) { const a = k / 6 * TAU; C3(gz, .07, .07, 2.4, "#f2ece0", Math.cos(a) * 1.8, .3, Math.sin(a) * 1.8, 8); } put(gz, new THREE.ConeGeometry(2.4, 1.2, 6), "#7a4a5a", 0, 3.3, 0); bulb(gz, 0, 3.95, 0, 0xffd27a, .12);
-    for (let k = 0; k < 6; k++) { const a = k / 6 * TAU + .5; bulb(gz, Math.cos(a) * 1.9, 2.6, Math.sin(a) * 1.9, 0xffd9a0, .06); }
+    [[-7, -6, "tree_oak", .9], [-3, -10, "tree_oak", 1.05], [1.5, -12, "tree_pine", 1], [8, -8, "tree_oak", 1], [-9.5, -12, "tree_pine", 1.1], [5, -14, "tree_oak", 1.2], [-5.5, -15, "tree_small", 1.3], [9.5, -15, "tree_pine", 1.2], [-1, -17, "tree_oak", 1.3]].forEach(([x, z, n, s], k) => kit(g, n, x, z, { s, ry: k * 1.7 }));
+    kit(g, "gazebo", 5.2, -5); bulb(g, 5.2, 3.95, -5, 0xffd27a, .12);
+    for (let k = 0; k < 6; k++) { const a = k / 6 * TAU + .5; bulb(g, 5.2 + Math.cos(a) * 1.9, 2.6, -5 + Math.sin(a) * 1.9, 0xffd9a0, .06); }
     const pond = put(g, new THREE.CylinderGeometry(1, 1, .03, 32), new THREE.MeshStandardMaterial({ color: 0x6a9ac8, roughness: .15, metalness: .3 }), -4.4, .02, -4.2, false); pond.scale.set(2.2, 1, 1.1);
-    const ducks = [0, 1, 2].map(k => { const d = G(g, 0, 0, 0); S3(d, .14, "#f7f3ea", 0, .1, 0, 1.3, .8, 1); S3(d, .08, "#f7f3ea", .14, .22, 0); K3(d, .03, .07, "#f2a03a", .24, .2, 0, 4).rotation.z = -Math.PI / 2; return d; });
-    upd(c.i, t => ducks.forEach((d, k) => { const a = t * .3 + k * 2.1; d.position.set(-4.4 + Math.cos(a) * 1.5, 0, -4.2 + Math.sin(a) * .65); d.rotation.y = -a - Math.PI / 2; }));
-    for (const x of [-7.5, 2.4, 8]) lampPost(g, x, -1.6, 3, 0xffd9a0, .5);
-    for (let k = 0; k < 7; k++) bulb(g, -2.6 + k * .3, .25, -2.4, ["#ff6b6b", "#ffd166", "#f7a6c8"][k % 3], .07); B3(g, 2.3, .15, .5, "#6a4a2a", -1.7, 0, -2.4);
-    S3(g, .14, "#f2f2f2", 2.3, .14, .9); C3(g, .18, .16, .55, "#2f5a3a", -3, 0, -.8, 10);
+    for (const [x, z] of [[-6.4, -4.5], [-2.4, -4.8], [-5.8, -3.4], [-3, -3.3]]) kit(g, "reeds", x, z, { ry: x });
+    kitMany(g, "rocks_small", [[-6.7, -4, 0, .6], [-2.1, -4.1, 2, .5]]);
+    const ducks = [0, 1, 2].map(k => kit(g, "duck", 0, 0, { cast: false }));
+    upd(c.i, t => ducks.forEach((d, k) => { const a = t * .3 + k * 2.1; d.position.set(-4.4 + Math.cos(a) * 1.5, .02, -4.2 + Math.sin(a) * .65); d.rotation.y = -a; }));
+    for (const x of [-7.5, 2.4, 8]) { kit(g, "lamp_classic", x, -1.6, { s: .95 }); glow3(g, x, 3.05, -1.6, 0xffd9a0, 1.2, .55); }
+    kit(g, "flowers_pink", -2.3, -2.4); kit(g, "flowers_yellow", -1.7, -2.5); kit(g, "flowers_pink", -1.1, -2.3, { ry: 2 });
+    kit(g, "picnic", 2.6, -2.6, { ry: -.2 }); kit(g, "fountain", -1.2, -8); kit(g, "bush_a", 3.6, -1.9); kit(g, "bush_flower", -3, -.9); kit(g, "trash_bin", 1.3, -1.7, { s: .9 });
+    kitMany(g, "grass_tuft", spots(9, 40, -8, 8, -12, 1.8)); kitMany(g, "flowers_yellow", spots(10, 10, -8, 8, -10, -2.5));
     const kite = G(g, 1.2, 6.5, -6); put(kite, new THREE.CircleGeometry(.5, 4), mat3("#ff6b6b", { side: THREE.DoubleSide }), 0, 0, 0, false).scale.set(.8, 1.2, 1);
     wire(g, new THREE.Vector3(1.2, 6.2, -6), new THREE.Vector3(3, .8, -3), 1.2, 0x333333, .006);
     upd(c.i, t => { kite.position.x = 1.2 + Math.sin(t * .7) * .5; kite.position.y = 6.5 + Math.sin(t * 1.1) * .3; kite.rotation.z = Math.sin(t) * .2; });
@@ -1483,95 +1248,108 @@ const BUILD = {
   lounge(g, c) {
     room(g, "lounge", c.i);
     for (const x of [-2.3, -.9]) { C3(g, .04, .04, .9, "#d9b35a", x, 0, 1.5, 8); S3(g, .07, "#d9b35a", x, .95, 1.5); } wire(g, new THREE.Vector3(-2.3, .85, 1.5), new THREE.Vector3(-.9, .85, 1.5), .25, 0x8a1f2a, .03);
-    armchair(g, -3.4, -1.4, "#7a1f2a", .5); armchair(g, 3.6, -1.6, "#7a1f2a", -.5);
-    for (const [x, z] of [[-2.4, -1.9], [2.6, -2.1]]) { C3(g, .35, .35, .04, "#2a1a12", x, .6, z, 16); C3(g, .04, .04, .6, "#2a1a12", x, 0, z, 6); C3(g, .03, .03, .12, "#f2e6d0", x, .64, z, 8); bulb(g, x, .8, z, 0xffd27a, .025); glow3(g, x, .8, z, 0xffb060, .7, .8); }
-    C3(g, .12, .08, .4, "#4a2a6a", 4.2, 0, -2.2, 10); for (let k = 0; k < 5; k++) S3(g, .06, "#f2a6c8", 4.2 + Math.cos(k) * .08, .5 + k % 2 * .06, -2.2 + Math.sin(k) * .08);
+    kit(g, "armchair", -3.4, -1.4, { ry: .5 }); kit(g, "armchair", 3.6, -1.6, { ry: -.5 });
+    for (const [x, z] of [[-2.4, -1.9], [2.6, -2.1]]) { kit(g, "side_table", x, z); glow3(g, x, .8, z, 0xffb060, .7, .8); }
+    kit(g, "plant_monstera", 4.3, -2.3); kit(g, "bookshelf_low", -4.2, -2.45); kit(g, "bar_stool", 1.6, -2.2); kit(g, "cocktail_table", 1.1, -2.4);
+    kit(g, "rug_rect", .4, -.4, { s: .9 });
   },
   karaoke(g, c) {
     room(g, "karaoke", c.i);
-    const so = G(g, 2.6, 0, -1.9); B3(so, 2.2, .4, .8, "#6a2a6a", 0, 0, 0); B3(so, 2.2, .6, .2, "#6a2a6a", 0, .4, -.3); for (const s of [-1.05, 1.05]) B3(so, .2, .55, .8, "#5a2058", s, .1, 0);
-    table(g, 2.6, -.9, .9, .35, "#1c1428"); for (const [dx, col] of [[-.2, 0xff8cc8], [0, 0xffd27a], [.2, 0x8ce6ff]]) C3(g, .04, .035, .14, mat3(col, { basic: true, transparent: true, opacity: .8 }), 2.6 + dx, .4, -.9, 10);
-    for (const x of [-4.2, 4.3]) { B3(g, .6, 1.3, .5, "#16141e", x, 0, -2.2); for (const [y, r] of [[1.0, .18], [.45, .13]]) { const sp = put(g, new THREE.CylinderGeometry(r, r, .05, 20).rotateX(Math.PI / 2), "#2b2838", x, y, -1.94); upd(c.i, t => sp.scale.setScalar(1 + .08 * Math.max(0, Math.sin(t * 8)))); } }
+    kit(g, "sofa_booth", 2.6, -1.9); kit(g, "coffee_table", 2.6, -.9, { s: .9 });
+    for (const [dx, col] of [[-.2, 0xff8cc8], [0, 0xffd27a], [.2, 0x8ce6ff]]) C3(g, .04, .035, .14, mat3(col, { basic: true, transparent: true, opacity: .8 }), 2.6 + dx, .42, -.9, 10);
+    for (const x of [-4.2, 4.3]) pulse(kitP(g, "speaker_tall", x, -2.2), c, .04);
+    kit(g, "drum_kit", -2.6, -2.2, { ry: .3, s: .9 }); kit(g, "amp", -1.4, -2.4, { ry: .2 }); kit(g, "bar_stool", 4.4, -.8); kit(g, "cocktail_table", 4, -.9, { s: .9 });
     const ball = put(g, new THREE.IcosahedronGeometry(.3, 1), new THREE.MeshStandardMaterial({ color: 0xdddde8, metalness: .9, roughness: .15, flatShading: true }), -.6, 3.4, -1.2, false); wire(g, new THREE.Vector3(-.6, 3.7, -1.2), new THREE.Vector3(-.6, 4.4, -1.2), 0, 0x888888, .01);
-    const spots = [0xff5ab4, 0x50dcff, 0xffe65a].map(col => glow3(g, 0, 0, 0, col, .5, .5));
-    upd(c.i, t => { ball.rotation.y = t * .8; spots.forEach((s, k) => { const a = t * .7 + k * 2.1; s.position.set(Math.cos(a) * 3.5, 1.5 + Math.sin(a * 1.3) * 1, -2.7); }); });
-    C3(g, .02, .02, 1.3, "#2a2a30", -3, 0, -.5, 6); S3(g, .06, "#b8bcc6", -3, 1.34, -.5, 1, 1.3, 1);
+    const spots3 = [0xff5ab4, 0x50dcff, 0xffe65a].map(col => glow3(g, 0, 0, 0, col, .5, .5));
+    upd(c.i, t => { ball.rotation.y = t * .8; spots3.forEach((s, k) => { const a = t * .7 + k * 2.1; s.position.set(Math.cos(a) * 3.5, 1.5 + Math.sin(a * 1.3) * 1, -2.7); }); });
+    kit(g, "mic_stand", -3.4, -.6, { ry: .4 }); kit(g, "rug_round", 0, .3, { s: [1.2, 1, .8] });
   },
   tokyo(g, c) {
     const r = mulberry32(21), cols = ["#ff4fa3", "#3fe0ff", "#ffd27a", "#9dff7a"], words = ["ラーメン", "カフェ", "ゲーム", "本屋", "カラオケ", "居酒屋"];
     for (const [z, hmin, hmax] of [[-7, 5, 9], [-12, 7, 14], [-22, 10, 20]]) for (let x = -L3 / 2 - 2; x < L3 / 2 + 2;) {
       const w = 1.6 + r() * 1.8, h = hmin + r() * (hmax - hmin); building(g, x + w / 2, z, w, h, 2.5, ["#2a2838", "#1d1a2e", "#34304a"][Math.floor(r() * 3)], 1, 0xffe0b0);
       if (z === -7 || r() > .4) { const word = words[Math.floor(r() * words.length)], col = cols[Math.floor(r() * 4)]; const sh = word.length * .45 + .3; B3(g, .5, sh, .08, "#0d0c16", x + w - .3, h * .45, z + 1.3); plane(g, textTex(word, { w: 128, h: 128 * word.length * 1.1, fg: col, size: 96, glow: 24, vertical: true, font: "'Zen Kaku Gothic New', sans-serif" }), .5, sh - .1, x + w - .3, h * .45 + sh / 2, z + 1.35); glow3(g, x + w - .3, h * .45 + sh / 2, z + 1.5, new THREE.Color(col), sh * 1.2, .25); }
+      if (z === -7 && r() > .3) kit(g, "ac_unit", x + w * .3, z + 1.3, { y: 1.8 + r() * 2, s: .6, cast: false });
       x += w + .2;
     }
-    const torii = G(g, -3.6, 0, -2.6); for (const s of [-1, 1]) C3(torii, .12, .14, 2.8, "#d9432f", s * 1.1, 0, 0, 10); B3(torii, 3.2, .2, .3, "#1a1416", 0, 2.85, 0); B3(torii, 2.8, .16, .24, "#d9432f", 0, 2.6, 0); B3(torii, 2.4, .12, .2, "#d9432f", 0, 2.1, 0);
-    const st = G(g, 2.8, 0, -2.6); B3(st, 2, 1.1, 1, "#5a3a22", 0, 0, 0); B3(st, 2.3, .1, 1.3, "#1a1416", 0, 2, 0); for (const s of [-1, 1]) C3(st, .04, .04, .9, "#3a2a1a", s * .95, 1.1, .5, 6);
-    plane(st, textTex("ラーメン", { w: 512, h: 128, bg: "#d9432f", fg: "#f7f3ea", size: 72, font: "'Zen Kaku Gothic New', sans-serif" }), 1.9, .45, 0, 1.75, .56); glow3(st, 0, 1.2, .8, 0xffbe6e, 2.2, .35);
+    kit(g, "shop_front", -6.2, -4.4); kit(g, "shop_front", 5.6, -4.4, { ry: 0, s: .95 });
+    kit(g, "torii", -3.6, -2.6);
+    const st = G(g, 2.8, 0, -2.6); kit(st, "yatai", 0, 0);
+    plane(st, textTex("ラーメン", { w: 512, h: 128, bg: "#d9432f", fg: "#f7f3ea", size: 72, font: "'Zen Kaku Gothic New', sans-serif" }), 1.6, .4, 0, 2.15, .7); glow3(st, 0, 1.3, .8, 0xffbe6e, 2.2, .35);
     const steam = [0, 1, 2].map(k => glow3(st, 0, 0, 0, 0xffffff, .4, .3)); upd(c.i, t => steam.forEach((s, k) => { const q = (t * .4 + k / 3) % 1; s.position.set(-.3 + k * .3, 1.2 + q * 1.1, .3); s.material.opacity = .3 * (1 - q); s.scale.setScalar(.3 + q * .5); }));
-    const tree = G(g, 6, 0, -4); C3(tree, .14, .2, 1.8, "#3a2a2a", 0, 0, 0, 8); for (const [dx, dy, rr] of [[0, 2.4, 1], [-.8, 2.1, .7], [.8, 2.1, .75], [-.3, 2.9, .6], [.4, 2.9, .6]]) S3(tree, rr, "#f7b6c8", dx, dy, 0, 1, .85, 1);
+    kit(g, "tree_blossom", 6.2, -4, { s: 1 });
     const petalM = mat3("#ffc2d4", { side: THREE.DoubleSide }); const petals = Array.from({ length: 24 }, () => put(g, new THREE.PlaneGeometry(.06, .04), petalM, 0, 0, 0, false));
     upd(c.i, t => petals.forEach((pt, k) => { const q = (t * .12 + k / 24) % 1; pt.position.set(6 - 2.5 + ((k * 1.7) % 5) + Math.sin(t + k) * .4, 3.2 - q * 3.2, -4 + ((k * .7) % 3) - 1); pt.rotation.set(t + k, t * 1.3 + k, 0); }));
-    for (const [x, col] of [[-1.3, "#e8e8f0"], [-.5, "#d9433a"]]) { B3(g, .7, 1.8, .6, col, x, 0, -2.6); plane(g, canvasTex(64, 96, (q) => { q.fillStyle = "#cfe8ff"; q.fillRect(0, 0, 64, 96); for (let a = 0; a < 3; a++) for (let b = 0; b < 4; b++) { q.fillStyle = ["#ff6b6b", "#ffd166", "#06d6a0", "#118ab2"][(a + b) % 4]; q.fillRect(6 + b * 14, 8 + a * 26, 10, 18); } }), .55, .8, x, 1.3, -2.29); glow3(g, x, 1.2, -2.1, 0xc8e6ff, 1.6, .25); }
+    for (const x of [-1.3, -.5]) { kit(g, "vending_machine", x, -2.6, { s: .95 }); glow3(g, x, 1.2, -2.1, 0xc8e6ff, 1.6, .25); }
     const jc = document.createElement("canvas"); jc.width = 320; jc.height = 192; const jt = new THREE.CanvasTexture(jc); jt.encoding = THREE.sRGBEncoding;
     B3(g, 3.6, 2.3, .2, "#0b0b12", .8, 4.6, -6.8); plane(g, jt, 3.3, 2, .8, 5.75, -6.68, { transparent: false }); C3(g, .1, .1, 4.6, "#0b0b12", .8, 0, -6.9, 8);
     upd(c.i, t => { const x = jc.getContext("2d"), gr = x.createLinearGradient(0, 0, 320, 192); gr.addColorStop(0, `hsl(${(t * 40) % 360},80%,60%)`); gr.addColorStop(1, `hsl(${(t * 40 + 120) % 360},80%,50%)`); x.fillStyle = gr; x.fillRect(0, 0, 320, 192); for (let k = 0; k < 9; k++) { const bh = 30 + 70 * Math.abs(Math.sin(t * 5 + k)); x.fillStyle = "rgba(255,255,255,.55)"; x.fillRect(20 + k * 32, 180 - bh, 22, bh); } x.font = "40px 'Dela Gothic One', sans-serif"; x.fillStyle = "#fff"; x.textAlign = "center"; x.fillText("J-POP ♪", 160, 52); jt.needsUpdate = true; });
-    for (const x of [-7, 0.5, 7.5]) { C3(g, .1, .12, 6, "#3a3440", x, 0, -1.6, 8); B3(g, 1.2, .08, .08, "#3a3440", x, 5.6, -1.6); }
-    for (const [a, b] of [[-7, .5], [.5, 7.5]]) { wire(g, new THREE.Vector3(a, 5.6, -1.6), new THREE.Vector3(b, 5.6, -1.6), .5); wire(g, new THREE.Vector3(a, 5.3, -1.6), new THREE.Vector3(b, 5.3, -1.6), .45); }
-    bulbsAlong(g, new THREE.Vector3(-7, 3.4, -2), new THREE.Vector3(.5, 3.4, -2), .5, 10, [0xe0402a], .09).forEach(b => glow3(g, b.position.x, b.position.y, b.position.z, 0xff5a3c, .6, .45));
-    bike(g, -2, .9, "#e8e0d0", -.3); C3(g, .04, .04, 2, "#2a2a30", 4.6, 0, .6, 6); plane(g, textTex("止まれ", { w: 256, h: 160, bg: "#2f6fb0", fg: "#fff", size: 72, font: "'Zen Kaku Gothic New', sans-serif" }), .6, .38, 4.6, 2.1, .62);
+    for (const x of [-7, .5, 7.5]) kit(g, "utility_pole", x, -1.6, { cast: false });
+    for (const [a, b] of [[-7, .5], [.5, 7.5]]) { wire(g, new THREE.Vector3(a, 6.2, -1.6), new THREE.Vector3(b, 6.2, -1.6), .5); wire(g, new THREE.Vector3(a, 5.8, -1.6), new THREE.Vector3(b, 5.8, -1.6), .45); }
+    const lanterns = []; for (let k = 0; k <= 8; k++) { const x = -6.6 + k * .85, y = 3.6 - Math.sin(k / 8 * Math.PI) * .45; lanterns.push(kit(g, "paper_lantern", x, -2, { y: y - .6, s: .7, cast: false })); glow3(g, x, y - .35, -2, 0xff5a3c, .7, .45); }
+    wire(g, new THREE.Vector3(-6.6, 3.6, -2), new THREE.Vector3(.2, 3.6, -2), .45, 0x222228, .008);
+    upd(c.i, t => lanterns.forEach((l, k) => (l.rotation.z = Math.sin(t * 1.4 + k) * .06)));
+    kit(g, "bicycle", -2, .9, { ry: -.3 }); kit(g, "jp_postbox", 4.6, .6); kit(g, "stone_lantern", -4.9, -2.4); kit(g, "stone_lantern", -2.3, -2.4);
+    C3(g, .04, .04, 2, "#2a2a30", 1.4, 0, .7, 6); plane(g, textTex("止まれ", { w: 256, h: 160, bg: "#2f6fb0", fg: "#fff", size: 72, font: "'Zen Kaku Gothic New', sans-serif" }), .6, .38, 1.4, 2.1, .72);
     const cat = G(g, 1.2, 0, -2); S3(cat, .16, "#14121c", 0, .15, 0, 1.4, .8, .9); S3(cat, .1, "#14121c", .2, .3, 0); K3(cat, .035, .08, "#14121c", .17, .4, 0, 4); K3(cat, .035, .08, "#14121c", .24, .4, 0, 4);
   },
   tvroom(g, c) {
     room(g, "tvroom", c.i);
-    rug(g, 0, .4, 1.8, 1.1, "#6a5a8a"); S3(g, .55, "#e0a34a", 3.6, .35, -1.4, 1.3, .7, 1.1);
-    table(g, -1.6, -.4, .9, .35, "#3a2a20"); B3(g, .45, .04, .45, "#e0a34a", -1.6, .4, -.4); B3(g, .22, .04, .14, "#2b2838", -1.4, .41, -.3);
-    floorLamp(g, 4.5, -2.2, 0xffd2a0); pot(g, -4.2, -2.2, 1.5); S3(g, .14, "#f2a6c8", 1.6, .06, .9, 1.4, .4, .8); S3(g, .14, "#f2a6c8", 1.9, .06, .95, 1.4, .4, .8);
+    kit(g, "rug_rect", 0, .4, { s: 1.1 }); kit(g, "beanbag", 3.6, -1.4, { ry: -.6 });
+    kit(g, "coffee_table", -1.6, -.4); B3(g, .45, .04, .45, "#e0a34a", -1.6, .42, -.4);
+    kit(g, "floor_lamp", 4.5, -2.2); glow3(g, 4.5, 1.5, -2.2, 0xffd2a0, 1.6, .5); kit(g, "plant_monstera", -4.2, -2.2, { s: 1.2 });
+    kit(g, "cushion_floor", 1.6, .9, { ry: .3 }); kit(g, "cushion_floor", 2.2, 1.1, { ry: 1.2, s: .85 });
+    kit(g, "sofa", -3.2, -2.1, { s: .9 }); kit(g, "cat_bed", 3.3, -.3, { ry: -.8, s: .9 }); kit(g, "plant_hanging", -1.4, -2.5, { y: 1.6 });
     const tvGlow = glow3(g, 1.6, 1.8, -2.4, 0xffaac0, 3.5, .25); upd(c.i, t => tvGlow.material.opacity = .2 + .08 * Math.sin(t * 3));
   },
   books(g, c) {
     room(g, "books", c.i);
-    armchair(g, -2.6, -1.4, "#7a3a2a", .5); floorLamp(g, -3.6, -1.8, 0xffd27a);
-    for (let k = 0; k < 6; k++) B3(g, .45 - (k % 2) * .05, .1, .32, ["#a8423a", "#3e6a8a", "#c99a3c", "#4f7a4a"][k % 4], 2.2 + (k % 2) * .03, k * .1, -1.6).rotation.y = (k - 3) * .08;
-    const gl = G(g, 3.4, 0, -1.9); C3(gl, .03, .03, .9, "#8a5f3c", 0, 0, 0, 6); const globe = S3(gl, .22, "#3e6a8a", 0, 1.1, 0, 1, 1, 1, 2); upd(c.i, t => globe.rotation.y = t * .5);
-    const lad = G(g, -1, 0, -2.5); lad.rotation.x = -.2; for (const s of [-.25, .25]) B3(lad, .05, 3.6, .05, "#8a5f3c", s, 0, 0); for (let k = 1; k < 10; k++) B3(lad, .5, .04, .04, "#8a5f3c", 0, k * .36, 0);
-    table(g, 4.4, -.8, .6, .5, "#5a3d2a"); S3(g, .1, "#e8e0d0", 4.4, .62, -.8, 1.2, .9, 1);
+    kit(g, "armchair", -2.6, -1.4, { ry: .5 }); kit(g, "floor_lamp", -3.6, -1.8); glow3(g, -3.6, 1.5, -1.8, 0xffd27a, 1.6, .55);
+    kit(g, "book_stack", 2.2, -1.6, { ry: .2 }); kit(g, "book_stack", 2.6, -1.4, { ry: -.6, s: .8 });
+    const globe = kit(g, "globe_stand", 3.4, -1.9); upd(c.i, t => globe.rotation.y = Math.sin(t * .3) * .6);
+    kit(g, "library_ladder", -1, -2.45, { ry: 0 }); kit(g, "bookshelf_tall", -4.2, -2.5); kit(g, "bookshelf_tall", 4.3, -2.5, { ry: 0 });
+    kit(g, "side_table", 4.4, -.8); kit(g, "plant_snake", 1.4, -2.4); kit(g, "rug_round", -.4, .2, { s: [1.2, 1, .9] }); kit(g, "cat_bed", -3.4, -.4, { ry: .7, s: .8 });
   },
   coast(g, c) {
     seaPlane(g, c.night); ridge3(g, -80, 10, "#6b4a78", 12);
-    const r = mulberry32(31); for (let x = -L3 / 2; x < L3 / 2;) { const w = 1.8 + r() * 1.4, h = 2 + r() * 2.2; if (x > -4.5 && x < 8) { x += 1; continue; } const hs = G(g, x + w / 2, 0, -5.5 - r() * 1.5); B3(hs, w, h, 2, ["#d4bc94", "#c9b08a", "#e0caa0"][Math.floor(r() * 3)], 0, 0, 0); B3(hs, .9, .7, .4, r() > .5 ? "#2f7a4a" : "#2f5f8a", 0, h * .55, 1.1); B3(hs, .5, .6, .05, "#2f5f8a", -w * .3, .2, 1.01); x += w + .15; }
-    const lh = G(g, 6.4, 0, -9); C3(lh, .45, .7, 5, "#e8e0d0", 0, 0, 0, 14); C3(lh, .62, .66, .5, "#c8443a", 0, 1.2, 0, 14); C3(lh, .52, .56, .5, "#c8443a", 0, 3.2, 0, 14); C3(lh, .55, .55, .7, "#2a2a35", 0, 5, 0, 10); bulb(lh, 0, 5.4, 0, 0xfff0b4, .3); glow3(lh, 0, 5.4, 0, 0xfff0b4, 2.4, .8);
-    const beam = put(lh, new THREE.ConeGeometry(1.2, 14, 16, 1, true).rotateZ(Math.PI / 2).translate(7, 0, 0), new THREE.MeshBasicMaterial({ color: 0xfff0b4, transparent: true, opacity: .12, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide }), 0, 5.4, 0, false);
+    const r = mulberry32(31); for (let x = -L3 / 2; x < L3 / 2;) { const w = 3.6; if (x > -4.5 && x < 8) { x += 1; continue; } kit(g, r() > .5 ? "maltese_house" : "maltese_house_b", x + w / 2, -5.8 - r() * 1.2, { s: .7 + r() * .15, cast: false }); x += w * .8; }
+    const lh = G(g, 6.4, 0, -9); kit(lh, "lighthouse", 0, 0, { cast: false }); const lampY = 6.4; glow3(lh, 0, lampY, 0, 0xfff0b4, 2.4, .8);
+    const beam = put(lh, new THREE.ConeGeometry(1.2, 14, 16, 1, true).rotateZ(Math.PI / 2).translate(7, 0, 0), new THREE.MeshBasicMaterial({ color: 0xfff0b4, transparent: true, opacity: .12, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide }), 0, lampY, 0, false);
     upd(c.i, t => beam.rotation.y = t * .8);
-    const boats = [[-2, -11, "#2a6fd0"], [2.5, -16, "#d9433a"], [-6, -20, "#f2c14e"], [4.5, -9, "#2a6fd0"]].map(([x, z, col]) => { const b = G(g, x, 0, z); B3(b, 2.2, .45, .8, col, 0, 0, 0); B3(b, 2.2, .1, .82, "#f2c14e", 0, .35, 0); B3(b, 2.2, .08, .82, "#d9433a", 0, .2, 0); K3(b, .2, .6, col, 1.15, .1, 0, 4).rotation.z = -1.2; C3(b, .03, .03, 1.2, "#3a2a1a", 0, .4, 0, 5); return b; });
-    upd(c.i, t => boats.forEach((b, k) => { b.position.y = Math.sin(t * 1.5 + k) * .06; b.rotation.z = Math.sin(t + k) * .04; }));
-    for (const [x, z, s] of [[-5.5, -2.2, 1], [-4.6, -2.6, .7], [3.4, -2.4, .8]]) S3(g, .6 * s, "#b39a76", x, .2, z, 1.4, .7, 1);
-    C3(g, .03, .03, 2, "#e8e0d0", -3, 0, 1, 6); const um = put(g, new THREE.ConeGeometry(1.1, .45, 10), mat3("#e0484a", { side: THREE.DoubleSide }), -3, 2.1, 1);
-    const dc = G(g, -2, 0, 1.4); dc.rotation.y = .4; B3(dc, .6, .05, 1.1, "#2f6fb0", 0, .3, 0).rotation.x = .25; for (const s of [-.28, .28]) B3(dc, .04, .3, 1, "#8a5a3a", s, 0, 0);
+    const boats = [[-2, -11, "luzzu"], [2.5, -16, "sailboat"], [-6, -20, "luzzu"], [4.5, -9, "luzzu"]].map(([x, z, n], k) => { const b = kit(g, n, x, z, { ry: k % 2 ? Math.PI : 0, cast: false }); b.userData.y0 = n === "sailboat" ? -.45 : -.15; return b; });
+    upd(c.i, t => boats.forEach((b, k) => { b.position.y = b.userData.y0 + Math.sin(t * 1.5 + k) * .06; b.rotation.z = Math.sin(t + k) * .04; }));
+    kit(g, "rock_a", -5.5, -2.2, { s: 1.1 }); kit(g, "rock_b", -4.6, -2.6, { s: 1.2 }); kit(g, "rocks_small", 3.4, -2.4);
+    kit(g, "parasol_beach", -3, 1, { ry: .3 }); kit(g, "deck_chair", -2, 1.4, { ry: .4 }); kit(g, "deck_chair", -4.1, 1.2, { ry: -.3 });
+    kit(g, "pier", 1.2, -7.4, { ry: Math.PI / 2, y: -.62, cast: false }); kit(g, "lifebuoy", 4.8, -3.4, { ry: -.3 }); kit(g, "dock_bollard", 3.6, -4.6); kit(g, "dock_bollard", -1.4, -4.8);
+    kit(g, "palm_b", -6.8, -1.2, { s: .9 }); kit(g, "seagull", 1.8, 1.2, { ry: 2 });
+    const gulls = [0, 1].map(k => kit(g, "seagull_flying", 0, -6, { y: 5, cast: false }));
+    upd(c.i, t => gulls.forEach((s, k) => { const a = t * .25 + k * 3; s.position.set(Math.cos(a) * 5, 4.5 + k + Math.sin(t * 2 + k) * .2, -7 + Math.sin(a) * 2); s.rotation.y = -a - Math.PI / 2; }));
     S3(g, .08, "#e8a0b0", 1.8, .03, 1.2, 1, .5, 1); S3(g, .06, "#f2c14e", 2.1, .03, 1.4, 1, .5, 1);
   },
   sea(g, c) {
     seaPlane(g, c.night); ridge3(g, -90, 8, "#1f2a52", 14);
     const r = mulberry32(41); for (let x = -L3 / 2; x < L3 / 2;) { const w = 1.8 + r() * 1.6; if (x > 2 && x < 6.5) { x += 1; continue; } building(g, x + w / 2, -26 - r() * 4, w * 1.4, 3 + r() * 4, 3, ["#3c3a5a", "#57536e", "#4a4766"][Math.floor(r() * 3)], .9, 0xffce78); x += w + .15; }
-    const ch = G(g, 4, 0, -24); B3(ch, 3, 3.2, 3, "#2a2f52", 0, 0, 0); const dome = put(ch, new THREE.SphereGeometry(1.3, 16, 10, 0, TAU, 0, Math.PI / 2), "#323a66", 0, 3.2, 0); C3(ch, .3, .3, .8, "#2a2f52", 0, 4.4, 0, 8); C3(ch, .04, .04, .6, "#d9b35a", 0, 5.2, 0, 4);
-    for (const s of [-1.8, 1.8]) { B3(ch, .9, 4.5, .9, "#2a2f52", s, 0, .8); K3(ch, .65, 1, "#2a2f52", s, 4.5, .8, 4).rotation.y = Math.PI / 4; bulb(ch, s, 3.8, 1.26, 0xffce78, .12); }
-    for (let k = -1; k <= 1; k++) bulb(ch, k * .6, 1.6, 1.52, 0xffce78, .14); glow3(ch, 0, 3, 1.6, 0xffce78, 4, .2);
-    const boats = [[-6, -10], [-1, -14], [9, -9]].map(([x, z]) => { const b = G(g, x, 0, z); B3(b, 1.6, .35, .6, "#2a3050", 0, 0, 0); C3(b, .02, .02, 1.1, "#3a3a4a", 0, .35, 0, 4); bulb(b, 0, 1.45, 0, 0xffd27a, .07); glow3(b, 0, 1.45, 0, 0xffc878, 1.2, .8); return b; });
+    kit(g, "church_dome", 4, -24, { cast: false }); glow3(g, 4, 3, -22, 0xffce78, 5, .2);
+    const boats = [[-6, -10], [-1, -14], [9, -9]].map(([x, z], k) => { const b = G(g, x, 0, z); kit(b, "luzzu", 0, 0, { y: -.15, ry: k * 2, cast: false }); bulb(b, 0, 1.45, 0, 0xffd27a, .07); glow3(b, 0, 1.45, 0, 0xffc878, 1.2, .8); return b; });
     upd(c.i, t => boats.forEach((b, k) => { b.position.y = Math.sin(t * 1.2 + k) * .05; }));
     B3(g, L3 + 2, .08, 4, "#4a4a5e", 0, 0, -1.4); for (let x = -7; x <= 7; x += 1) C3(g, .03, .03, .9, "#2a2d3a", x, 0, -3.3, 6); B3(g, L3, .05, .05, "#2a2d3a", 0, .9, -3.3);
-    for (const x of [-4, 1.8]) { C3(g, .14, .17, .5, "#2a2d3a", x, 0, -2.6, 10); } lampPost(g, -6.5, -2.8, 3, 0xffce78, 1, 2); lampPost(g, 6.5, -2.8, 3, 0xffce78, 1, 2);
+    for (const x of [-4, 1.8]) kit(g, "dock_bollard", x, -2.7); kit(g, "bench_city", -2.2, -2.6); kit(g, "bench_city", 4.6, -2.6);
+    for (const x of [-6.5, 6.5]) { kit(g, "lamp_classic", x, -2.8); glow3(g, x, 3.05, -2.8, 0xffce78, 2, .8); }
+    kit(g, "lifebuoy", 3.2, -3.1); kit(g, "trash_bin", -5.4, -2.7, { s: .9 }); kit(g, "planter", 0, -2.8, { s: .9 });
   },
   rooftop(g, c) {
     seaPlane(g, c.night);
-    const r = mulberry32(51); for (let x = -L3 / 2 - 6; x < L3 / 2 + 6;) { const w = 3 + r() * 4; building(g, x + w / 2, -32 - r() * 10, w, 4 + r() * 8, 4, "#262a48", 1, 0xffce78); x += w + 1; }
+    const r = mulberry32(51); for (let x = -L3 / 2 - 6; x < L3 / 2 + 6;) { const w = 3 + r() * 4, h = 4 + r() * 8; building(g, x + w / 2, -32 - r() * 10, w, h, 4, "#262a48", 1, 0xffce78); x += w + 1; }
     B3(g, L3 + 2, .3, 6, "#3a3a50", 0, -.3, -.5); for (let x = -7; x <= 7; x += .8) B3(g, .05, 1, .05, "#2a2d3a", x, 0, -3.2); B3(g, L3, .06, .08, "#2a2d3a", 0, 1, -3.2);
-    for (const x of [-6, 0, 6]) C3(g, .04, .04, 3.2, "#2a2d3a", x, 0, -2.8, 6);
+    for (const x of [-6, 0, 6]) kit(g, "string_pole", x, -2.8, { cast: false });
     bulbsAlong(g, new THREE.Vector3(-6, 3.1, -2.8), new THREE.Vector3(0, 3.1, -2.8), .7, 12, [0xffd27a, 0xffb4c8, 0xfff0b4]);
     bulbsAlong(g, new THREE.Vector3(0, 3.1, -2.8), new THREE.Vector3(6, 3.1, -2.8), .7, 12, [0xffd27a, 0xffb4c8, 0xfff0b4]);
     const tri = new THREE.Shape(); tri.moveTo(-.12, 0); tri.lineTo(.12, 0); tri.lineTo(0, -.26); tri.closePath(); const triG = new THREE.ShapeGeometry(tri);
-    for (const [a, b] of [[-6, 0], [0, 6]]) { const A = new THREE.Vector3(a, 2.7, -2.6), Bv = new THREE.Vector3(b, 2.7, -2.6), M2 = A.clone().lerp(Bv, .5); M2.y -= .5; const cu = new THREE.QuadraticBezierCurve3(A, M2, Bv); wire(g, A, Bv, .5, 0x444444, .006); for (let k = 0; k < 14; k++) { const q = cu.getPoint(k / 13); const f = put(g, triG, mat3(["#e0484a", "#f7f3ea", "#f2c14e", "#2f6fb0"][k % 4], { basic: true, side: THREE.DoubleSide }), q.x, q.y, q.z, false); } }
-    table(g, 3, -1.4, .7, .7, "#3a2a20"); for (const [dx, col] of [[-.15, 0xff8cc8], [0, 0xffd27a], [.15, 0x8ce6ff]]) C3(g, .035, .03, .15, mat3(col, { basic: true, transparent: true, opacity: .85 }), 3 + dx, .75, -1.4, 10);
-    pot(g, -4, -2.2, 1.6); pot(g, 4.6, -2.3, 1.3); const chr = G(g, -2.6, 0, -1.6); B3(chr, .45, .05, .45, "#3a2a20", 0, .45, 0); B3(chr, .45, .5, .05, "#3a2a20", 0, .5, -.2); for (const [dx, dz] of [[-.2, -.2], [.2, -.2], [-.2, .2], [.2, .2]]) B3(chr, .04, .45, .04, "#3a2a20", dx, 0, dz);
-    C3(g, .7, .7, 1.4, "#5a4a3a", -6, 0, -2.2, 12); K3(g, .75, .5, "#4a3a2a", -6, 1.4, -2.2, 12);
+    for (const [a, b] of [[-6, 0], [0, 6]]) { const A = new THREE.Vector3(a, 2.7, -2.6), Bv = new THREE.Vector3(b, 2.7, -2.6), M2 = A.clone().lerp(Bv, .5); M2.y -= .5; const cu = new THREE.QuadraticBezierCurve3(A, M2, Bv); wire(g, A, Bv, .5, 0x444444, .006); for (let k = 0; k < 14; k++) { const q = cu.getPoint(k / 13); put(g, triG, mat3(["#e0484a", "#f7f3ea", "#f2c14e", "#2f6fb0"][k % 4], { basic: true, side: THREE.DoubleSide }), q.x, q.y, q.z, false); } }
+    kit(g, "cocktail_table", 3, -1.4); for (const [dx, col] of [[-.15, 0xff8cc8], [0, 0xffd27a], [.15, 0x8ce6ff]]) C3(g, .035, .03, .15, mat3(col, { basic: true, transparent: true, opacity: .85 }), 3 + dx, 1.07, -1.4, 10);
+    kit(g, "plant_monstera", -4, -2.2, { s: 1.3 }); kit(g, "plant_monstera", 4.6, -2.3, { s: 1.1, ry: 2 }); kit(g, "deck_chair", -2.6, -1.6, { ry: .3 }); kit(g, "bar_stool", 3.6, -1.2);
+    kit(g, "rooftop_tank", -6.2, -2.2, { cast: false }); kit(g, "ac_unit", 6.4, -2.2, { ry: -.3 }); kit(g, "antenna", -5, -2.6); kit(g, "satellite_dish", 5.4, -2.7, { ry: .6 }); kit(g, "chimney", 2, -2.8);
+    kit(g, "speaker_tall", 1.1, -2.4, { s: .8, ry: -.2 });
   },
 };
 
@@ -1666,13 +1444,10 @@ const fill = new THREE.DirectionalLight(0xc8d6ff, .55);
 const rim = new THREE.DirectionalLight(0xffffff, 1.4);
 stage3.add(hemi, key, key.target, fill, rim);
 window.filmLoad && window.filmLoad(.65);
-const EMMA = buildEmma();
 const RIG = new THREE.Group(); stage3.add(RIG);
 RIG.add(EMMA.root);
-const PROPS = buildProps(EMMA);
-RIG.add(PROPS.world);
+let PROPS = null;
 stage3.fog = new THREE.Fog(0xffffff, 22, 130);
-EMMA.root.traverse(o => { if (o.isMesh && (o.material.transparent || o.material.isMeshBasicMaterial)) o.castShadow = false; });
 
 // key and rim light per scene: warm dawn, white noon, lamp-lit studio, gold hour, sunset, neon magenta + cyan, bookshop amber, dusk, moonlight
 // key and rim light per scene
@@ -1868,4 +1643,9 @@ async function rehearse() {
   for (const [k, o] of Object.entries(PROPS.all)) { o.visible = false; PROPS.amt[k] = 0; }
   RIG.position.set(0, 0, 0);
 }
-buildWorld3D(stage3).then(rehearse).then(() => requestAnimationFrame(frame));
+// load Emma and the prop kit together, build the world from the kit, then rehearse
+const emmaReady = loadEmma(EMMA).then(() => window.filmLoad && window.filmLoad(.6, "Waking Emma up"));
+loadKit().then(() => buildWorld3D(stage3)).then(() => emmaReady).then(() => {
+  PROPS = buildProps(EMMA); RIG.add(PROPS.world);
+  RIG.traverse(o => { if (o.isMesh && (o.material.transparent || o.material.isMeshBasicMaterial)) o.castShadow = false; });
+}).then(rehearse).then(() => requestAnimationFrame(frame)).catch(e => { console.error(e); window.filmFail && window.filmFail(); });
